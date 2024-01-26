@@ -1,0 +1,578 @@
+    Day 3
+        Variables and Constants
+            What Is a Variable?
+                Figure 3.1. 
+            Setting Aside Memory
+                Size of Integers 
+            Listing 3.1. Determining the size of variable types
+            on your computer.
+                signed and unsigned
+                Fundamental Variable Types 
+            Defining a Variable
+                Case Sensitivity
+                Keywords 
+            Creating More Than One Variable at a Time
+            Assigning Values to Your Variables
+            Listing 3.2. A demonstration of the use of variables.
+            typedef
+            Listing 3.3. A demonstration of typedef.
+            When to Use short and When to Use long
+                Wrapping Around an unsigned Integer 
+            Listing 3.4.
+            A demonstration of putting too large a value in an unsigned integer.
+                Wrapping Around a signed Integer 
+            Listing 3.5.
+            A demonstration of adding too large a number to a signed integer.
+            Characters
+                Characters and Numbers 
+            Listing 3.6. Printing characters based on numbers.
+                Special Printing Characters 
+            Constants
+                Literal Constants
+                Symbolic Constants 
+            Enumerated Constants
+            Listing 3.7. A demonstration of enumerated constants
+            .
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 3
+Variables and Constants
+
+Programs need a way to store the data they use. Variables and constants offer various ways to represent and manipulate that data.
+
+Today you will learn
+
+    How to declare and define variables and constants.
+
+    How to assign values to variables and manipulate those values.
+
+    How to write the value of a variable to the screen. 
+
+What Is a Variable?
+
+In C++ a variable is a place to store information. A variable is a location in your computer's memory in which you can store a value and from which you can later retrieve that value.
+
+Your computer's memory can be viewed as a series of cubbyholes. Each cubbyhole is one of many, many such holes all lined up. Each cubbyhole--or memory location--is numbered sequentially. These numbers are known as memory addresses. A variable reserves one or more cubbyholes in which you may store a value.
+
+Your variable's name (for example, myVariable) is a label on one of these cubbyholes, so that you can find it easily without knowing its actual memory address. Figure 3.1 is a schematic representation of this idea. As you can see from the figure, myVariable starts at memory address 103. Depending on the size of myVariable, it can take up one or more memory addresses.
+
+Figure 3.1. A schematic representation of memory.
+
+    NOTE: RAM is random access memory. When you run your program, it is loaded into RAM from the disk file. All variables are also created in RAM. When programmers talk of memory, it is usually RAM to which they are referring. 
+
+Setting Aside Memory
+
+When you define a variable in C++, you must tell the compiler what kind of variable it is: an integer, a character, and so forth. This information tells the compiler how much room to set aside and what kind of value you want to store in your variable.
+
+Each cubbyhole is one byte large. If the type of variable you create is two bytes in size, it needs two bytes of memory, or two cubbyholes. The type of the variable (for example, integer) tells the compiler how much memory (how many cubbyholes) to set aside for the variable.
+
+Because computers use bits and bytes to represent values, and because memory is measured in bytes, it is important that you understand and are comfortable with these concepts. For a full review of this topic, please read Appendix B, "C++ Keywords."
+Size of Integers
+
+On any one computer, each variable type takes up a single, unchanging amount of room. That is, an integer might be two bytes on one machine, and four on another, but on either computer it is always the same, day in and day out.
+
+A char variable (used to hold characters) is most often one byte long. A short integer is two bytes on most computers, a long integer is usually four bytes, and an integer (without the keyword short or long) can be two or four bytes. Listing 3.1 should help you determine the exact size of these types on your computer.
+
+    New Term: A character is a single letter, number, or symbol that takes up one byte of memory. 
+
+Listing 3.1. Determining the size of variable types on your computer.
+
+1:   #include <iostream.h>
+2:
+3:   int main()
+4:   {
+5:     cout << "The size of an int is:\t\t"    << sizeof(int)    << " bytes.\n";
+6:     cout << "The size of a short int is:\t" << sizeof(short)  << " bytes.\n";
+7:     cout << "The size of a long int is:\t"  << sizeof(long)   << " bytes.\n";
+8:     cout << "The size of a char is:\t\t"    << sizeof(char)   << " bytes.\n";
+9:     cout << "The size of a float is:\t\t"   << sizeof(float)  << " bytes.\n";
+10:    cout << "The size of a double is:\t"    << sizeof(double) << " bytes.\n";
+11:
+12:        return 0;
+13: }
+Output: The size of an int is:          2 bytes.
+The size of a short int is:     2 bytes.
+The size of a long int is:      4 bytes.
+The size of a char is:          1 bytes.
+The size of a float is:         4 bytes.
+The size of a double is:        8 bytes.
+
+    NOTE: On your computer, the number of bytes presented might be different. 
+
+    Analysis: Most of Listing 3.1 should be pretty familiar. The one new feature is the use of the sizeof() function in lines 5 through 10. sizeof() is provided by your compiler, and it tells you the size of the object you pass in as a parameter. For example, on line 5 the keyword int is passed into sizeof(). Using sizeof(), I was able to determine that on my computer an int is equal to a short int, which is 2 bytes. 
+
+signed and unsigned
+
+In addition, all integer types come in two varieties: signed and unsigned. The idea here is that sometimes you need negative numbers, and sometimes you don't. Integers (short and long) without the word "unsigned" are assumed to be signed. Signed integers are either negative or positive. Unsigned integers are always positive.
+
+Because you have the same number of bytes for both signed and unsigned integers, the largest number you can store in an unsigned integer is twice as big as the largest positive number you can store in a signed integer. An unsigned short integer can handle numbers from 0 to 65,535. Half the numbers represented by a signed short are negative, thus a signed short can only represent numbers from -32,768 to 32,767. If this is confusing, be sure to read Appendix A, "Operator Precedence."
+Fundamental Variable Types
+
+Several other variable types are built into C++. They can be conveniently divided into integer variables (the type discussed so far), floating-point variables, and character variables.
+
+Floating-point variables have values that can be expressed as fractions--that is, they are real numbers. Character variables hold a single byte and are used for holding the 256 characters and symbols of the ASCII and extended ASCII character sets.
+
+    New Term: The ASCII character set is the set of characters standardized for use on computers. ASCII is an acronym for American Standard Code for Information Interchange. Nearly every computer operating system supports ASCII, though many support other international character sets as well. 
+
+The types of variables used in C++ programs are described in Table 3.1. This table shows the variable type, how much room this book assumes it takes in memory, and what kinds of values can be stored in these variables. The values that can be stored are determined by the size of the variable types, so check your output from Listing 3.1.
+
+Table 3.1. Variable Types.
+Type 	Size 	Values
+unsigned short int 	2 bytes 	0 to 65,535
+short int 	2 bytes 	-32,768 to 32,767
+unsigned long int 	4 bytes 	0 to 4,294,967,295
+long int 	4 bytes 	-2,147,483,648 to 2,147,483,647
+int (16 bit) 	2 bytes 	-32,768 to 32,767
+int (32 bit) 	4 bytes 	-2,147,483,648 to 2,147,483,647
+unsigned int (16 bit) 	2 bytes 	0 to 65,535
+unsigned int (32 bit) 	2 bytes 	0 to 4,294,967,295
+char 	1 byte 	256 character values
+float 	4 bytes 	1.2e-38 to 3.4e38
+double 	8 bytes 	2.2e-308 to 1.8e308
+
+    NOTE: The sizes of variables might be different from those shown in Table 3.1, depending on the compiler and the computer you are using. If your computer had the same output as was presented in Listing 3.1, Table 3.1 should apply to your compiler. If your output from Listing 3.1 was different, you should consult your compiler's manual for the values that your variable types can hold. 
+
+Defining a Variable
+
+You create or define a variable by stating its type, followed by one or more spaces, followed by the variable name and a semicolon. The variable name can be virtually any combination of letters, but cannot contain spaces. Legal variable names include x, J23qrsnf, and myAge. Good variable names tell you what the variables are for; using good names makes it easier to understand the flow of your program. The following statement defines an integer variable called myAge:
+
+int myAge;
+
+As a general programming practice, avoid such horrific names as J23qrsnf, and restrict single-letter variable names (such as x or i) to variables that are used only very briefly. Try to use expressive names such as myAge or howMany. Such names are easier to understand three weeks later when you are scratching your head trying to figure out what you meant when you wrote that line of code.
+
+Try this experiment: Guess what these pieces of programs do, based on the first few lines of code:
+
+Example 1
+
+main()
+{
+     unsigned short x;
+     unsigned short y;
+     ULONG z;
+     z = x * y;
+}
+
+Example 2
+
+main ()
+{
+     unsigned short Width;
+     unsigned short Length;
+     unsigned short Area;
+     Area = Width * Length;
+}
+
+Clearly, the second program is easier to understand, and the inconvenience of having to type the longer variable names is more than made up for by how much easier it is to maintain the second program.
+Case Sensitivity
+
+C++ is case-sensitive. In other words, uppercase and lowercase letters are considered to be different. A variable named age is different from Age, which is different from AGE.
+
+    NOTE: Some compilers allow you to turn case sensitivity off. Don't be tempted to do this; your programs won't work with other compilers, and other C++ programmers will be very confused by your code. 
+
+There are various conventions for how to name variables, and although it doesn't much matter which method you adopt, it is important to be consistent throughout your program.
+
+Many programmers prefer to use all lowercase letters for their variable names. If the name requires two words (for example, my car), there are two popular conventions: my_car or myCar. The latter form is called camel-notation, because the capitalization looks something like a camel's hump.
+
+Some people find the underscore character (my_car) to be easier to read, while others prefer to avoid the underscore, because it is more difficult to type. This book uses camel-notation, in which the second and all subsequent words are capitalized: myCar, theQuickBrownFox, and so forth.
+
+    NOTE: Many advanced programmers employ a notation style that is often referred to as Hungarian notation. The idea behind Hungarian notation is to prefix every variable with a set of characters that describes its type. Integer variables might begin with a lowercase letter i, longs might begin with a lowercase l. Other notations indicate constants, globals, pointers, and so forth. Most of this is much more important in C programming, because C++ supports the creation of user-defined types (see Day 6, "Basic Classes") and because C++ is strongly typed. 
+
+Keywords
+
+Some words are reserved by C++, and you may not use them as variable names. These are keywords used by the compiler to control your program. Keywords include if, while, for, and main. Your compiler manual should provide a complete list, but generally, any reasonable name for a variable is almost certainly not a keyword.
+
+    DO define a variable by writing the type, then the variable name. DO use meaningful variable names. DO remember that C++ is case sensitive. DON'T use C++ keywords as variable names. DO understand the number of bytes each variable type consumes in memory, and what values can be stored in variables of that type. DON'T use unsigned variables for negative numbers. 
+
+Creating More Than One Variable at a Time
+
+You can create more than one variable of the same type in one statement by writing the type and then the variable names, separated by commas. For example:
+
+unsigned int myAge, myWeight;   // two unsigned int variables
+long area, width, length;       // three longs
+
+As you can see, myAge and myWeight are each declared as unsigned integer variables. The second line declares three individual long variables named area, width, and length. The type (long) is assigned to all the variables, so you cannot mix types in one definition statement.
+Assigning Values to Your Variables
+
+You assign a value to a variable by using the assignment operator (=). Thus, you would assign 5 to Width by writing
+
+unsigned short Width;
+Width = 5;
+
+You can combine these steps and initialize Width when you define it by writing
+
+unsigned short Width = 5;
+
+Initialization looks very much like assignment, and with integer variables, the difference is minor. Later, when constants are covered, you will see that some values must be initialized because they cannot be assigned to. The essential difference is that initialization takes place at the moment you create the variable.
+
+Just as you can define more than one variable at a time, you can initialize more than one variable at creation. For example:
+
+// create two long variables and initialize them
+Âlong width = 5, length = 7;  
+
+This example initializes the long integer variable width to the value 5 and the long integer variable length to the value 7. You can even mix definitions and initializations:
+
+int myAge = 39, yourAge, hisAge = 40;
+
+This example creates three type int variables, and it initializes the first and third.
+
+Listing 3.2 shows a complete program, ready to compile, that computes the area of a rectangle and writes the answer to the screen.
+
+Listing 3.2. A demonstration of the use of variables.
+
+1:   // Demonstration of variables
+2:   #include <iostream.h>
+3:
+4:   int main()
+5:   {
+6:     unsigned short int Width = 5, Length;
+7:     Length = 10;
+8:
+9:     // create  an unsigned short and initialize with result
+10:       // of multiplying Width by Length
+11:     unsigned short int Area  = Width * Length;
+12:
+13:     cout << "Width:" << Width << "\n";
+14:     cout << "Length: "  << Length << endl;
+15:     cout << "Area: " << Area << endl;
+16:        return 0;
+17: }
+
+Output: Width:5
+Length: 10
+Area: 50
+
+Analysis: Line 2 includes the required include statement for the iostream's library so that cout will work. Line 4 begins the program.
+
+On line 6, Width is defined as an unsigned short integer, and its value is initialized to 5. Another unsigned short integer, Length, is also defined, but it is not initialized. On line 7, the value 10 is assigned to Length.
+
+On line 11, an unsigned short integer, Area, is defined, and it is initialized with the value obtained by multiplying Width times Length. On lines 13-15, the values of the variables are printed to the screen. Note that the special word endl creates a new line.
+typedef
+
+It can become tedious, repetitious, and, most important, error-prone to keep writing unsigned short int. C++ enables you to create an alias for this phrase by using the keyword typedef, which stands for type definition.
+
+In effect, you are creating a synonym, and it is important to distinguish this from creating a new type (which you will do on Day 6). typedef is used by writing the keyword typedef, followed by the existing type and then the new name. For example
+
+typedef unsigned short int USHORT
+
+creates the new name USHORT that you can use anywhere you might have written unsigned short int. Listing 3.3 is a replay of Listing 3.2, using the type definition USHORT rather than unsigned short int.
+
+Listing 3.3. A demonstration of typedef.
+
+1:   // *****************
+2:   // Demonstrates typedef keyword
+3:   #include <iostream.h>
+4:
+5:   typedef unsigned short int USHORT;       //typedef defined
+6:
+7:   void main()
+8:   {
+9:     USHORT  Width = 5;
+10:    USHORT Length;
+11:    Length = 10;
+12:    USHORT Area  = Width * Length;
+13:    cout << "Width:" << Width << "\n";
+14:    cout << "Length: "  << Length << endl;
+15:    cout << "Area: " << Area <<endl;
+16: }
+Output: Width:5
+Length: 10
+Area: 50
+
+Analysis: On line 5, USHORT is typedefined as a synonym for unsigned short int. The program is very much like Listing 3.2, and the output is the same.
+When to Use short and When to Use long
+
+One source of confusion for new C++ programmers is when to declare a variable to be type long and when to declare it to be type short. The rule, when understood, is fairly straightforward: If there is any chance that the value you'll want to put into your variable will be too big for its type, use a larger type.
+
+As seen in Table 3.1, unsigned short integers, assuming that they are two bytes, can hold a value only up to 65,535. Signed short integers can hold only half that. Although unsigned long integers can hold an extremely large number (4,294,967,295) that is still quite finite. If you need a larger number, you'll have to go to float or double, and then you lose some precision. Floats and doubles can hold extremely large numbers, but only the first 7 or 19 digits are significant on most computers. That means that the number is rounded off after that many digits.
+Wrapping Around an unsigned Integer
+
+The fact that unsigned long integers have a limit to the values they can hold is only rarely a problem, but what happens if you do run out of room?
+
+When an unsigned integer reaches its maximum value, it wraps around and starts over, much as a car odometer might. Listing 3.4 shows what happens if you try to put too large a value into a short integer.
+
+Listing 3.4.A demonstration of putting too large a value in an unsigned integer.
+
+1: #include <iostream.h>
+2:  int main()
+3:  {
+4:     unsigned short int smallNumber;
+5:     smallNumber = 65535;
+6:     cout << "small number:" << smallNumber << endl;
+7:     smallNumber++;
+8:     cout << "small number:" << smallNumber << endl;
+9:     smallNumber++;
+10:    cout << "small number:" << smallNumber << endl;
+11:        return 0;
+12: }
+Output: small number:65535
+small number:0
+small number:1
+
+Analysis: On line 4, smallNumber is declared to be an unsigned short int, which on my computer is a two-byte variable, able to hold a value between 0 and 65,535. On line 5, the maximum value is assigned to smallNumber, and it is printed on line 6.
+
+On line 7, smallNumber is incremented; that is, 1 is added to it. The symbol for incrementing is ++ (as in the name C++--an incremental increase from C). Thus, the value in smallNumber would be 65,536. However, unsigned short integers can't hold a number larger than 65,535, so the value is wrapped around to 0, which is printed on line 8.
+
+On line 9 smallNumber is incremented again, and then its new value, 1, is printed.
+Wrapping Around a signed Integer
+
+A signed integer is different from an unsigned integer, in that half of the values you can represent are negative. Instead of picturing a traditional car odometer, you might picture one that rotates up for positive numbers and down for negative numbers. One mile from 0 is either 1 or -1. When you run out of positive numbers, you run right into the largest negative numbers and then count back down to 0. Listing 3.5 shows what happens when you add 1 to the maximum positive number in an unsigned short integer.
+
+Listing 3.5. A demonstration of adding too large a number to a signed integer.
+
+1:  #include <iostream.h>
+2:  int main()
+3:  {
+4:     short int smallNumber;
+5:     smallNumber = 32767;
+6:     cout << "small number:" << smallNumber << endl;
+7:     smallNumber++;
+8:     cout << "small number:" << smallNumber << endl;
+9:     smallNumber++;
+10:    cout << "small number:" << smallNumber << endl;
+11:        return 0;
+12: }
+Output: small number:32767
+small number:-32768
+small number:-32767
+
+Analysis: On line 4, smallNumber is declared this time to be a signed short integer (if you don't explicitly say that it is unsigned, it is assumed to be signed). The program proceeds much as the preceding one, but the output is quite different. To fully understand this output, you must be comfortable with how signed numbers are represented as bits in a two-byte integer. For details, check Appendix C, "Binary and Hexadecimal."
+
+The bottom line, however, is that just like an unsigned integer, the signed integer wraps around from its highest positive value to its highest negative value.
+Characters
+
+Character variables (type char) are typically 1 byte, enough to hold 256 values (see Appendix C). A char can be interpreted as a small number (0-255) or as a member of the ASCII set. ASCII stands for the American Standard Code for Information Interchange. The ASCII character set and its ISO (International Standards Organization) equivalent are a way to encode all the letters, numerals, and punctuation marks.
+
+    Computers do not know about letters, punctuation, or sentences. All they understand are numbers. In fact, all they really know about is whether or not a sufficient amount of electricity is at a particular junction of wires. If so, it is represented internally as a 1; if not, it is represented as a 0. By grouping ones and zeros, the computer is able to generate patterns that can be interpreted as numbers, and these in turn can be assigned to letters and punctuation. 
+
+In the ASCII code, the lowercase letter "a" is assigned the value 97. All the lower- and uppercase letters, all the numerals, and all the punctuation marks are assigned values between 1 and 128. Another 128 marks and symbols are reserved for use by the computer maker, although the IBM extended character set has become something of a standard.
+Characters and Numbers
+
+When you put a character, for example, `a', into a char variable, what is really there is just a number between 0 and 255. The compiler knows, however, how to translate back and forth between characters (represented by a single quotation mark and then a letter, numeral, or punctuation mark, followed by a closing single quotation mark) and one of the ASCII values.
+
+The value/letter relationship is arbitrary; there is no particular reason that the lowercase "a" is assigned the value 97. As long as everyone (your keyboard, compiler, and screen) agrees, there is no problem. It is important to realize, however, that there is a big difference between the value 5 and the character `5'. The latter is actually valued at 53, much as the letter `a' is valued at 97.
+
+Listing 3.6. Printing characters based on numbers
+
+1:   #include <iostream.h>
+2:   int main()
+3:   {
+4:   for (int i = 32; i<128; i++)
+5:         cout << (char) i;
+6:         return 0;
+7: }
+ Output: !"#$%G'()*+,./0123456789:;<>?@ABCDEFGHIJKLMNOP
+_QRSTUVWXYZ[\]^'abcdefghijklmnopqrstuvwxyz<|>~s
+
+This simple program prints the character values for the integers 32 through 127.
+Special Printing Characters
+
+The C++ compiler recognizes some special characters for formatting. Table 3.2 shows the most common ones. You put these into your code by typing the backslash (called the escape character), followed by the character. Thus, to put a tab character into your code, you would enter a single quotation mark, the slash, the letter t, and then a closing single quotation mark:
+
+char tabCharacter = `\t';
+
+This example declares a char variable (tabCharacter) and initializes it with the character value \t, which is recognized as a tab. The special printing characters are used when printing either to the screen or to a file or other output device.
+
+    New Term: An escape character changes the meaning of the character that follows it. For example, normally the character n means the letter n, but when it is preceded by the escape character (\) it means new line. 
+
+Table 3.2. The Escape Characters.
+Character 	What it means
+\n 	new line
+\t 	tab
+\b 	backspace
+\" 	double quote
+\' 	single quote
+\? 	question mark
+\\ 	backslash
+Constants
+
+Like variables, constants are data storage locations. Unlike variables, and as the name implies, constants don't change. You must initialize a constant when you create it, and you cannot assign a new value later.
+Literal Constants
+
+C++ has two types of constants: literal and symbolic.
+
+A literal constant is a value typed directly into your program wherever it is needed. For example
+
+int myAge = 39;
+
+myAge is a variable of type int; 39 is a literal constant. You can't assign a value to 39, and its value can't be changed.
+Symbolic Constants
+
+A symbolic constant is a constant that is represented by a name, just as a variable is represented. Unlike a variable, however, after a constant is initialized, its value can't be changed.
+
+If your program has one integer variable named students and another named classes, you could compute how many students you have, given a known number of classes, if you knew there were 15 students per class:
+
+students = classes * 15;
+
+    NOTE: * indicates multiplication. 
+
+In this example, 15 is a literal constant. Your code would be easier to read, and easier to maintain, if you substituted a symbolic constant for this value:
+
+students = classes * studentsPerClass
+
+If you later decided to change the number of students in each class, you could do so where you define the constant studentsPerClass without having to make a change every place you used that value.
+
+There are two ways to declare a symbolic constant in C++. The old, traditional, and now obsolete way is with a preprocessor directive, #define. Defining Constants with #define To define a constant the traditional way, you would enter this:
+
+#define studentsPerClass 15
+
+Note that studentsPerClass is of no particular type (int, char, and so on). #define does a simple text substitution. Every time the preprocessor sees the word studentsPerClass, it puts in the text 15.
+
+Because the preprocessor runs before the compiler, your compiler never sees your constant; it sees the number 15. Defining Constants with const Although #define works, there is a new, much better way to define constants in C++:
+
+const unsigned short int studentsPerClass = 15;
+
+This example also declares a symbolic constant named studentsPerClass, but this time studentsPerClass is typed as an unsigned short int. This method has several advantages in making your code easier to maintain and in preventing bugs. The biggest difference is that this constant has a type, and the compiler can enforce that it is used according to its type.
+
+    NOTE: Constants cannot be changed while the program is running. If you need to change studentsPerClass, for example, you need to change the code and recompile.
+
+    DON'T use the term int. Use short and long to make it clear which size number you intended. DO watch for numbers overrunning the size of the integer and wrapping around incorrect values. DO give your variables meaningful names that reflect their use. DON'T use keywords as variable names. 
+
+Enumerated Constants
+
+Enumerated constants enable you to create new types and then to define variables of those types whose values are restricted to a set of possible values. For example, you can declare COLOR to be an enumeration, and you can define that there are five values for COLOR: RED, BLUE, GREEN, WHITE, and BLACK.
+
+The syntax for enumerated constants is to write the keyword enum, followed by the type name, an open brace, each of the legal values separated by a comma, and finally a closing brace and a semicolon. Here's an example:
+
+enum COLOR { RED, BLUE, GREEN, WHITE, BLACK };
+
+This statement performs two tasks:
+
+    1. It makes COLOR the name of an enumeration, that is, a new type.
+
+    2. It makes RED a symbolic constant with the value 0, BLUE a symbolic constant with the value 1, GREEN a symbolic constant with the value 2, and so forth. 
+
+Every enumerated constant has an integer value. If you don't specify otherwise, the first constant will have the value 0, and the rest will count up from there. Any one of the constants can be initialized with a particular value, however, and those that are not initialized will count upward from the ones before them. Thus, if you write
+
+enum Color { RED=100, BLUE, GREEN=500, WHITE, BLACK=700 };
+
+then RED will have the value 100; BLUE, the value 101; GREEN, the value 500; WHITE, the value 501; and BLACK, the value 700.
+
+You can define variables of type COLOR, but they can be assigned only one of the enumerated values (in this case, RED, BLUE, GREEN, WHITE, or BLACK, or else 100, 101, 500, 501, or 700). You can assign any color value to your COLOR variable. In fact, you can assign any integer value, even if it is not a legal color, although a good compiler will issue a warning if you do. It is important to realize that enumerator variables actually are of type unsigned int, and that the enumerated constants equate to integer variables. It is, however, very convenient to be able to name these values when working with colors, days of the week, or similar sets of values. Listing 3.7 presents a program that uses an enumerated type.
+
+Listing 3.7. A demonstration of enumerated constants.
+
+1:  #include <iostream.h>
+2:  int main()
+3:  {
+4:       enum Days { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday,                     Â_Saturday };
+5:
+6:       Days DayOff;
+7:       int x;
+8:
+9:       cout << "What day would you like off (0-6)? ";
+10:      cin  >> x;
+11:      DayOff = Days(x);
+12:
+13:      if (DayOff == Sunday || DayOff == Saturday)
+14:            cout << "\nYou're already off on weekends!\n";
+15:      else
+16:            cout << "\nOkay, I'll put in the vacation day.\n";
+17:       return 0;
+18: }
+Output: What day would you like off (0-6)?  1
+
+Okay, I'll put in the vacation day.
+
+What day would you like off (0-6)?  0
+
+You're already off on weekends!
+
+Analysis: On line 4, the enumerated constant DAYS is defined, with seven values counting upward from 0. The user is prompted for a day on line 9. The chosen value, a number between 0 and 6, is compared on line 13 to the enumerated values for Sunday and Saturday, and action is taken accordingly.
+
+The if statement will be covered in more detail on Day 4, "Expressions and Statements."
+
+You cannot type the word "Sunday" when prompted for a day; the program does not know how to translate the characters in Sunday into one of the enumerated values.
+
+    NOTE: For this and all the small programs in this book, I've left out all the code you would normally write to deal with what happens when the user types inappropriate data. For example, this program doesn't check, as it would in a real program, to make sure that the user types a number between 0 and 6. This detail has been left out to keep these programs small and simple, and to focus on the issue at hand. 
+
+Summary
+
+This chapter has discussed numeric and character variables and constants, which are used by C++ to store data during the execution of your program. Numeric variables are either integral (char, short, and long int) or they are floating point (float and double). Numeric variables can also be signed or unsigned. Although all the types can be of various sizes among different computers, the type specifies an exact size on any given computer.
+
+You must declare a variable before it can be used, and then you must store the type of data that you've declared as correct for that variable. If you put too large a number into an integral variable, it wraps around and produces an incorrect result.
+
+This chapter also reviewed literal and symbolic constants, as well as enumerated constants, and showed two ways to declare a symbolic constant: using #define and using the keyword const.
+Q&A
+
+    Q. If a short int can run out of room and wrap around, why not always use long integers?
+
+    A .Both short integers and long integers will run out of room and wrap around, but a long integer will do so with a much larger number. For example, an unsigned short int will wrap around after 65,535, whereas an unsigned long int will not wrap around until 4,294,967,295. However, on most machines, a long integer takes up twice as much memory every time you declare one (4 bytes versus 2 bytes), and a program with 100 such variables will consume an extra 200 bytes of RAM. Frankly, this is less of a problem than it used to be, because most personal computers now come with many thousands (if not millions) of bytes of memory.
+
+    Q. What happens if I assign a number with a decimal point to an integer rather than to a float? Consider the following line of code: 
+
+int aNumber = 5.4;
+
+    A. A good compiler will issue a warning, but the assignment is completely legal. The number you've assigned will be truncated into an integer. Thus, if you assign 5.4 to an integer variable, that variable will have the value 5. Information will be lost, however, and if you then try to assign the value in that integer variable to a float variable, the float variable will have only 5.
+
+    Q. Why not use literal constants; why go to the bother of using symbolic constants?
+
+    A. If you use the value in many places throughout your program, a symbolic constant allows all the values to change just by changing the one definition of the constant. Symbolic constants also speak for themselves. It might be hard to understand why a number is being multiplied by 360, but it's much easier to understand what's going on if the number is being multiplied by degreesInACircle.
+
+    Q. What happens if I assign a negative number to an unsigned variable? Consider the following line of code: 
+
+unsigned int aPositiveNumber = -1;
+
+    A. A good compiler will warn, but the assignment is legal. The negative number will be assessed as a bit pattern and assigned to the variable. The value of that variable will then be interpreted as an unsigned number. Thus, -1, whose bit pattern is 11111111 11111111 (0xFF in hex), will be assessed as the unsigned value 65,535. If this information confuses you, refer to Appendix C.
+
+    Q. Can I work with C++ without understanding bit patterns, binary arithmetic, and hexadecimal?
+
+    A. Yes, but not as effectively as if you do understand these topics. C++ does not do as good a job as some languages at "protecting" you from what the computer is really doing. This is actually a benefit, because it provides you with tremendous power that other languages don't. As with any power tool, however, to get the most out of C++ you must understand how it works. Programmers who try to program in C++ without understanding the fundamentals of the binary system often are confused by their results. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered, and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure that you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is the difference between an integral variable and a floating-point variable?
+
+    2. What are the differences between an unsigned short int and a long int?
+
+    3. What are the advantages of using a symbolic constant rather than a literal constant?
+
+    4. What are the advantages of using the const keyword rather than #define?
+
+    5. What makes for a good or bad variable name?
+
+    6. Given this enum, what is the value of BLUE? 
+
+
+enum COLOR { WHITE, BLACK = 100, RED, BLUE, GREEN = 300 };
+
+    7. Which of the following variable names are good, which are bad, and which are invalid?
+
+
+        a. Age
+
+        b. !ex
+
+        c. R79J
+
+        d. TotalIncome
+
+        e. __Invalid 
+
+Exercises
+
+    1. What would be the correct variable type in which to store the following information?
+
+
+        a. Your age.
+
+        b. The area of your backyard.
+
+        c. The number of stars in the galaxy.
+
+        d. The average rainfall for the month of January. 
+
+
+    2. Create good variable names for this information.
+
+    3. Declare a constant for pi as 3.14159.
+
+    4. Declare a float variable and initialize it using your pi constant.
+
+

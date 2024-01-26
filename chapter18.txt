@@ -1,0 +1,829 @@
+    Day 18
+        Object-Oriented Analysis and Design
+            The Development Cycle
+            Simulating an Alarm System
+                Preliminary Design
+                What Are the Objects?
+                Other Objects
+                What Are the Classes?
+                How Are Alarms Reported?
+                Event Loops 
+            Listing 18.1. A simple event loop.
+            PostMaster
+            Measure Twice, Cut Once
+            Divide and Conquer
+            Message Format
+            Initial Class Design
+            Rooted Hierarchies Versus Non-Rooted Hierarchies
+                Figure 18.1. 
+            Designing the Interfaces
+                Building a Prototype
+                The 80/80 Rule 
+            Designing the PostMasterMessage Class
+                Application Program Interface 
+            Listing 18.2. PostMasterMessages interface.
+                Programming in Large Groups
+                Ongoing Design Considerations 
+            Design Decisions
+                Decisions, Decisions 
+            Working with Driver Programs
+            Listing 18.3. A driver program for PostMasterMessage.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 18
+Object-Oriented Analysis and Design
+
+It is easy to become focused on the syntax of C++ and to lose sight of how and why you use these techniques to build programs. Today you will learn
+
+    How to analyze problems from an object-oriented perspective.
+
+    How to design your program from an object-oriented perspective.
+
+    How to design for reusability and extensibility. 
+
+The Development Cycle
+
+Many volumes have been written about the development cycle. Some propose a "waterfall" method, in which designers determine what the program should do; architects determine how the program will be built, what classes will be used, and so forth; and then programmers implement the design and architecture. By the time the design and architecture is given to the programmer, it is complete; all the programmer needs to do is implement the required functionality.
+
+Even if the waterfall method worked, it would probably be a poor method for writing good programs. As the programmer proceeds, there is a necessary and natural feedback between what has been written so far and what remains to be done. While it is true that good C++ programs are designed in great detail before a line of code is written, it is not true that that design remains unchanged throughout the cycle.
+
+The amount of design that must be finished "up front," before programming begins, is a function of the size of the program. A highly complex effort, involving dozens of programmers working for many months, will require a more fully articulated architecture than a quick-and-dirty utility written in one day by a single programmer.
+
+This chapter will focus on the design of large, complex programs which will be expanded and enhanced over many years. Many programmers enjoy working at the bleeding edge of technology; they tend to write programs whose complexity pushes at the limits of their tools and understanding. In many ways, C++ was designed to extend the complexity that a programmer or team of programmers could manage.
+
+This chapter will examine a number of design problems from an object-oriented perspective. The goal will be to review the analysis process, and then to understand how you apply the syntax of C++ to implement these design objectives.
+Simulating an Alarm System
+
+A simulation is a computer model of a part of a real-world system. There are many reasons to build a simulation, but a good design must start with an understanding of what questions you hope the simulation will answer.
+
+As a starting point, examine this problem: You have been asked to simulate the alarm system for a house. The house is a center hall colonial with four bedrooms, a finished basement, and an under-the-house garage.
+
+The downstairs has the following windows: three in the kitchen, four in the dining room, one in the half-bathroom, two each in the living room and the family room, and two small windows next to the door. All four bedrooms are upstairs, each of which has two windows except for the master bedroom, which has four. There are two baths, each with one window. Finally, there are four half-windows in the basement, and one window in the garage.
+
+Normal access to the house is through the front door. Additionally, the kitchen has a sliding glass door, and the garage has two doors for the cars and one door for easy access to the basement. There is also a cellar door in the backyard.
+
+All the windows and doors are alarmed, and there are panic buttons on each phone and next to the bed. The grounds are alarmed as well, though these are carefully calibrated so that they are not set off by small animals or birds.
+
+There is a central alarm system in the basement, which sounds a warning chirp when the alarm has been tripped. If the alarm is not disabled within a setable amount of time, the police are called. If a panic button is pushed, the police are called immediately.
+
+The alarm is also wired into the fire and smoke detectors and the sprinkler system, and the alarm system itself is fault tolerant, has its own internal backup power supply, and is encased in a fireproof box.
+Preliminary Design
+
+You begin by asking, "What questions might this simulation answer?" For example, you might be able to use the simulation to answer the questions, "How long might a sensor be broken before anyone notices?" or "Is there a way to defeat the window alarms without the police being notified?"
+
+Once you understand the purpose of the simulation you will know what parts of the real system the program must model. Once that is well understood, it becomes much easier to design the program itself.
+What Are the Objects?
+
+One way to approach this problem is to set aside issues relating to the user interface and to focus only on the components of the "problem space." A first approximation of an object-oriented design might be to list the objects that you need to simulate, and then to examine what these objects "know" and "do."
+
+    New Term: The problem space is the set of problems and issues your program is trying to solve. The solution space is the set of possible solutions to the problems. 
+
+For example, clearly you have sensors of various types, a central alarm system, buttons, wires, and telephones. Further thought convinces you that you must also simulate rooms, perhaps floors, and possibly groups of people such as owners and police.
+
+The sensors can be divided into motion detectors, trip wires, sound detectors, smoke detectors, and so forth. All of these are types of sensors, though there is no such thing as a sensor per se. This is a good indication that sensor is an abstract data type (ADT).
+
+As an ADT, the class sensor would provide the complete interface for all types of sensors, and each derived type would provide the implementation. Clients of the various sensors would use them without regard to which type of sensor they are, and they would each "do the right thing" based on their real type.
+
+To create a good ADT, you need to have a complete understanding of what sensors do (rather than how they work). For example, are sensors passive devices or are they active? Do they wait for some element to heat up, a wire to break, or a piece of caulk to melt, or do they probe their environment? Perhaps some sensors have only a binary state (alarm state or okay), but others have a more analog state (what is the current temperature?). The interface to the abstract data type should be sufficiently complete to handle all the anticipated needs of the myriad derived classes.
+Other Objects
+
+The design continues in this way, teasing out the various other classes that will be required to meet the specification. For example, if a log is to be kept, probably a timer will be needed; should the timer poll each sensor or should each sensor file its own report periodically?
+
+The user is going to need to be able to set up, disarm, and program the system, and so a terminal of some sort will be required. You may want a separate object in your simulation for the alarm program itself.
+What Are the Classes?
+
+As you solve these problems, you will begin to design your classes. For example, you already have an indication that HeatSensor will derive from Sensor. If the sensor is to make periodic reports, it may also derive via multiple inheritance from Timer, or it may have a timer as a member variable.
+
+The HeatSensor will probably have member functions such as CurrentTemp() and SetTempLimit() and will probably inherit functions such as SoundAlarm() from its base class, Sensor.
+
+A frequent issue in object-oriented design is that of encapsulation. You could imagine a design in which the alarm system has a setting for MaxTemp. The alarm system asks the heat sensor what the current temperature is, compares it to the maximum temperature, and sounds the alarm if it is too hot. One could argue that this violates the principle of encapsulation. Perhaps it would be better if the alarm system didn't know or care what the details are of temperature analysis; arguably that should be in the HeatSensor.
+
+Whether or not you agree with that argument, it is the kind of decision you want to focus on during the analysis of the problem. To continue this analysis, one could argue that only the Sensor and the Log object should know any details of how sensor activity is logged; the Alarm object shouldn't know or care.
+
+Good encapsulation is marked by each class having a coherent and complete set of responsibilities, and no other class having the same responsibilities. If the sensor is responsible for noting the current temperature, no other class should have that responsibility.
+
+On the other hand, other classes might help deliver the necessary functionality. For example, while it might be the responsibility of the Sensor class to note and log the current temperature, it might implement that responsibility by delegating to a Log object the job of actually recording the data.
+
+Maintaining a firm division of responsibilities makes your program easier to extend and maintain. When you decide to change the alarm system for an enhanced module, its interface to the log and to the sensors will be narrow and well defined. Changes to the alarm system should not affect the Sensor classes, and vice versa.
+
+Should the HeatSensor have a ReportAlarm() function? All sensors will need the ability to report an alarm. This is a good indication that ReportAlarm() should be a virtual method of Sensor, and that Sensor may be an abstract base class. It is possible that HeatSensor will chain up to Sensor's more general ReportAlarm() method; the overridden function would just fill in the details it is uniquely qualified to supply.
+How Are Alarms Reported?
+
+When your sensors report an alarm condition, they will want to provide a lot of information to the object that phones the police and to the log. It may well be that you'll want to create a Condition class, whose constructor takes a number of measurements. Depending on the complexity of the measurements, these too might be objects, or they might be simple scalar values such as integers.
+
+It is possible that Condition objects are passed to the central Alarm object, or that Condition objects are subclassed into Alarm objects, which themselves know how to take emergency action. Perhaps there is no central object; instead there might be sensors, which know how to create Condition objects. Some Condition objects would know how to log themselves; others might know how to contact the police.
+
+A well-designed event-driven system need not have a central coordinator. One can imagine the sensors all independently receiving and sending message objects to one another, setting parameters, taking readings, and monitoring the house. When a fault is detected, an Alarm object is created, which logs the problem (by sending a message to the Log object) and takes the appropriate action.
+Event Loops
+
+To simulate such an event-driven system, your program needs to create an event loop. An event loop is typically an infinite loop such as while(1), which gets messages from the operating system (mouse clicks, keyboard presses, and so on) and dispatches them one by one, returning to the loop until an exit condition is satisfied. Listing 18.1 shows a rudimentary event loop.
+
+Listing 18.1. A simple event loop.
+
+1:     // Listing 18.1
+2:
+3:     #include <iostream.h>
+4:
+5:     class Condition
+6:     {
+7:     public:
+8:        Condition() { }
+9:        virtual ~Condition() {}
+10:       virtual void Log() = 0;
+11:    };
+12:
+13:    class Normal : public Condition
+14:    {
+15:    public:
+16:       Normal() { Log(); }
+17:       virtual ~Normal() {}
+18:       virtual void Log() { cout << "Logging normal conditions...\n"; }
+19:    };
+20:
+21:    class Error : public Condition
+22:    {
+23:    public:
+24:       Error() {Log();}
+25:       virtual ~Error() {}
+26:       virtual void Log() { cout << "Logging error!\n"; }
+27:    };
+28:
+29:    class Alarm : public Condition
+30:    {
+31:    public:
+32:       Alarm ();
+33:       virtual   ~Alarm() {}
+34:       virtual void Warn() { cout << "Warning!\n"; }
+35:       virtual void Log() { cout << "General Alarm log\n"; }
+36:       virtual void Call() = 0;
+37:
+38:    };
+39:
+40:    Alarm::Alarm()
+41:    {
+42:        Log();
+43:       Warn();
+44:    }
+45:    class FireAlarm : public Alarm
+46:    {
+47:    public:
+48:       FireAlarm(){Log();};
+49:       virtual ~FireAlarm() {}
+50:       virtual void Call() { cout<< "Calling Fire Dept.!\n"; }
+51:       virtual void Log() { cout << "Logging fire call.\n"; }
+52:    };
+53:
+54:    int main()
+55:    {
+56:       int input;
+57:       int okay = 1;
+58:       Condition * pCondition;
+59:       while (okay)
+60:       {
+61:          cout << "(0)Quit (1)Normal (2)Fire: ";
+62:          cin >> input;
+63:          okay = input;
+64:          switch (input)
+65:          {
+66:             case 0: break;
+67:             case 1:
+68:                pCondition = new Normal;
+69:                delete pCondition;
+70:                break;
+71:             case 2:
+72:                pCondition = new FireAlarm;
+73:                delete pCondition;
+74:                break;
+75:             default:
+76:                pCondition = new Error;
+77:                delete pCondition;
+78:                okay = 0;
+79:                break;
+80:          }
+81:       }
+82:     return 0;
+83: }
+
+Output: (0)Quit (1)Normal (2)Fire: 1
+Logging normal conditions...
+(0)Quit (1)Normal (2)Fire: 2
+General Alarm log
+Warning!
+Logging fire call.
+(0)Quit (1)Normal (2)Fire: 0
+
+Analysis: The simple loop created on lines 59-80 allows the user to enter input simulating a normal report from a sensor and a report of a fire. Note that the effect of this report is to spawn a Condition object whose constructor calls various member functions.
+
+Calling virtual member functions from a constructor can cause confusing results if you are not mindful of the order of construction of objects. For example, when the FireAlarm object is created on line 72, the order of construction is Condition, Alarm, FireAlarm. The Alarm constructor calls Log, but it is Alarm's Log(), not FireAlarm's, that is invoked, despite Log() being declared virtual. This is because at the time Alarm's constructor runs, there is no FireAlarm object. Later, when FireAlarm itself is constructed, its constructor calls Log() again, and this time FireAlarm::Log() is called.
+PostMaster
+
+Here's another problem on which to practice your object-oriented analysis: You have been hired by Acme Software, Inc., to start a new software project and to hire a team of C++ programmers to implement your program. Jim Grandiose, vice-president of new product development, is your new boss. He wants you to design and build PostMaster, a utility to read electronic mail from various unrelated e-mail providers. The potential customer is a businessperson who uses more than one e-mail product, for example Interchange, CompuServe, Prodigy, America Online, Delphi, Internet Mail, Lotus Notes, AppleMail, cc:Mail, and so forth.
+
+The customer will be able to "teach" PostMaster how to dial up or otherwise connect to each of the e-mail providers, and PostMaster will get the mail and then present it in a uniform manner, allowing the customer to organize the mail, reply, forward letters among services, and so forth.
+
+PostMasterProfessional, to be developed as version 2 of PostMaster, is already anticipated. It will add an Administrative Assistant mode, which will allow the user to designate another person to read some or all of the mail, to handle routine correspondence, and so forth. There is also speculation in the marketing department that an artificial intelligence component might add the capability for PostMaster to pre-sort and prioritize the mail based on subject and content keywords and associations.
+
+Other enhancements have been talked about, including the ability to handle not only mail but discussion groups such as Interchange discussions, CompuServe forums, Internet newsgroups, and so forth. It is obvious that Acme has great hopes for PostMaster, and you are under severe time constraints to bring it to market, though you seem to have a nearly unlimited budget.
+Measure Twice, Cut Once
+
+You set up your office and order your equipment, and then your first order of business is to get a good specification for the product. After examining the market, you decide to recommend that development be focused on a single platform, and you set out to decide among DOS; UNIX; the Macintosh; and Windows, Windows NT, and OS/2.
+
+You have many painful meetings with Jim Grandiose, and it becomes clear that there is no right choice, and so you decide to separate the front end, that is the user interface or UI, from the back end, the communications and database part. To get things going quickly, you decide to write for DOS first, followed by Win32, the Mac, and then UNIX and OS/2.
+
+This simple decision has enormous ramifications for your project. It quickly becomes obvious that you will need a class library or a series of libraries to handle memory management, the various user interfaces, and perhaps also the communications and database components.
+
+Mr. Grandiose believes strongly that projects live or die by having one person with a clear vision, so he asks that you do the initial architectural analysis and design before hiring any programmers. You set out to analyze the problem.
+Divide and Conquer
+
+It quickly becomes obvious that you really have more than one problem to solve. You divide the project into these significant sub-projects:
+
+    1. Communications: the ability for the software to dial into the e-mail provider via modem, or to connect over a network.
+
+    2. Database: the ability to store data and to retrieve it from disk.
+
+    3. E-mail: the ability to read various e-mail formats and to write new messages to each system.
+
+    4. Editing: providing state-of-the-art editors for the creation and manipulation of messages.
+
+    5. Platform issues: the various UI issues presented by each platform (DOS, Macintosh, and so on).
+
+    6. Extensibility: planning for growth and enhancements.
+
+    7. Organization and scheduling: managing the various developers and their code interdependencies. Each group must devise and publish schedules, and then be able to plan accordingly. Senior management and marketing need to know when the product will be ready. 
+
+You decide to hire a manager to handle item 7, organization and scheduling. You then hire senior developers to help you analyze and design, and then to manage the implementation of the remaining areas. These senior developers will create the following teams:
+
+    1. Communications: responsible for both dial-up and network communications. They deal with packets, streams, and bits, rather than with e-mail messages per se.
+
+    2. Message format: responsible for converting messages from each e-mail provider to a canonical form (PostMaster standard) and back. It is also their job to write these messages to disk and to get them back off the disk as needed.
+
+    3. Message editors: This group is responsible for the entire UI of the product, on each platform. It is their job to ensure that the interface between the back end and the front end of the product is sufficiently narrow that extending the product to other platforms does not require duplication of code. 
+
+Message Format
+
+You decide to focus on the message format first, setting aside the issues relating to communications and user interface. These will follow once you understand more fully what it is you are dealing with. There is little sense in worrying about how to present the information to the user until you understand what information you are dealing with.
+
+An examination of the various e-mail formats reveals that they have many things in common, despite their various differences. Each e-mail message has a point of origination, a destination, and a creation date. Nearly all such messages have a title or subject line and a body which may consist of simple text, rich text (text with formatting), graphics, and perhaps even sound or other fancy additions. Most such e-mail services also support attachments, so that users can send programs and other files.
+
+You confirm your early decision that you will read each mail message out of its original format and into PostMaster format. This way you will only have to store one record format, and writing to and reading from the disk will be simplified. You also decide to separate the "header" information (sender, recipient, date, title, and so on) from the body of the message. Often the user will want to scan the headers without necessarily reading the contents of all the messages. You anticipate that a time may come when users will want to download only the headers from the message provider, without getting the text at all, but for now you intend that version 1 of PostMaster will always get the full message, although it may not display it to the user.
+Initial Class Design
+
+This analysis of the messages leads you to design the Message class. In anticipation of extending the program to non-e-mail messages, you derive EmailMessage from the abstract base Message. From EmailMessage you derive PostMasterMessage, InterchangeMessage, CISMessage, ProdigyMessage, and so forth.
+
+Messages are a natural choice for objects in a program handling mail messages, but finding all the right objects in a complex system is the single greatest challenge of object-oriented programming. In some cases, such as with messages, the primary objects seem to "fall out" of your understanding of the problem. More often, however, you have to think long and hard about what you are trying to accomplish to find the right objects.
+
+Don't despair. Most designs are not perfect the first time. A good starting point is to describe the problem out loud. Make a list of all the nouns and verbs you use when describing the project. The nouns are good candidates for objects. The verbs might be the methods of those objects (or they may be objects in their own right). This is not a foolproof method, but it is a good technique to use when getting started on your design.
+
+That was the easy part. Now the question arises, "Should the message header be a separate class from the body?" If so, do you need parallel hierarchies, CompuServeBody and CompuServeHeader, as well as ProdigyBody and ProdigyHeader?
+
+Parallel hierarchies are often a warning sign of a bad design. It is a common error in object-oriented design to have a set of objects in one hierarchy, and a matching set of "managers" of those objects in another. The burden of keeping these hierarchies up-to-date and in sync with each other soon becomes overwhelming: a classic maintenance nightmare.
+
+There are no hard-and-fast rules, of course, and at times such parallel hierarchies are the most efficient way to solve a particular problem. Nonetheless, if you see your design moving in this direction, you should rethink the problem; there may be a more elegant solution available.
+
+When the messages arrive from the e-mail provider, they will not necessarily be separated into header and body; many will be one large stream of data, which your program will have to disentangle. Perhaps your hierarchy should reflect that idea directly.
+
+Further reflection on the tasks at hand leads you to try to list the properties of these messages, with an eye towards introducing capabilities and data storage at the right level of abstraction. Listing properties of your objects is a good way to find the data members, as well as to "shake out" other objects you might need.
+
+Mail messages will need to be stored, as will the user's preferences, phone numbers, and so forth. Storage clearly needs to be high up in the hierarchy. Should the mail messages necessarily share a base class with the preferences?
+Rooted Hierarchies Versus Non-Rooted Hierarchies
+
+There are two overall approaches to inheritance hierarchies: you can have all, or nearly all, of your classes descend from a common root class, or you can have more than one inheritance hierarchy. An advantage of a common root class is that you often can avoid multiple inheritance; a disadvantage is that many times implementation will percolate up into the base class.
+
+    New Term: A set of classes is rooted if all share a common ancestor. Non-rooted hierarchies do not all share a common base class. 
+
+Because you know that your product will be developed on many platforms, and because multiple inheritance is complex and not necessarily well supported by all compilers on all platforms, your first decision is to use a rooted hierarchy and single inheritance. You decide to identify those places where multiple inheritance might be used in the future, and to design so that breaking apart the hierarchy and adding multiple inheritance at a later time need not be traumatic to your entire design.
+
+You decide to prefix the name of all of your internal classes with the letter p so that you can easily and quickly tell which classes are yours and which are from other libraries. On Day 21, "What's Next," you'll learn about name spaces, which can reinforce this idea, but for now the initial will do nicely.
+
+Your root class will be pObject; virtually every class you create will descend from this object. pObject itself will be kept fairly simple; only that data which absolutely every item shares will appear in this class.
+
+If you want a rooted hierarchy, you'll want to give the root class a fairly generic name (like pObject) and few capabilities. The point of a root object is to be able to create collections of all its descendants and refer to them as instances of pObject. The trade-off is that rooted hierarchies often percolate interface up into the root class. You will pay the price; by percolating these interfaces up into the root object, other descendants will have interfaces that are inappropriate to their design. The only good solution to this problem, in single inheritance, is to use templates. Templates are discussed tomorrow.
+
+The next likely candidates for top of the hierarchy status are pStored and pWired. pStored objects are saved to disk at various times (for example when the program is not in use), and pWired objects are sent over the modem or network. Because nearly all of your objects will need to be stored to disk, it makes sense to push this functionality up high in the hierarchy. Because all the objects that are sent over the modem must be stored, but not all stored objects must be sent over the wire, it makes sense to derive pWired from pStored.
+
+Each derived class acquires all the knowledge (data) and functionality (methods) of its base class, and each should add one discrete additional ability. Thus, pWired may add various methods, but all are in service of adding the ability to be transferred over the modem.
+
+It is possible that all wired objects are stored, or that all stored objects are wired, or that neither of these statements is true. If only some wired objects are stored, and only some stored objects are wired, you will be forced either to use multiple inheritance or to "hack around" the problem. A potential "hack" for such a situation would be to inherit, for example, Wired from Stored, and then for those objects that are sent via modem, but are never stored, to make the stored methods do nothing or return an error.
+
+In fact, you realize that some stored objects clearly are not wired: for example, user preferences. All wired objects, however, are stored, and so your inheritance hierarchy so far is as reflected in Figure 18.1.
+
+Figure 18.1. Initial inheritance hierarchy.
+Designing the Interfaces
+
+It is important at this stage of designing your product to avoid being concerned with implementation. You want to focus all of your energies on designing a clean interface among the classes and then delineating what data and methods each class will need.
+
+It is often a good idea to have a solid understanding of the base classes before trying to design the more derived classes, so you decide to focus on pObject, pStored, and pWired.
+
+The root class, pObject, will only have the data and methods that are common to everything on your system. Perhaps every object should have a unique identification number. You could create pID (PostMaster ID) and make that a member of pObject; but first you must ask yourself, "Does any object that is not stored and not wired need such a number?" That begs the question, "Are there any objects that are not stored, but that are part of this hierarchy?"
+
+If there are no such objects, you may want to consider collapsing pObject and pStored into one class; after all, if all objects are stored, what is the point of the differentiation? Thinking this through, you realize that there may be some objects, such as address objects, that it would be beneficial to derive from pObject, but that will never be stored on their own; if they are stored, they will be as part of some other object.
+
+That says that for now having a separate pObject class would be useful. One can imagine that there will be an address book that would be a collection of pAddress objects, and while no pAddress will ever be stored on its own, there would be utility in having each one have its own unique identification number. You tentatively assign pID to pObject, and this means that pObject, at a minimum, will look like this:
+
+class pObject
+{
+public:
+pObject();
+~pObject();
+pID GetID()const;
+void SetID();
+private:
+pID  itsID;
+}
+
+There are a number of things to note about this class declaration. First, this class is not declared to derive from any other; this is your root class. Second, there is no attempt to show implementation, even for methods such as GetID() that are likely to have inline implementation when you are done.
+
+Third, const methods are already identified; this is part of the interface, not the implementation. Finally, a new data type is implied: pID. Defining pID as a type, rather than using, for example, unsigned long, puts greater flexibility into your design.
+
+If it turns out that you don't need an unsigned long, or that an unsigned long is not sufficiently large, you can modify pID. That modification will affect every place pID is used, and you won't have to track down and edit every file with a pID in it.
+
+For now, you will use typedef to declare pID to be ULONG, which in turn you will declare to be unsigned long. This raises the question: Where do these declarations go?
+
+When programming a large project, an overall design of the files is needed. A standard approach, one which you will follow for this project, is that each class appears in its own header file, and the implementation for the class methods appears in an associated CPP file. Thus, you will have a file called OBJECT.HPP and another called OBJECT.CPP. You anticipate having other files such as MSG.HPP and MSG.CPP, with the declaration of pMessage and the implementation of its methods, respectively.
+
+    NOTE: Buy it or write it? One question that you will confront throughout the design phase of your program is which routines might you buy and which must you write yourself. It is entirely possible that you can take advantage of existing commercial libraries to solve some or all of your communications issues. Licensing fees and other non-technical concerns must also be resolved. It is often advantageous to purchase such a library, and to focus your energies on your specific program, rather than to "reinvent the wheel" about secondary technical issues. You might even want to consider purchasing libraries that were not necessarily intended for use with C++, if they can provide fundamental functionality you'd otherwise have to engineer yourself. This can be instrumental in helping you hit your deadlines. 
+
+Building a Prototype
+
+For a project as large as PostMaster, it is unlikely that your initial design will be complete and perfect. It would be easy to become overwhelmed by the sheer scale of the problem, and trying to create all the classes and to complete their interface before writing a line of working code is a recipe for disaster.
+
+There are a number of good reasons to try out your design on a prototype--a quick-and-dirty working example of your core ideas. There are a number of different types of prototypes, however, each meeting different needs.
+
+An interface design prototype provides the chance to test the look and feel of your product with potential users.
+
+A functionality prototype might be designed that does not have the final user interface, but allows users to try out various features, such as forwarding messages or attaching files without worrying about the final interface.
+
+Finally, an architecture prototype might be designed to give you a chance to develop a smaller version of the program and to assess how easily your design decisions will "scale up," as the program is fleshed out.
+
+It is imperative to keep your prototyping goals clear. Are you examining the user interface, experimenting with functionality, or building a scale model of your final product? A good architecture prototype makes a poor user interface prototype, and vice versa.
+
+It is also important to keep an eye on over-engineering the prototype, or becoming so concerned with the investment you've made in the prototype that you are reluctant to tear the code down and redesign as you progress.
+The 80/80 Rule
+
+A good design rule of thumb at this stage is to design for those things that 80 percent of the people want to do 80 percent of the time, and to set aside your concerns about the remaining 20 percent. The "boundary conditions" will need to be addressed sooner or later, but the core of your design should focus on the 80/80.
+
+In the face of this, you might decide to start by designing the principal classes, setting aside the need for the secondary classes. Further, when you identify multiple classes that will have similar designs with only minor refinements, you might choose to pick one representative class and focus on that, leaving until later the design and implementation of its close cousins.
+
+    NOTE: There is another rule, the 80/20 rule, which states that "the first 20% of your program will take 80% of your time to code, and the remaining 80% of your program will take the other 80% of your time!" 
+
+Designing the PostMasterMessage Class
+
+In keeping with these considerations, you decide to focus on PostMasterMessage. This is the class that is most under your direct control.
+
+As part of its interface, PostMasterMessage will need to talk with other types of messages, of course. You hope to be able to work closely with the other message providers and to get their message format specifications, but for now you can make some smart guesses just by observing what is sent to your computer as you use their services.
+
+In any case, you know that every PostMasterMessage will have a sender, a recipient, a date, and a subject, as well as the body of the message and perhaps attached files. This tells you that you'll need accessor methods for each of these attributes, as well as methods to report on the size of the attached files, the size of the messages, and so forth.
+
+Some of the services to which you will connect will use rich text--that is, text with formatting instructions to set the font, character size, and attributes, such as bold and italic. Other services do not support these attributes, and those that do may or may not use their own proprietary scheme for managing rich text. Your class will need conversion methods for turning rich text into plain ASCII, and perhaps for turning other formats into PostMaster formats.
+Application Program Interface
+
+An Application Program Interface (API) is a set of documentation and routines for using a service. Many of the mail providers will give you an API so that PostMaster mail will be able to take advantage of their more advanced features, such as rich text and embedding files. PostMaster will also want to publish its own API so that other providers can plan for working with PostMaster in the future.
+
+Your PostMasterMessage class will want to have a well-designed public interface, and the conversion functions will be a principal component of PostMaster's API. Listing 18.2 illustrates what PostMasterMessage's interface looks like so far.
+
+Listing 18.2. PostMasterMessages interface
+
+1:     class PostMasterMessage : public MailMessage
+2:     {
+3:     public:
+4:       PostMasterMessage();
+5:       PostMasterMessage(
+6:           pAddress Sender,
+7:           pAddress Recipient,
+8:           pString Subject,
+9:           pDate creationDate);
+10:
+11:      // other constructors here
+12:      // remember to include copy constructor
+13:      // as well as constructor from storage
+14:      // and constructor from wire format
+15:      // Also include constructors from other formats
+16:      ~PostMasterMessage();
+17:      pAddress& GetSender() const;
+18:      void SetSender(pAddress&);
+19:      // other member accessors
+20:
+21:      // operator methods here, including operator equals
+22:      // and conversion routines to turn PostMaster messages
+23:      // into messages of other formats.
+24:
+25:    private:
+26:       pAddress itsSender;
+27:       pAddress itsRecipient;
+28:       pString  itsSubject;
+29:       pDate itsCreationDate;
+30:       pDate itsLastModDate;
+31:       pDate itsReceiptDate;
+32:       pDate itsFirstReadDate;
+33:       pDate itsLastReadDate;
+34: };
+
+
+Output: None.
+
+Analysis: Class PostMasterMessage is declared to derive from MailMessage. A number of constructors will be provided, facilitating the creation of PostMasterMessages from other types of mail messages.
+
+A number of accessor methods are anticipated for reading and setting the various member data, as well as operators for turning all or part of this message into other message formats. You anticipate storing these messages to disk and reading them from the wire, so accessor methods are needed for those purposes as well.
+Programming in Large Groups
+
+Even this preliminary architecture is enough to indicate how the various development groups ought to proceed. The communications group can go ahead and start work on the communications back end, negotiating a narrow interface with the message format group.
+
+The message format group will probably lay out the general interface to the Message classes, as was begun above, and then will turn its attention to the question of how to write data to the disk and read it back. Once this disk interface is well understood, they will be in a good position to negotiate the interface to the communications layer.
+
+The message editors will be tempted to create editors with an intimate knowledge of the internals of the Message class, but this would be a bad design mistake. They too must negotiate a very narrow interface to the Message class; message editor objects should know very little about the internal structure of messages.
+Ongoing Design Considerations
+
+As the project continues, you will repeatedly confront this basic design issue: In which class should you put a given set of functionality (or information)? Should the Message class have this function, or should the Address class? Should the editor store this information, or should the message store it itself?
+
+Your classes should operate on a "need to know" basis, much like secret agents. They shouldn't share any more knowledge than is absolutely necessary.
+Design Decisions
+
+As you progress with your program, you will face hundreds of design issues. They will range from the more global questions, "What do we want this to do?" to the more specific, "How do we make this work?"
+
+While the details of your implementation won't be finalized until you ship the code, and some of the interfaces will continue to shift and change as you work, you must ensure that your design is well understood early in the process. It is imperative that you know what you are trying to build before you write the code. The single most frequent cause of software dying on the vine must be that there was not sufficient agreement early enough in the process about what was being built.
+Decisions, Decisions
+
+To get a feel for what the design process is like, examine this question, "What will be on the menu?" For PostMaster, the first choice is probably "new mail message," and this immediately raises another design issue: When the user presses New Message, what happens? Does an editor get created, which in turn creates a mail message, or does a new mail message get created, which then creates the editor?
+
+The command you are working with is "new mail message," so creating a new mail message seems like the obvious thing to do. But what happens if the user hits Cancel after starting to write the message? Perhaps it would be cleaner to first create the editor and have it create (and own) the new message.
+
+The problem with this approach is that the editor will need to act differently if it is creating a message than if it is editing the message, whereas if the message is created first and then handed to the editor, only one set of code need exist: Everything is an edit of an existing message.
+
+If a message is created first, who creates it? Is it created by the menu command code? If so, does the menu also tell the message to edit itself, or is this part of the constructor method of the message?
+
+It makes sense for the constructor to do this at first glance; after all, every time you create a message you'll probably want to edit it. Nonetheless, this is not a good design idea. First, it is very possible that the premise is wrong: You may well create "canned" messages (that is, error messages mailed to the system operator) that are not put into an editor. Second, and more important, a constructor's job is to create an object; it should do no more and no less than that. Once a mail message is created, the constructor's job is done; adding a call to the edit method just confuses the role of the constructor and makes the mail message vulnerable to failures in the editor.
+
+What is worse, the edit method will call another class, the editor, causing its constructor to be called. Yet the editor is not a base class of the message, nor is it contained within the message; it would be unfortunate if the construction of the message depended on successful construction of the editor.
+
+Finally, you won't want to call the editor at all if the message can't be successfully created; yet successful creation would, in this scenario, depend on calling the editor! Clearly you want to fully return from the message's constructor before calling Message::Edit().
+
+    DO look for objects that arise naturally out of your design. DO redesign as your understanding of the problem space improves. DON'T share more information among the classes than is absolutely necessary. DO look for opportunities to take advantage of C++'s polymorphism. 
+
+Working with Driver Programs
+
+One approach to surfacing design issues is to create a driver program early in the process. For example, the driver program for PostMaster might offer a very simple menu, which will create PostMasterMessage objects, manipulate them, and otherwise exercise some of the design.
+
+    New Term: A driver program is a function that exists only to demonstrate or test other functions. 
+
+Listing 18.3 illustrates a somewhat more robust definition of the PostMasterMessage class and a simple driver program.
+
+Listing 18.3. A driver program for PostMasterMessage.
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     typedef unsigned long pDate;
+5:     enum SERVICE 
+6:       { PostMaster, Interchange, CompuServe, Prodigy, AOL, Internet };
+7:     class String
+8:     {
+9:        public:
+10:          // constructors
+11:          String();
+12:           String(const char *const);
+13:           String(const String &);
+14:          ~String();
+15:
+16:          // overloaded operators
+17:          char & operator[](int offset);
+18:          char operator[](int offset) const;
+19:          String operator+(const String&);
+20:          void operator+=(const String&);
+21:          String & operator= (const String &);
+22:          friend ostream& operator<<
+23:             ( ostream& theStream,String& theString);
+24:          // General accessors
+25:          int GetLen()const { return itsLen; }
+26:          const char * GetString() const { return itsString; }
+27:          // static int ConstructorCount;
+28:       private:
+29:          String (int);         // private constructor
+30:          char * itsString;
+31:          unsigned short itsLen;
+32:
+33:    };
+34:
+35:    // default constructor creates string of 0 bytes
+36:    String::String()
+37:    {
+38:       itsString = new char[1];
+39:       itsString[0] = `\0';
+40:       itsLen=0;
+41:       // cout << "\tDefault string constructor\n";
+42:       // ConstructorCount++;
+43:    }
+44:
+45:    // private (helper) constructor, used only by
+46:    // class methods for creating a new string of
+47:    // required size.  Null filled.
+48:    String::String(int len)
+49:    {
+50:       itsString = new char[len+1];
+51:       for (int i = 0; i<=len; i++)
+52:          itsString[1] = `\0';
+53:       itsLen=len;
+54:       // cout << "\tString(int) constructor\n";
+55:       // ConstructorCount++;
+56:    }
+57:
+58:    // Converts a character array to a String
+59:    String::String(const char * const cString)
+60:    {
+61:       itsLen = strlen(cString);
+62:       itsString = new char[itsLen+1];
+63:       for (int i = 0; i<itsLen; i++)
+64:          itsString[i] = cString[i];
+65:       itsString[itsLen]='\0';
+66:       // cout << "\tString(char*) constructor\n";
+67:       // ConstructorCount++;
+68:    }
+69:
+70:    // copy constructor
+71:    String::String (const String & rhs)
+72:    {
+73:       itsLen=rhs.GetLen();
+74:       itsString = new char[itsLen+1];
+75:       for (int i = 0; i<itsLen;i++)
+76:          itsString[i] = rhs[i];
+77:       itsString[itsLen] = `\0';
+78:       // cout << "\tString(String&) constructor\n";
+79:       // ConstructorCount++;
+80:    }
+81:
+82:    // destructor, frees allocated memory
+83:    String::~String ()
+84:    {
+85:       delete [] itsString;
+86:       itsLen = 0;
+87:       // cout << "\tString destructor\n";
+88:    }
+89:
+90:    // operator equals, frees existing memory
+91:    // then copies string and size
+92:    String& String::operator=(const String & rhs)
+93:    {
+94:       if (this == &rhs)
+95:          return *this;
+96:       delete [] itsString;
+97:       itsLen=rhs.GetLen();
+98:       itsString = new char[itsLen+1];
+99:       for (int i = 0; i<itsLen;i++)
+100:         itsString[i] = rhs[i];
+101:      itsString[itsLen] = `\0';
+102:      return *this;
+103:      // cout << "\tString operator=\n";
+104:   }
+105:
+106:   //non constant offset operator, returns
+107:   // reference to character so it can be
+108:   // changed!
+109:   char & String::operator[](int offset)
+110:   {
+111:      if (offset > itsLen)
+112:         return itsString[itsLen-1];
+113:      else
+114:         return itsString[offset];
+115:   }
+116:
+117:   // constant offset operator for use
+118:   // on const objects (see copy constructor!)
+119:   char String::operator[](int offset) const
+120:   {
+121:      if (offset > itsLen)
+122:         return itsString[itsLen-1];
+123:      else
+124:         return itsString[offset];
+125:   }
+126:
+127:   // creates a new string by adding current
+128:   // string to rhs
+129:   String String::operator+(const String& rhs)
+130:   {
+131:      int  totalLen = itsLen + rhs.GetLen();
+132:      int i,j;
+133:      String temp(totalLen);
+134:      for ( i = 0; i<itsLen; i++)
+135:         temp[i] = itsString[i];
+136:      for ( j = 0; j<rhs.GetLen(); j++, i++)
+137:         temp[i] = rhs[j];
+138:      temp[totalLen]='\0';
+139:      return temp;
+140:   }
+141:   
+142:   void String::operator+=(const String& rhs)
+143:   {
+144:      unsigned short rhsLen = rhs.GetLen();
+145:      unsigned short totalLen = itsLen + rhsLen;
+146:      String  temp(totalLen);
+147:      for (int i = 0; i<itsLen; i++)
+148:         temp[i] = itsString[i];
+149:      for (int j = 0; j<rhs.GetLen(); j++, i++)
+150:         temp[i] = rhs[i-itsLen];
+151:      temp[totalLen]='\0';
+152:      *this = temp;
+153:   }
+154:
+155:   // int String::ConstructorCount = 0;
+156:
+157:   ostream& operator<<( ostream& theStream,String& theString)
+158:   {
+159:       theStream << theString.GetString();
+160:       return theStream;
+161:   }
+162:
+163:   class pAddress
+164:   {
+165:   public:
+166:      pAddress(SERVICE theService,
+167:               const String& theAddress,
+168:               const String& theDisplay):
+169:         itsService(theService),
+170:         itsAddressString(theAddress),
+171:         itsDisplayString(theDisplay)
+172:         {}
+173:      // pAddress(String, String);
+174:      // pAddress();
+175:      // pAddress (const pAddress&);
+176:      ~pAddress(){}
+177:      friend ostream& operator<<( ostream& theStream, pAddress& theAddress);
+178:      String& GetDisplayString() { return itsDisplayString; }
+179:   private:
+180:      SERVICE itsService;
+181:      String itsAddressString;
+182:      String itsDisplayString;
+183:   };
+184:
+185:   ostream& operator<<( ostream& theStream, pAddress& theAddress)
+186:   {
+187:       theStream << theAddress.GetDisplayString();
+188:       return theStream;
+189:   }
+190:
+191:   class PostMasterMessage
+192:   {
+193:   public:
+194:     // PostMasterMessage();
+195:
+196:     PostMasterMessage(const pAddress& Sender,
+197:                     const pAddress& Recipient,
+198:                     const String& Subject,
+199:                     const pDate& creationDate);
+200:
+201:     // other constructors here
+202:     // remember to include copy constructor
+203:     // as well as constructor from storage
+204:     // and constructor from wire format
+205:     // Also include constructors from other formats
+206:     ~PostMasterMessage(){}
+207:
+208:     void Edit(); // invokes editor on this message
+209:
+210:     pAddress& GetSender() const { return itsSender; }
+211:     pAddress& GetRecipient() const { return itsRecipient; }
+212:     String& GetSubject() const { return itsSubject; }
+213:     //  void SetSender(pAddress& );
+214:     // other member accessors
+215:
+216:     // operator methods here, including operator equals
+217:     // and conversion routines to turn PostMaster messages
+218:     // into messages of other formats.
+219:
+220:   private:
+221:      pAddress itsSender;
+222:      pAddress itsRecipient;
+223:      String  itsSubject;
+224:      pDate itsCreationDate;
+225:      pDate itsLastModDate;
+226:      pDate itsReceiptDate;
+227:      pDate itsFirstReadDate;
+228:      pDate itsLastReadDate;
+229:   };
+230:
+231:   PostMasterMessage::PostMasterMessage(
+232:         const pAddress& Sender,
+233:         const pAddress& Recipient,
+234:         const String& Subject,
+235:         const pDate& creationDate):
+236:         itsSender(Sender),
+237:         itsRecipient(Recipient),
+238:         itsSubject(Subject),
+239:         itsCreationDate(creationDate),
+240:         itsLastModDate(creationDate),
+241:         itsFirstReadDate(0),
+242:         itsLastReadDate(0)
+243:     {
+244:       cout << "Post Master Message created. \n";
+245:     }
+246:
+247:     void PostMasterMessage::Edit()
+248:      {
+249:         cout << "PostMasterMessage edit function called\n";
+250:      }
+251:
+252:
+253:   int main()
+254:   {
+255:      pAddress Sender(PostMaster, "jliberty@PostMaster", "Jesse Liberty");
+256:      pAddress Recipient(PostMaster, "sl@PostMaster","Stacey Liberty");
+257:      PostMasterMessage PostMessage(Sender, Recipient, "Saying Hello", 0);
+258:      cout << "Message review... \n";
+259:      cout << "From:\t\t" << PostMessage.GetSender() << endl;
+260:      cout << "To:\t\t" << PostMessage.GetRecipient() << endl;
+261:      cout << "Subject:\t" << PostMessage.GetSubject() << endl;
+262:     return 0;
+263: }
+
+    WARNING: If you receive a "can't convert" error, remove the const keywords from lines 210-212. 
+
+Output: Post Master Message created.
+Message review...
+From:           Jesse Liberty
+To:             Stacey Liberty
+Subject:        Saying Hello
+
+Analysis: On line 4, pDate is type-defined to be an unsigned long. It is not uncommon for dates to be stored as a long integer (typically as the number of seconds since an arbitrary starting date such as January 1, 1900). In this program, this is a placeholder; you would expect to eventually turn pDate into a real class.
+
+On line 5, an enumerated constant, SERVICE, is defined to allow the Address objects to keep track of what type of address they are, including PostMaster, CompuServe, and so forth.
+
+Lines 7-161 represent the interface to and implementation of String, along much the same lines as you have seen in previous chapters. The String class is used for a number of member variables in all of the Message classes and various other classes used by messages, and as such it is pivotal in your program. A full and robust String class will be essential to making your Message classes complete.
+
+On lines 162-183, the pAddress class is declared. This represents only the fundamental functionality of this class, and you would expect to flesh this out once your program is better understood. These objects represent essential components in every message: both the sender's address and that of the recipient. A fully functional pAddress object will be able to handle forwarding messages, replies, and so forth.
+
+It is the pAddress object's job to keep track of the display string as well as the internal routing string for its service. One open question for your design is whether there should be one pAddress object or if this should be subclassed for each service type. For now, the service is tracked as an enumerated constant, which is a member variable of each pAddress object.
+
+Lines 191-229 show the interface to the PostMasterMessage class. In this particular listing, this class stands on its own, but very soon you'll want to make this part of its inheritance hierarchy. When you do redesign this to inherit from Message, some of the member variables may move into the base classes, and some of the member functions may become overrides of base class methods.
+
+A variety of other constructors, accessor functions, and other member functions will be required to make this class fully functional. Note that what this listing illustrates is that your class does not have to be 100 percent complete before you can write a simple driver program to test some of your assumptions.
+
+On lines 247-250, the Edit() function is "stubbed out" in just enough detail to indicate where the editing functionality will be put once this class is fully operational.
+
+Lines 253-263 represent the driver program. Currently this program does nothing more than exercise a few of the accessor functions and the operator<< overload. Nonetheless, this gives you the starting point for experimenting with PostMasterMessages and a framework within which you can modify these classes and examine the impact.
+Summary
+
+Today you saw a review of how to bring together many of the elements of C++ syntax and apply them to object-oriented analysis, design, and programming. The development cycle is not a linear progression from clean analysis through design and culminating in programming; rather, it is cyclical. The first phase is typically analysis of the problem, with the results of that analysis forming the basis for the preliminary design.
+
+Once a preliminary design is complete, programming can begin, but the lessons learned during the programming phase are fed back into the analysis and design. As programming progresses, testing and then debugging begins. The cycle continues, never really ending; although discrete points are reached, at which time it is appropriate to ship the product.
+
+When analyzing a large problem from an object-oriented viewpoint, the interacting parts of the problem are often the objects of the preliminary design. The designer keeps an eye out for process, hoping to encapsulate discrete activities into objects whenever possible.
+
+A class hierarchy must be designed, and fundamental relationships among the interacting parts must be established. The preliminary design is not meant to be final, and functionality will migrate among objects as the design solidifies.
+
+It is a principal goal of object-oriented analysis to hide as much of the data and implementation as possible and to build discrete objects that have a narrow and well-defined interface. The clients of your object should not need to understand the implementation details of how they fulfill their responsibilities.
+Q&A
+
+    Q. In what way is object-oriented analysis and design fundamentally different from other approaches?
+
+    A. Prior to the development of these object-oriented techniques, analysts and programmers tended to think of programs as functions that acted on data. Object-oriented programming focuses on the integrated data and functionality as discrete units that have both knowledge (data) and capabilities (functions). Procedural programs, on the other hand, focus on functions and how they act on data. It has been said that Pascal and C programs are collections of procedures and C++ programs are collections of classes.
+
+    Q. Is object-oriented programming finally the silver bullet that will solve all programming problems?
+
+    A. No, it was never intended to be. For large, complex problems, however, object-oriented analysis, design, and programming can provide the programmer with tools to manage enormous complexity in ways that were previously impossible.
+
+    Q. Is C++ the perfect object-oriented language?
+
+    A. C++ has a number of advantages and disadvantages when compared with alternative object-oriented programming languages, but it has one killer advantage above and beyond all others: It is the single most popular object-oriented programming language on the face of the Earth. Frankly, most programmers don't decide to program in C++ after an exhaustive analysis of the alternative object-oriented programming languages; they go where the action is, and in the 1990s the action is with C++. There are good reasons for that; C++ has a lot to offer, but this book exists, and I'd wager you are reading it, because C++ is the development language of choice at so many corporations.
+
+    Q. Where can I learn more about object-oriented analysis and design?
+
+    A. Day 21 offers some further suggestions, but it is my personal opinion that there are a number of terrific object-oriented analysis and design books available. My personal favorites include:
+    Object-Oriented Analysis and Design with Applications by Grady Booch (2nd Edition). Published by Benjamin/Cummings Publishing Company, Inc., ISBN: 0-8053-5340-2.
+    Object-Oriented Modeling and Design by Rumbaugh, Blaha, Premerlani, Eddy, and Lorenson. Published by Prentice-Hall, ISBN 0-13-629841-9.
+    There are many other excellent alternatives. Also be sure to join one of the newsgroups or conferences on the Internet, Interchange, or one of the alternative dial-up services. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is the difference between object-oriented programming and procedural programming?
+
+    2. To what does "event-driven" refer?
+
+    3. What are the stages in the development cycle?
+
+    4. What is a rooted hierarchy?
+
+    5. What is a driver program?
+
+    6. What is encapsulation? 
+
+Exercises
+
+    1. Suppose you had to simulate the intersection of Massachusetts Avenue and Vassar Street--two typical two-lane roads, with traffic lights and crosswalks. The purpose of the simulation is to determine if the timing of the traffic signal allows for a smooth flow of traffic.
+    What kinds of objects should be modeled in the simulation? What would the classes be for the simulation?
+
+    2. Suppose the intersection from Exercise 1 were in a suburb of Boston, which has arguably the unfriendliest streets in the United States. At any time there are three kinds of Boston drivers:
+    Locals, who continue to drive through intersections after the light turns red; tourists, who drive slowly and cautiously (in a rental car, typically); and taxis, who have a wide variation of driving patterns, depending on the kinds of passengers in the cabs.
+    Also, Boston has two kinds of pedestrians: locals, who cross the street whenever they feel like it and seldom use the crosswalk buttons; and tourists, who always use the crosswalk buttons and only cross when the Walk/Don't Walk light permits.
+    Finally, Boston has bicyclists who never pay attention to stop lights.
+    How do these considerations change the model?
+
+    3. You are asked to design a group scheduler. The software allows you to arrange meetings among individuals or groups and to reserve a limited number of conference rooms. Identify the principal subsystems.
+
+    4. Design and show the interfaces to the classes in the room reservation portion of the program discussed in Exercise 3. 
+
+

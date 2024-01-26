@@ -1,0 +1,1153 @@
+    Day 7
+        More Program Flow
+            Looping
+                The Roots of Looping goto 
+            Listing 7.1. Looping with the keyword goto.
+                Why goto Is Shunned 
+            The goto Statement
+            while Loops
+            Listing 7.2. while loops.
+            The while Statement
+                More Complicated while Statements 
+            Listing 7.3. Complex while loops.
+                continue and break 
+            Listing 7.4. break and continue.
+            The continue Statement
+            The break Statement
+                while (1) Loops 
+            Listing 7.5. while (1) loops.
+            do...while Loops
+            Listing 7.6. Skipping the body of the while Loop.
+            do...while
+            Listing 7.7. Demonstrates do...while loop.
+            The do...while Statement
+            for Loops
+            Listing 7.8. While reexamined.
+            Listing 7.9. Demonstrating the for loop.
+            The for Statement
+                Advanced for Loops 
+            Listing 7.10. Demonstrating multiple statements in for loops.
+            Listing 7.11. Null statements in for loops.
+            Listing 7.12. Illustrating empty for loop statement.
+                Empty for Loops 
+            Listing 7.13. Illustrates the null statement in a for loop.
+                Nested Loops 
+            Listing 7.14. Illustrates nested for loops.
+                Scoping in for Loops 
+            Summing Up Loops
+            Listing 7.15. Solving the nth Fibonacci number
+            using iteration.
+            switch Statements
+            Listing 7.16. Demonstrating the switch statement.
+            The switch Statement
+                Using a switch Statement with a Menu 
+            Listing 7.17. Demonstrating a forever loop.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+
+Day 7
+More Program Flow
+
+Programs accomplish most of their work by branching and looping. On Day 4, "Expressions and Statements," you learned how to branch your program using the if statement. Today you learn
+
+    What loops are and how they are used.
+
+    How to build various loops.
+
+    An alternative to deeply-nested if/else statements. 
+
+Looping
+
+Many programming problems are solved by repeatedly acting on the same data. There are two ways to do this: recursion (discussed yesterday) and iteration. Iteration means doing the same thing again and again. The principal method of iteration is the loop.
+The Roots of Looping goto
+
+In the primitive days of early computer science, programs were nasty, brutish, and short. Loops consisted of a label, some statements, and a jump.
+
+In C++, a label is just a name followed by a colon (:). The label is placed to the left of a legal C++ statement, and a jump is accomplished by writing goto followed by the label name. Listing 7.1 illustrates this.
+
+Listing 7.1. Looping with the keyword goto.
+
+1:    // Listing 7.1
+2:    // Looping with goto
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:           int counter = 0;      // initialize counter
+9:    loop:  counter ++;           // top of the loop
+10:            cout << "counter: " << counter << "\n";
+11:           if (counter < 5)            // test the value
+12:               goto loop;                 // jump to the top
+13:
+14:           cout << "Complete. Counter: " << counter << ".\n";
+15:       return 0;
+16: }
+Output: counter: 1
+counter: 2
+counter: 3
+counter: 4
+counter: 5
+Complete. Counter: 5.
+
+Analysis: On line 8, counter is initialized to 0. The label loop is on line 9, marking the top of the loop. Counter is incremented and its new value is printed. The value of counter is tested on line 11. If it is less than 5, the if statement is true and the goto statement is executed. This causes program execution to jump back to line 9. The program continues looping until counter is equal to 5, at which time it "falls through" the loop and the final output is printed.
+Why goto Is Shunned
+
+goto has received some rotten press lately, and it's well deserved. goto statements can cause a jump to any location in your source code, backward or forward. The indiscriminate use of goto statements has caused tangled, miserable, impossible-to-read programs known as "spaghetti code." Because of this, computer science teachers have spent the past 20 years drumming one lesson into the heads of their students: "Never, ever, ever use goto! It is evil!"
+
+To avoid the use of goto, more sophisticated, tightly controlled looping commands have been introduced: for, while, and do...while. Using these makes programs that are more easily understood, and goto is generally avoided, but one might argue that the case has been a bit overstated. Like any tool, carefully used and in the right hands, goto can be a useful construct, and the ANSI committee decided to keep it in the language because it has its legitimate uses. But as they say, kids, don't try this at home.
+The goto Statement
+
+To use the goto statement, you write goto followed by a label name. This causes an unconditioned jump to the label. Example
+
+if (value > 10)     goto end;if (value < 10)     goto end;cout << "value is Â10!";end:cout << "done";
+
+    WARNING: Use of goto is almost always a sign of bad design. The best advice is to avoid using it. In 10 years of programming, I've needed it only once. 
+
+while Loops
+
+A while loop causes your program to repeat a sequence of statements as long as the starting condition remains true. In the example of goto, in Listing 7.1, the counter was incremented until it was equal to 5. Listing 7.2 shows the same program rewritten to take advantage of a while loop.
+
+Listing 7.2. while loops.
+
+1:    // Listing 7.2
+2:    // Looping with while
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:      int counter = 0;               // initialize the condition
+9:
+10:      while(counter < 5)     // test condition still true
+11:       {
+12:          counter++;              // body of the loop
+13:          cout << "counter: " << counter << "\n";
+14:      }
+15:
+16:      cout << "Complete. Counter: " << counter << ".\n";
+17:       return 0;
+18: }
+Output: counter: 1
+counter: 2
+counter: 3
+counter: 4
+counter: 5
+Complete. Counter: 5.
+
+Analysis: This simple program demonstrates the fundamentals of the while loop. A condition is tested, and if it is true, the body of the while loop is executed. In this case, the condition tested on line 10 is whether counter is less than 5. If the condition is true, the body of the loop is executed; on line 12 the counter is incremented, and on line 13 the value is printed. When the conditional statement on line 10 fails (when counter is no longer less than 5), the entire body of the while loop (lines 11-14) is skipped. Program execution falls through to line 15.
+The while Statement
+
+The syntax for the while statement is as follows:
+
+while ( condition )
+statement;
+
+condition is any C++ expression, and statement is any valid C++ statement or block of statements. When condition evaluates to TRUE (1), statement is executed, and then condition is tested again. This continues until condition tests FALSE, at which time the while loop terminates and execution continues on the first line below statement.
+
+Example
+
+// count to 10
+int x = 0;
+while (x < 10)
+cout << "X: " << x++;
+
+More Complicated while Statements
+
+The condition tested by a while loop can be as complex as any legal C++ expression. This can include expressions produced using the logical && (AND), || (OR), and ! (NOT) operators. Listing 7.3 is a somewhat more complicated while statement.
+
+Listing 7.3. Complex while loops.
+
+1:    // Listing 7.3
+2:    // Complex while statements
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:      unsigned short small;
+9:      unsigned long  large;
+10:      const unsigned short MAXSMALL=65535;
+11:
+12:      cout << "Enter a small number: ";
+13:      cin >> small;
+14:      cout << "Enter a large number: ";
+15:      cin >> large;
+16:
+17:       cout << "small: " << small << "...";
+18:
+19:      // for each iteration, test three conditions
+20:      while (small < large && large > 0 && small < MAXSMALL)
+21:
+22:      {
+23:         if (small % 5000 == 0)  // write a dot every 5k lines
+24:           cout << ".";
+25:
+26:         small++;
+27:
+28:         large-=2;
+29:      }
+30:
+31:      cout << "\nSmall: " << small << " Large: " << large << endl;
+32:     return 0;
+33: }
+Output: Enter a small number: 2
+Enter a large number: 100000
+small: 2.........
+Small: 33335 Large: 33334
+
+Analysis: This program is a game. Enter two numbers, one small and one large. The smaller number will count up by ones, and the larger number will count down by twos. The goal of the game is to guess when they'll meet.
+On lines 12-15, the numbers are entered. Line 20 sets up a while loop, which will continue only as long as three conditions are met:
+
+small is not bigger than large.
+
+large isn't negative.
+
+small doesn't overrun the size of a small integer (MAXSMALL).
+
+On line 23, the value in small is calculated modulo 5,000. This does not change the value in small; however, it only returns the value 0 when small is an exact multiple of 5,000. Each time it is, a dot (.) is printed to the screen to show progress. On line 26, small is incremented, and on line 28, large is decremented by 2.
+When any of the three conditions in the while loop fails, the loop ends and execution of the program continues after the while loop's closing brace on line 29.
+
+    NOTE: The modulus operator (%) and compound conditions are covered on Day 3, "Variables and Constants." 
+
+continue and break
+
+At times you'll want to return to the top of a while loop before the entire set of statements in the while loop is executed. The continue statement jumps back to the top of the loop.
+
+At other times, you may want to exit the loop before the exit conditions are met. The break statement immediately exits the while loop, and program execution resumes after the closing brace.
+
+Listing 7.4 demonstrates the use of these statements. This time the game has become more complicated. The user is invited to enter a small number and a large number, a skip number, and a target number. The small number will be incremented by one, and the large number will be decremented by 2. The decrement will be skipped each time the small number is a multiple of the skip. The game ends if small becomes larger than large. If the large number reaches the target exactly, a statement is printed and the game stops.
+
+The user's goal is to put in a target number for the large number that will stop the game.
+
+Listing 7.4. break and continue.
+
+1:    // Listing 7.4
+2:    // Demonstrates break and continue
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:      unsigned short small;
+9:      unsigned long  large;
+10:      unsigned long  skip;
+11:      unsigned long target;
+12:      const unsigned short MAXSMALL=65535;
+13:
+14:      cout << "Enter a small number: ";
+15:      cin >> small;
+16:      cout << "Enter a large number: ";
+17:      cin >> large;
+18:      cout << "Enter a skip number: ";
+19:      cin >> skip;
+20:      cout << "Enter a target number: ";
+21:      cin >> target;
+22:
+23:    cout << "\n";
+24:
+25:     // set up 3 stop conditions for the loop
+26:      while (small < large && large > 0 && small < 65535)
+27:
+28:      {
+29:
+30:        small++;
+31:
+32:         if (small % skip == 0)  // skip the decrement?
+33:         {
+34:           cout << "skipping on " << small << endl;
+35:           continue;
+36:         }
+37:
+38:         if (large == target)    // exact match for the target?
+39:         {
+40:           cout << "Target reached!";
+41:           break;
+42:         }
+43:
+44:         large-=2;
+45:      }                   // end of while loop
+46:
+47:      cout << "\nSmall: " << small << " Large: " << large << endl;
+48:    return 0;
+49: }
+Output: Enter a small number: 2
+Enter a large number: 20
+Enter a skip number: 4
+Enter a target number: 6
+skipping on 4
+skipping on 8
+
+Small: 10 Large: 8
+
+Analysis: In this play, the user lost; small became larger than large before the target number of 6 was reached.
+On line 26, the while conditions are tested. If small continues to be smaller than large, large is larger than 0, and small hasn't overrun the maximum value for a small int, the body of the while loop is entered.
+
+On line 32, the small value is taken modulo the skip value. If small is a multiple of skip, the continue statement is reached and program execution jumps to the top of the loop at line 26. This effectively skips over the test for the target and the decrement of large.
+
+On line 38, target is tested against the value for large. If they are the same, the user has won. A message is printed and the break statement is reached. This causes an immediate break out of the while loop, and program execution resumes on line 46.
+
+    NOTE: Both continue and break should be used with caution. They are the next most dangerous commands after goto, for much the same reason. Programs that suddenly change direction are harder to understand, and liberal use of continue and break can render even a small while loop unreadable. 
+
+The continue Statement
+
+continue; causes a while or for loop to begin again at the top of the loop. Example
+
+if (value > 10)
+     goto end;
+
+if (value < 10)
+     goto end;
+
+cout << "value is 10!";
+
+end:
+
+cout << "done";
+
+The break Statement
+
+break; causes the immediate end of a while or for loop. Execution jumps to the closing brace. Example
+
+while (condition)
+{
+    if (condition2)
+        break;
+    // statements;
+}
+
+while (1) Loops
+
+The condition tested in a while loop can be any valid C++ expression. As long as that condition remains true, the while loop will continue. You can create a loop that will never end by using the number 1 for the condition to be tested. Since 1 is always true, the loop will never end, unless a break statement is reached. Listing 7.5 demonstrates counting to 10 using this construct.
+
+Listing 7.5. while (1) loops.
+
+1:    // Listing 7.5
+2:    // Demonstrates a while true loop
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:      int counter = 0;
+9:
+10:      while (1)
+11:      {
+12:         counter ++;
+13:         if (counter > 10)
+14:             break;
+15:      }
+16:      cout << "Counter: " << counter << "\n";
+17:       return 0;
+18: 
+Output: Counter: 11
+
+Analysis: On line 10, a while loop is set up with a condition that can never be false. The loop increments the counter variable on line 12 and then on line 13 tests to see whether counter has gone past 10. If it hasn't, the while loop iterates. If counter is greater than 10, the break on line 14 ends the while loop, and program execution falls through to line 16, where the results are printed.
+This program works, but it isn't pretty. This is a good example of using the wrong tool for the job. The same thing can be accomplished by putting the test of counter's value where it belongs--in the while condition.
+
+    WARNING: Eternal loops such as while (1) can cause your computer to hang if the exit condition is never reached. Use these with caution and test them thoroughly. 
+
+C++ gives you many different ways to accomplish the same task. The real trick is picking the right tool for the particular job.
+
+    DON'T use the goto statement. DO use while loops to iterate while a condition is true. DO exercise caution when using continue and break statements. DO make sure your loop will eventually end. 
+
+do...while Loops
+
+It is possible that the body of a while loop will never execute. The while statement checks its condition before executing any of its statements, and if the condition evaluates false, the entire body of the while loop is skipped. Listing 7.6 illustrates this.
+
+Listing 7.6. Skipping the body of the while Loop.
+
+1:     // Listing 7.6
+2:      // Demonstrates skipping the body of
+3:      // the while loop when the condition is false.
+4:
+5:      #include <iostream.h>
+6:
+7:      int main()
+8:      {
+9:         int counter;
+10:        cout << "How many hellos?: ";
+11:        cin >> counter;
+12:        while (counter > 0)
+13:        {
+14:           cout << "Hello!\n";
+15:           counter--;
+16:        }
+17:        cout << "Counter is OutPut: " << counter;
+18:         return 0;
+19: }
+Output: How many hellos?: 2
+Hello!
+Hello!
+Counter is OutPut: 0
+
+How many hellos?: 0
+Counter is OutPut: 0
+
+Analysis: The user is prompted for a starting value on line 10. This starting value is stored in the integer variable counter. The value of counter is tested on line 12, and decremented in the body of the while loop. The first time through counter was set to 2, and so the body of the while loop ran twice. The second time through, however, the user typed in 0. The value of counter was tested on line 12 and the condition was false; counter was not greater than 0. The entire body of the while loop was skipped, and Hello was never printed.
+What if you want to ensure that Hello is always printed at least once? The while loop can't accomplish this, because the if condition is tested before any printing is done. You can force the issue with an if statement just before entering the while:
+
+if (counter < 1)  // force a minimum value
+counter = 1;
+
+but that is what programmers call a "kludge," an ugly and inelegant solution.
+do...while
+
+The do...while loop executes the body of the loop before its condition is tested and ensures that the body always executes at least one time. Listing 7.7 rewrites Listing 7.6, this time using a do...while loop.
+
+Listing 7.7. Demonstrates do...while loop.
+
+1:      // Listing 7.7
+2:      // Demonstrates do while
+3:
+4:      #include <iostream.h>
+5:
+6:      int main()
+7:      {
+8:         int counter;
+9:         cout << "How many hellos? ";
+10:        cin >> counter;
+11:        do
+12:        {
+13:           cout << "Hello\n";
+14:           counter--;
+15:        }  while (counter >0 );
+16:        cout << "Counter is: " << counter << endl;
+17:         return 0;
+18: }
+
+Output: How many hellos? 2
+Hello
+Hello
+Counter is: 0
+
+Analysis: The user is prompted for a starting value on line 9, which is stored in the integer variable counter. In the do...while loop, the body of the loop is entered before the condition is tested, and therefore the body of the loop is guaranteed to run at least once. On line 13 the message is printed, on line 14 the counter is decremented, and on line 15 the condition is tested. If the condition evaluates TRUE, execution jumps to the top of the loop on line 13; otherwise, it falls through to line 16.
+The continue and break statements work in the do...while loop exactly as they do in the while loop. The only difference between a while loop and a do...while loop is when the condition is tested.
+The do...while Statement
+
+The syntax for the do...while statement is as follows:
+
+do
+statement
+while (condition);
+
+statement is executed, and then condition is evaluated. If condition is TRUE, the loop is repeated; otherwise, the loop ends. The statements and conditions are otherwise identical to the while loop. Example 1
+
+// count to 10
+int x = 0;
+do
+cout << "X: " << x++;
+while (x < 10)
+
+Example 2
+
+// print lowercase alphabet.
+char ch = `a';
+do
+{
+cout << ch << ` `;
+ch++;
+} while ( ch <= `z' );
+
+    DO use do...while when you want to ensure the loop is executed at least once. DO use while loops when you want to skip the loop if the condition is false. DO test all loops to make sure they do what you expect. 
+
+for Loops
+
+When programming while loops, you'll often find yourself setting up a starting condition, testing to see if the condition is true, and incrementing or otherwise changing a variable each time through the loop. Listing 7.8 demonstrates this.
+
+Listing 7.8. While reexamined.
+
+1:    // Listing 7.8
+2:    // Looping with while
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:      int counter = 0;
+9:
+10:      while(counter < 5)
+11:      {
+12:           counter++;
+13:           cout << "Looping!  ";
+14:      }
+15:
+16:      cout << "\nCounter: " << counter << ".\n";
+17:       return 0;
+18: }
+Output: Looping!  Looping!  Looping!  Looping!  Looping!
+Counter: 5.
+
+Analysis: The condition is set on line 8: counter is initialized to 0. On line 10, counter is tested to see whether it is less than 5. counter is incremented on line 12. On line 16, a simple message is printed, but you can imagine that more important work could be done for each increment of the counter.
+A for loop combines three steps into one statement. The three steps are initialization, test, and increment. A for statement consists of the keyword for followed by a pair of parentheses. Within the parentheses are three statements separated by semicolons.
+
+The first statement is the initialization. Any legal C++ statement can be put here, but typically this is used to create and initialize a counting variable. Statement 2 is the test, and any legal C++ expression can be used here. This serves the same role as the condition in the while loop. Statement 3 is the action. Typically a value is incremented or decremented, though any legal C++ statement can be put here. Note that statements 1 and 3 can be any legal C++ statement, but statement 2 must be an expression--a C++ statement that returns a value. Listing 7.9 demonstrates a for loop.
+
+Listing 7.9. Demonstrating the for loop.
+
+1:      // Listing 7.9
+2:      // Looping with for
+3:
+4:      #include <iostream.h>
+5:
+6:      int main()
+7:      {
+8:        int counter;
+9:        for (counter = 0; counter < 5; counter++)
+10:          cout << "Looping! ";
+11:
+12:        cout << "\nCounter: " << counter << ".\n";
+13:         return 0;
+14: }
+Output: Looping!  Looping!  Looping!  Looping!  Looping!
+Counter: 5.
+
+Analysis: The for statement on line 8 combines the initialization of counter, the test that counter is less than 5, and the increment of counter all into one line. The body of the for statement is on line 9. Of course, a block could be used here as well.
+The for Statement
+
+The syntax for the for statement is as follows:
+
+for (initialization; test; action )
+statement;
+
+The initialization statement is used to initialize the state of a counter, or to otherwise prepare for the loop. test is any C++ expression and is evaluated each time through the loop. If test is TRUE, the action in the header is executed (typically the counter is incremented) and then the body of the for loop is executed. Example 1
+
+// print Hello ten times
+for (int i = 0; i<10; i++)
+cout << "Hello! ";
+
+Example 2
+
+for (int i = 0; i < 10; i++)
+{
+    cout << "Hello!" << endl;
+    cout << "the value of i is: " << i << endl;
+}
+
+Advanced for Loops
+
+for statements are powerful and flexible. The three independent statements (initialization, test, and action) lend themselves to a number of variations.
+
+A for loop works in the following sequence:
+
+    1. Performs the operations in the initialization.
+
+    2. Evaluates the condition.
+
+    3. If the condition is TRUE, executes the action statement and the loop. 
+
+After each time through, the loop repeats steps 2 and 3. Multiple Initialization and Increments It is not uncommon to initialize more than one variable, to test a compound logical expression, and to execute more than one statement. The initialization and the action may be replaced by multiple C++ statements, each separated by a comma. Listing 7.10 demonstrates the initialization and increment of two variables.
+
+Listing 7.10. Demonstrating multiple statements in for loops.
+
+1:  //listing 7.10
+2:  // demonstrates multiple statements in
+3:  // for loops
+4:
+5: #include <iostream.h>
+6:
+7:  int main()
+8:  {
+9:      for (int i=0, j=0; i<3; i++, j++)
+10:          cout << "i: " << i << " j: " << j << endl;
+11:     return 0;
+12: }
+
+Output: i: 0  j: 0
+i: 1  j: 1
+i: 2  j: 2
+
+Analysis: On line 9, two variables, i and j, are each initialized with the value 0. The test (i<3) is evaluated, and because it is true, the body of the for statement is executed, and the values are printed. Finally, the third clause in the for statement is executed, and i and j are incremented.
+Once line 10 completes, the condition is evaluated again, and if it remains true the actions are repeated (i and j are again incremented), and the body of loop is executed again. This continues until the test fails, in which case the action statement is not executed, and control falls out of the loop. Null Statements in for Loops Any or all of the statements in a for loop can be null. To accomplish this, use the semicolon to mark where the statement would have been. To create a for loop that acts exactly like a while loop, leave out the first and third statements. Listing 7.11 illustrates this idea.
+
+Listing 7.11. Null statements in for loops.
+
+1:    // Listing 7.11
+2:    // For loops with null statements
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:        int counter = 0;
+9:
+10:        for( ; counter < 5; )
+11:        {
+12:           counter++;
+13:           cout << "Looping!  ";
+14:        }
+15:
+16:        cout << "\nCounter: " << counter << ".\n";
+17:       return 0;
+18: }
+
+output: Looping!  Looping!  Looping!  Looping!  Looping!
+Counter: 5.
+
+Analysis: You may recognize this as exactly like the while loop illustrated in Listing 7.8! On line 8, the counter variable is initialized. The for statement on line 10 does not initialize any values, but it does include a test for counter < 5. There is no increment statement, so this loop behaves exactly as if it had been written:
+
+while (counter < 5)
+
+Once again, C++ gives you a number of ways to accomplish the same thing. No experienced C++ programmer would use a for loop in this way, but it does illustrate the flexibility of the for statement. In fact, it is possible, using break and continue, to create a for loop with none of the three statements. Listing 7.12 illustrates how.
+
+Listing 7.12. Illustrating empty for loop statement.
+
+1:     //Listing 7.12 illustrating
+2:     //empty for loop statement
+3:
+4:     #include <iostream.h>
+5:
+6:     int main()
+7:     {
+8:         int counter=0;       // initialization
+9:         int max;
+10:         cout << "How many hellos?";
+11:         cin >> max;
+12:         for (;;)          // a for loop that doesn't end
+13:         {
+14:            if (counter < max)       // test
+15:            {
+16:              cout << "Hello!\n";
+17:              counter++;          // increment
+18:            }
+19:            else
+20:                break;
+21:         }
+22:        return 0;
+23: }
+
+Output: How many hellos?3
+Hello!
+Hello!
+Hello!
+
+Analysis: The for loop has now been pushed to its absolute limit. Initialization, test, and action have all been taken out of the for statement. The initialization is done on line 8, before the for loop begins. The test is done in a separate if statement on line 14, and if the test succeeds, the action, an increment to counter, is performed on line 17. If the test fails, breaking out of the loop occurs on line 20.
+While this particular program is somewhat absurd, there are times when a for(;;) loop or a while (1) loop is just what you'll want. You'll see an example of a more reasonable use of such loops when switch statements are discussed later today.
+Empty for Loops
+
+So much can be done in the header of a for statement, there are times you won't need the body to do anything at all. In that case, be sure to put a null statement (;) as the body of the loop. The semicolon can be on the same line as the header, but this is easy to overlook. Listing 7.13 illustrates how to use a null body in a for loop.
+
+Listing 7.13. Illustrates the null statement in a for loop.
+
+1:     //Listing 7.13
+2:     //Demonstrates null statement
+3:     // as body of for loop
+4:
+5:     #include <iostream.h>
+6:     int main()
+7:     {
+8:        for (int i = 0; i<5; cout << "i: " << i++ << endl)
+9:        ;
+10:       return 0;
+11: }
+
+Output: i: 0
+i: 1
+i: 2
+i: 3
+i: 4
+
+Analysis: The for loop on line 8 includes three statements: the initialization statement establishes the counter i and initializes it to 0. The condition statement tests for i<5, and the action statement prints the value in i and increments it.
+There is nothing left to do in the body of the for loop, so the null statement (;) is used. Note that this is not a well-designed for loop: the action statement is doing far too much. This would be better rewritten as
+
+8:         for (int i = 0; i<5; i++)
+
+
+9:              cout << "i: " << i << endl;
+
+
+While both do exactly the same thing, this example is easier to understand.
+Nested Loops
+
+Loops may be nested, with one loop sitting in the body of another. The inner loop will be executed in full for every execution of the outer loop. Listing 7.14 illustrates writing marks into a matrix using nested for loops.
+
+Listing 7.14. Illustrates nested for loops.
+
+1:   //Listing 7.14
+2:   //Illustrates nested for loops
+3:
+4:   #include <iostream.h>
+5:
+6:   int main()
+7:   {
+8:       int rows, columns;
+9:       char theChar;
+10:       cout << "How many rows? ";
+11:       cin >> rows;
+12:       cout << "How many columns? ";
+13:       cin >> columns;
+14:       cout << "What character? ";
+15:       cin >> theChar;
+16:       for (int i = 0; i<rows; i++)
+17:       {
+18:          for (int j = 0; j<columns; j++)
+19:              cout << theChar;
+20:          cout << "\n";
+21:       }
+22:      return 0;
+23: }
+
+Output: How many rows? 4
+How many columns? 12
+What character? x
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+
+Analysis: The user is prompted for the number of rows and columns and for a character to print. The first for loop, on line 16, initializes a counter (i) to 0, and then the body of the outer for loop is run.
+On line 18, the first line of the body of the outer for loop, another for loop is established. A second counter (j) is also initialized to 0, and the body of the inner for loop is executed. On line 19, the chosen character is printed, and control returns to the header of the inner for loop. Note that the inner for loop is only one statement (the printing of the character). The condition is tested (j < columns) and if it evaluates true, j is incremented and the next character is printed. This continues until j equals the number of columns.
+
+Once the inner for loop fails its test, in this case after 12 Xs are printed, execution falls through to line 20, and a new line is printed. The outer for loop now returns to its header, where its condition (i < rows) is tested. If this evaluates true, i is incremented and the body of the loop is executed.
+
+In the second iteration of the outer for loop, the inner for loop is started over. Thus, j is reinitialized to 0 and the entire inner loop is run again.
+
+The important idea here is that by using a nested loop, the inner loop is executed for each iteration of the outer loop. Thus the character is printed columns times for each row.
+
+    NOTE: As an aside, many C++ programmers use the letters i and j as counting variables. This tradition goes all the way back to FORTRAN, in which the letters i, j, k, l, m, and n were the only legal counting variables. Other programmers prefer to use more descriptive counter variable names, such as Ctrl and Ctr2. Using i and j in for loop headers should not cause much confusion, however. 
+
+Scoping in for Loops
+
+You will remember that variables are scoped to the block in which they are created. That is, a local variable is visible only within the block in which it is created. It is important to note that counting variables created in the header of a for loop are scoped to the outer block, not the inner block. The implication of this is that if you have two for loops in the same function, you must give them different counter variables, or they may interfere with one another.
+Summing Up Loops
+
+On Day 5, "Functions," you learned how to solve the Fibonacci series problem using recursion. To review briefly, a Fibonacci series starts with 1, 1, 2, 3, and all subsequent numbers are the sum of the previous two:
+
+1,1,2,3,5,8,13,21,34...
+
+The nth Fibonacci number is the sum of the n-1 and the n-2 Fibonacci numbers. The problem solved on Day 5 was finding the value of the nth Fibonacci number. This was done with recursion. Listing 7.15 offers a solution using iteration.
+
+Listing 7.15. Solving the nth Fibonacci numberusing iteration.
+
+1:  // Listing 7.15
+2:  // Demonstrates solving the nth
+3:  // Fibonacci number using iteration
+4:
+5:  #include <iostream.h>
+6:
+7:  typedef unsigned long int ULONG;
+8:
+9:  ULONG fib(ULONG position);
+10:  int main()
+11:  {
+12:      ULONG answer, position;
+13:      cout << "Which position? ";
+14:      cin >> position;
+15:      cout << "\n";
+16:
+17:      answer = fib(position);
+18:      cout << answer << " is the ";
+19:      cout << position << "th Fibonacci number.\n";
+20:     return 0;
+21:  }
+22:
+23:  ULONG fib(ULONG n)
+24:  {
+25:      ULONG minusTwo=1, minusOne=1, answer=2;
+26:
+27:      if (n < 3)
+28:          return 1;
+29:
+30:      for (n -= 3; n; n--)
+31:      {
+32:          minusTwo = minusOne;
+33:          minusOne = answer;
+34:          answer = minusOne + minusTwo;
+35:      }
+36:
+37:      return answer;
+38: }
+Output: Which position? 4
+
+3 is the 4th Fibonacci number.
+
+Which position? 5
+
+5 is the 5th Fibonacci number.
+
+Which position? 20
+
+6765 is the 20th Fibonacci number.
+
+Which position? 100
+
+3314859971 is the 100th Fibonacci number.
+
+Analysis: Listing 7.15 solves the Fibonacci series using iteration rather than recursion. This approach is faster and uses less memory than the recursive solution.
+On line 13, the user is asked for the position to check. The function fib() is called, which evaluates the position. If the position is less than 3, the function returns the value 1. Starting with position 3, the function iterates using the following algorithm:
+
+1. Establish the starting position: Fill variable answer with 2, minusTwo with 0 (answer-2), and minusOne with 1 (answer-1). Decrement the position by 3, because the first two numbers are handled by the starting position.
+
+2. For every number, count up the Fibonacci series. This is done by
+a. Putting the value currently in minusOne into minusTwo.
+
+b. Putting the value currently in answer into minusOne.
+
+c. Adding minusOne and minusTwo and putting the sum in answer.
+
+d. Decrementing n.
+
+3. When n reaches 0, return the answer.
+
+This is exactly how you would solve this problem with pencil and paper. If you were asked for the fifth Fibonacci number, you would write:
+
+1, 1, 2,
+
+and think, "two more to do." You would then add 2+1 and write 3, and think, "one more to find." Finally you would write 3+2 and the answer would be 5. In effect, you are shifting your attention right one number each time through, and decrementing the number remaining to be found.
+
+Note the condition tested on line 30 (n). This is a C++ idiom, and is exactly equivalent to n != 0. This for loop relies on the fact that when n reaches 0 it will evaluate false, because 0 is false in C++. The for loop header could have been written:
+
+for (n-=3; n>0; n++)
+
+which might have been clearer. However, this idiom is so common in C++ that there is little sense in fighting it.
+
+Compile, link, and run this program, along with the recursive solution offered on Day 5. Try finding position 25 and compare the time it takes each program. Recursion is elegant, but because the function call brings a performance overhead, and because it is called so many times, its performance is noticeably slower than iteration. Microcomputers tend to be optimized for the arithmetic operations, so the iterative solution should be blazingly fast.
+
+Be careful how large a number you enter. fib grows quickly, and long integers will overflow after a while.
+switch Statements
+
+On Day 4, you saw how to write if and if/else statements. These can become quite confusing when nested too deeply, and C++ offers an alternative. Unlike if, which evaluates one value, switch statements allow you to branch on any of a number of different values. The general form of the switch statement is:
+
+switch (expression)
+{
+case valueOne: statement;
+                   break;
+case valueTwo: statement;
+                   break;
+....
+case valueN:   statement;
+                   break;
+default:       statement;
+}
+
+expression is any legal C++ expression, and the statements are any legal C++ statements or block of statements. switch evaluates expression and compares the result to each of the case values. Note, however, that the evaluation is only for equality; relational operators may not be used here, nor can Boolean operations.
+
+If one of the case values matches the expression, execution jumps to those statements and continues to the end of the switch block, unless a break statement is encountered. If nothing matches, execution branches to the optional default statement. If there is no default and there is no matching value, execution falls through the switch statement and the statement ends.
+
+    NOTE: It is almost always a good idea to have a default case in switch statements. If you have no other need for the default, use it to test for the supposedly impossible case, and print out an error message; this can be a tremendous aid in debugging. 
+
+It is important to note that if there is no break statement at the end of a case statement, execution will fall through to the next case statement. This is sometimes necessary, but usually is an error. If you decide to let execution fall through, be sure to put a comment, indicating that you didn't just forget the break.
+
+Listing 7.16 illustrates use of the switch statement.
+
+Listing 7.16. Demonstrating the switch statement.
+
+1:  //Listing 7.16
+2:  // Demonstrates switch statement
+3:
+4:  #include <iostream.h>
+5:
+6:  int main()
+7:  {
+8:    unsigned short int number;
+9:    cout << "Enter a number between 1 and 5: ";
+10:    cin >> number;
+11:    switch (number)
+12:    {
+13:       case 0:   cout << "Too small, sorry!";
+14:                 break;
+15:       case 5:  cout << "Good job!\n";  // fall through
+16:       case 4:  cout << "Nice Pick!\n"; // fall through
+17:       case 3:  cout << "Excellent!\n"; // fall through
+18:       case 2:  cout << "Masterful!\n"; // fall through
+19:       case 1:  cout << "Incredible!\n";
+20:                break;
+21:       default: cout << "Too large!\n";
+22:                break;
+23:    }
+24:    cout << "\n\n";
+25:     return 0;
+26: }
+
+Output: Enter a number between 1 and 5: 3
+Excellent!
+Masterful!
+Incredible!
+
+Enter a number between 1 and 5: 8
+Too large!
+
+Analysis: The user is prompted for a number. That number is given to the switch statement. If the number is 0, the case statement on line 13 matches, the message Too small, sorry! is printed, and the break statement ends the switch. If the value is 5, execution switches to line 15 where a message is printed, and then falls through to line 16, another message is printed, and so forth until hitting the break on line 20.
+The net effect of these statements is that for a number between 1 and 5, that many messages are printed. If the value of number is not 0-5, it is assumed to be too large, and the default statement is invoked on line 21.
+The switch Statement
+
+The syntax for the switch statement is as follows:
+
+switch (expression)
+{
+case valueOne: statement;
+case valueTwo: statement;
+....
+case valueN: statement
+default: statement;
+}
+
+The switch statement allows for branching on multiple values of expression. The expression is evaluated, and if it matches any of the case values, execution jumps to that line. Execution continues until either the end of the switch statement or a break statement is encountered. If expression does not match any of the case statements, and if there is a default statement, execution switches to the default statement, otherwise the switch statement ends. Example 1
+
+switch (choice)
+{
+case 0:
+        cout << "Zero!" << endl;
+        break
+case 1:
+        cout << "One!" << endl;
+       break;
+case 2:
+       cout << "Two!" << endl;
+default:
+       cout << "Default!" << endl;
+}
+
+Example 2
+
+switch (choice)
+{
+choice 0:
+choice 1:
+choice 2:
+       cout << "Less than 3!";
+       break;
+choice 3:
+       cout << "Equals 3!";
+       break;
+default:
+       cout << "greater than 3!";
+}
+
+Using a switch Statement with a Menu
+
+Listing 7.17 returns to the for(;;) loop discussed earlier. These loops are also called forever loops, as they will loop forever if a break is not encountered. The forever loop is used to put up a menu, solicit a choice from the user, act on the choice, and then return to the menu. This will continue until the user chooses to exit.
+
+    NOTE: Some programmers like to write 
+
+#define EVER ;;
+for (EVER)
+{
+    // statements...
+}
+
+Using #define is covered on Day 17, "The Preprocessor."
+
+    New Term: A forever loop is a loop that does not have an exit condition. In order to exit the loop, a break statement must be used. Forever loops are also known as eternal loops. 
+
+Listing 7.17. Demonstrating a forever loop.
+
+1:    //Listing 7.17
+2:    //Using a forever loop to manage
+3:    //user interaction
+4:    #include <iostream.h>
+5:
+6:    // types & defines
+7:    enum BOOL { FALSE, TRUE };
+8:    typedef unsigned short int USHORT;
+9:
+10:    // prototypes
+11:    USHORT menu();
+12:    void DoTaskOne();
+13:    void DoTaskMany(USHORT);
+14:
+15:    int main()
+16:    {
+17:
+18:        BOOL exit = FALSE;
+19:        for (;;)
+20:        {
+21:             USHORT choice = menu();
+22:             switch(choice)
+23:             {
+24:                case (1):
+25:                     DoTaskOne();
+26:                     break;
+27:                case (2):
+28:                     DoTaskMany(2);
+29:                     break;
+30:                case (3):
+31:                     DoTaskMany(3);
+32:                     break;
+33:                case (4):
+34:                     continue;  // redundant!
+35:                     break;
+36:                case (5):
+37:                     exit=TRUE;
+38:                     break;
+39:                default:
+40:                     cout << "Please select again!\n";
+41:                     break;
+42:             }          // end switch
+43:
+44:             if (exit)
+45:                    break;
+46:        }                // end forever
+47:       return 0;
+48:    }                    // end main()
+49:
+50:    USHORT menu()
+51:    {
+52:        USHORT choice;
+53:
+54:        cout << " **** Menu ****\n\n";
+55:        cout << "(1) Choice one.\n";
+56:        cout << "(2) Choice two.\n";
+57:        cout << "(3) Choice three.\n";
+58:        cout << "(4) Redisplay menu.\n";
+59:        cout << "(5) Quit.\n\n";
+60:        cout << ": ";
+61:        cin >> choice;
+62:        return choice;
+63:    }
+64:
+65:    void DoTaskOne()
+66:    {
+67:        cout << "Task One!\n";
+68:    }
+69:
+70:    void DoTaskMany(USHORT which)
+71:    {
+72:        if (which == 2)
+73:             cout << "Task Two!\n";
+74:        else
+75:             cout << "Task Three!\n";
+76: }
+
+Output: **** Menu ****
+
+(1) Choice one.
+(2) Choice two.
+(3) Choice three.
+(4) Redisplay menu.
+(5) Quit.
+
+: 1
+Task One!
+ **** Menu ****
+(1) Choice one.
+(2) Choice two.
+(3) Choice three.
+(4) Redisplay menu.
+(5) Quit.
+
+: 3
+Task Three!
+ **** Menu ****
+(1) Choice one.
+(2) Choice two.
+(3) Choice three.
+(4) Redisplay menu.
+(5) Quit.
+
+: 5
+
+Analysis: This program brings together a number of concepts from today and previous days. It also shows a common use of the switch statement. On line 7, an enumeration, BOOL, is created, with two possible values: FALSE, which equals 0, as it should, and TRUE, which equals 1. On line 8, typedef is used to create an alias, USHORT, for unsigned short int.
+The forever loop begins on 19. The menu() function is called, which prints the menu to the screen and returns the user's selection. The switch statement, which begins on line 22 and ends on line 42, switches on the user's choice.
+
+If the user enters 1, execution jumps to the case 1: statement on line 24. Line 25 switches execution to the DoTaskOne() function, which prints a message and returns. On its return, execution resumes on line 26, where the break ends the switch statement, and execution falls through to line 43. On line 44, the variable exit is evaluated. If it evaluates true, the break on line 45 will be executed and the for(;;) loop will end, but if it evaluates false, execution resumes at the top of the loop on line 19.
+
+Note that the continue statement on line 34 is redundant. If it were left out and the break statement were encountered, the switch would end, exit would evaluate FALSE, the loop would reiterate, and the menu would be reprinted. The continue does, however, bypass the test of exit.
+
+    DO use switch statements to avoid deeply nested if statements. DON'T forget break at the end of each case unless you wish to fall through. DO carefully document all intentional fall-through cases. DO put a default case in switch statements, if only to detect seemingly impossible situations. 
+
+Summary
+
+There are different ways to cause a C++ program to loop. While loops check a condition, and if it is true, execute the statements in the body of the loop. do...while loops execute the body of the loop and then test the condition. for loops initialize a value, then test an expression. If an expression is true, the final statement in the for header is executed, as is the body of the loop. Each subsequent time through the loop the expression is tested again.
+
+The goto statement is generally avoided, as it causes an unconditional jump to a seemingly arbitrary location in the code, and thus makes source code difficult to understand and maintain. continue causes while, do...while, and for loops to start over, and break causes while, do...while, for, and switch statements to end.
+Q&A
+
+    Q. How do you choose between if/else and switch?
+
+    A. If there are more than just one or two else clauses, and all are testing the same value, consider using a switch statement.
+
+    Q. How do you choose between while and do...while?
+
+    A. If the body of the loop should always execute at least once, consider a do...while loop; otherwise, try to use the while loop.
+
+    Q. How do you choose between while and for?
+
+    A If you are initializing a counting variable, testing that variable, and incrementing it each time through the loop, consider the for loop. If your variable is already initialized and is not incremented on each loop, a while loop may be the better choice.
+
+    Q. How do you choose between recursion and iteration?
+
+    A. Some problems cry out for recursion, but most problems will yield to iteration as well. Put recursion in your back pocket; it may come in handy someday.
+
+    Q. Is it better to use while (1) or for (;;)?
+
+    A. There is no significant difference. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered, as well as exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. How do I initialize more than one variable in a for loop?
+
+    2. Why is goto avoided?
+
+    3. Is it possible to write a for loop with a body that is never executed?
+
+    4. Is it possible to nest while loops within for loops?
+
+    5. Is it possible to create a loop that never ends? Give an example.
+
+    6. What happens if you create a loop that never ends? 
+
+Exercises
+
+    1. What is the value of x when the for loop completes? 
+
+for (int x = 0; x < 100; x++)
+
+    2. Write a nested for loop that prints a 10x10 pattern of 0s.
+
+    3. Write a for statement to count from 100 to 200 by 2s.
+
+    4. Write a while loop to count from 100 to 200 by 2s.
+
+    5. Write a do...while loop to count from 100 to 200 by 2s.
+
+    6. BUG BUSTERS: What is wrong with this code? 
+
+int counter = 0
+while (counter < 10)
+{
+    cout << "counter: " << counter;
+}
+
+    7. BUG BUSTERS: What is wrong with this code? 
+
+for (int counter = 0; counter < 10; counter++);
+    cout << counter << " ";
+
+    8. BUG BUSTERS: What is wrong with this code? 
+
+int counter = 100;
+while (counter < 10)
+{
+    cout << "counter now: " << counter;
+    counter--;
+}
+
+    9. BUG BUSTERS: What is wrong with this code? 
+
+cout << "Enter a number between 0 and 5: ";
+cin >> theNumber;
+switch (theNumber)
+{
+   case 0:
+         doZero();
+   case 1:              // fall through
+   case 2:              // fall through
+   case 3:              // fall through
+   case 4:              // fall through
+   case 5:
+         doOneToFive();
+         break;
+   default:
+         doDefault();
+         break;
+}
+
+

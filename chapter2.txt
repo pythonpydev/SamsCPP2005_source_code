@@ -1,0 +1,368 @@
+    Day 2
+        The Parts of a C++ Program
+            A Simple Program
+            Listing 2.1. HELLO.CPP demonstrates the parts of a C++ program.
+            A Brief Look at cout
+            Listing 2.2.
+            Using cout.
+            Comments
+                Types of Comments
+                Using Comments 
+            Listing 2.3. HELP.CPP demonstrates comments.
+                Comments at the Top of Each File
+                A Final Word of Caution About Comments 
+            Functions
+            Listing 2.4. Demonstrating a call to a function.
+                Using Functions 
+            Listing 2.5. FUNC.CPP demonstrates a simple function.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+
+Day 2
+The Parts of a C++ Program
+
+C++ programs consist of objects, functions, variables, and other component parts. Most of this book is devoted to explaining these parts in depth, but to get a sense of how a program fits together you must see a complete working program. Today you learn
+
+    The parts of a C++ program.
+
+    How the parts work together.
+
+    What a function is and what it does. 
+
+A Simple Program
+
+Even the simple program HELLO.CPP from Day 1, "Getting Started," had many interesting parts. This section will review this program in more detail. Listing 2.1 reproduces the original version of HELLO.CPP for your convenience.
+
+Listing 2.1. HELLO.CPP demonstrates the parts of a C++ program.
+
+1: #include <iostream.h>
+2:
+3:  int main()
+4: {
+5:    cout << "Hello World!\n";
+6:      return 0;
+7: }
+Hello World!
+
+On line 1, the file iostream.h is included in the file. The first character is the # symbol, which is a signal to the preprocessor. Each time you start your compiler, the preprocessor is run. The preprocessor reads through your source code, looking for lines that begin with the pound symbol (#), and acts on those lines before the compiler runs.
+
+include is a preprocessor instruction that says, "What follows is a filename. Find that file and read it in right here." The angle brackets around the filename tell the preprocessor to look in all the usual places for this file. If your compiler is set up correctly, the angle brackets will cause the preprocessor to look for the file iostream.h in the directory that holds all the H files for your compiler. The file iostream.h (Input-Output-Stream) is used by cout, which assists with writing to the screen. The effect of line 1 is to include the file iostream.h into this program as if you had typed it in yourself.
+
+New Term: The preprocessor runs before your compiler each time the compiler is invoked. The preprocessor translates any line that begins with a pound symbol (#) into a special command, getting your code file ready for the compiler.
+
+Line 3 begins the actual program with a function named main(). Every C++ program has a main() function. In general, a function is a block of code that performs one or more actions. Usually functions are invoked or called by other functions, but main() is special. When your program starts, main() is called automatically.
+
+main(), like all functions, must state what kind of value it will return. The return value type for main() in HELLO.CPP is void, which means that this function will not return any value at all. Returning values from functions is discussed in detail on Day 4, "Expressions and Statements."
+
+All functions begin with an opening brace ({) and end with a closing brace (}). The braces for the main() function are on lines 4 and 7. Everything between the opening and closing braces is considered a part of the function.
+
+The meat and potatoes of this program is on line 5. The object cout is used to print a message to the screen. We'll cover objects in general on Day 6, "Basic Classes," and cout and its related object cin in detail on Day 17, "The Preprocessor." These two objects, cout and cin, are used in C++ to print strings and values to the screen. A string is just a set of characters.
+
+Here's how cout is used: type the word cout, followed by the output redirection operator (<<). Whatever follows the output redirection operator is written to the screen. If you want a string of characters written, be sure to enclose them in double quotes ("), as shown on line 5.
+
+New Term: A text string is a series of printable characters.
+
+The final two characters, \n, tell cout to put a new line after the words Hello World! This special code is explained in detail when cout is discussed on Day 17.
+
+All ANSI-compliant programs declare main() to return an int. This value is "returned" to the operating system when your program completes. Some programmers signal an error by returning the value 1. In this book, main() will always return 0.
+
+The main() function ends on line 7 with the closing brace.
+A Brief Look at cout
+
+On Day 16, "Streams," you will see how to use cout to print data to the screen. For now, you can use cout without fully understanding how it works. To print a value to the screen, write the word cout, followed by the insertion operator (<<), which you create by typing the less-than character (<) twice. Even though this is two characters, C++ treats it as one.
+
+Follow the insertion character with your data. Listing 2.2 illustrates how this is used. Type in the example exactly as written, except substitute your own name where you see Jesse Liberty (unless your name is Jesse Liberty, in which case leave it just the way it is; it's perfect-- but I'm still not splitting royalties!).
+
+Listing 2.2.Using cout.
+
+1:     // Listing 2.2 using cout
+2:
+3:     #include <iostream.h>
+4:     int main()
+5:     {
+6:        cout << "Hello there.\n";
+7:        cout << "Here is 5: " << 5 << "\n";
+8:        cout << "The manipulator endl writes a new line to the screen." <<  
+                      Âendl;
+9:        cout << "Here is a very big number:\t" << 70000 << endl;
+10:       cout << "Here is the sum of 8 and 5:\t" << 8+5 << endl;
+11:       cout << "Here's a fraction:\t\t" << (float) 5/8 << endl;
+12:       cout << "And a very very big number:\t" << (double) 7000 * 7000 << 
+                      Âendl;
+13:       cout << "Don't forget to replace Jesse Liberty with your name...\n";
+14:       cout << "Jesse Liberty is a C++ programmer!\n";
+15:        return 0;
+16: }
+
+Hello there.
+Here is 5: 5
+The manipulator endl writes a new line to the screen.
+Here is a very big number:      70000
+Here is the sum of 8 and 5:     13
+Here's a fraction:              0.625
+And a very very big number:     4.9e+07
+Don't forget to replace Jesse Liberty with your name...
+Jesse Liberty is a C++ programmer!
+
+On line 3, the statement #include <iostream.h> causes the iostream.h file to be added to your source code. This is required if you use cout and its related functions.
+
+On line 6 is the simplest use of cout, printing a string or series of characters. The symbol \n is a special formatting character. It tells cout to print a newline character to the screen.
+
+Three values are passed to cout on line 7, and each value is separated by the insertion operator. The first value is the string "Here is 5: ". Note the space after the colon. The space is part of the string. Next, the value 5 is passed to the insertion operator and the newline character (always in double quotes or single quotes). This causes the line
+
+Here is 5: 5
+
+to be printed to the screen. Because there is no newline character after the first string, the next value is printed immediately afterwards. This is called concatenating the two values.
+
+On line 8, an informative message is printed, and then the manipulator endl is used. The purpose of endl is to write a new line to the screen. (Other uses for endl are discussed on Day 16.)
+
+On line 9, a new formatting character, \t, is introduced. This inserts a tab character and is used on lines 8-12 to line up the output. Line 9 shows that not only integers, but long integers as well can be printed. Line 10 demonstrates that cout will do simple addition. The value of 8+5 is passed to cout, but 13 is printed.
+
+On line 11, the value 5/8 is inserted into cout. The term (float) tells cout that you want this value evaluated as a decimal equivalent, and so a fraction is printed. On line 12 the value 7000 * 7000 is given to cout, and the term (double) is used to tell cout that you want this to be printed using scientific notation. All of this will be explained on Day 3, "Variables and Constants," when data types are discussed.
+
+On line 14, you substituted your name, and the output confirmed that you are indeed a C++ programmer. It must be true, because the computer said so!
+Comments
+
+When you are writing a program, it is always clear and self-evident what you are trying to do. Funny thing, though--a month later, when you return to the program, it can be quite confusing and unclear. I'm not sure how that confusion creeps into your program, but it always does.
+
+To fight the onset of confusion, and to help others understand your code, you'll want to use comments. Comments are simply text that is ignored by the compiler, but that may inform the reader of what you are doing at any particular point in your program.
+Types of Comments
+
+C++ comments come in two flavors: the double-slash (//) comment, and the slash-star (/*) comment. The double-slash comment, which will be referred to as a C++-style comment, tells the compiler to ignore everything that follows this comment, until the end of the line.
+
+The slash-star comment mark tells the compiler to ignore everything that follows until it finds a star-slash (*/) comment mark. These marks will be referred to as C-style comments. Every /* must be matched with a closing */.
+
+As you might guess, C-style comments are used in the C language as well, but C++-style comments are not part of the official definition of C.
+
+Many C++ programmers use the C++-style comment most of the time, and reserve C-style comments for blocking out large blocks of a program. You can include C++-style comments within a block "commented out" by C-style comments; everything, including the C++-style comments, is ignored between the C-style comment marks.
+Using Comments
+
+As a general rule, the overall program should have comments at the beginning, telling you what the program does. Each function should also have comments explaining what the function does and what values it returns. Finally, any statement in your program that is obscure or less than obvious should be commented as well.
+
+Listing 2.3 demonstrates the use of comments, showing that they do not affect the processing of the program or its output.
+
+Listing 2.3. HELP.CPP demonstrates comments.
+
+1: #include <iostream.h>
+2:
+3: int main()
+4: {
+5:  /* this is a comment
+6:  and it extends until the closing
+7:  star-slash comment mark */
+8:    cout << "Hello World!\n";
+9:    // this comment ends at the end of the line
+10:   cout << "That comment ended!\n";
+11:
+12:  // double slash comments can be alone on a line
+13: /* as can slash-star comments */
+14:     return 0;
+15: }
+Hello World!
+That comment ended!
+
+The comments on lines 5 through 7 are completely ignored by the compiler, as
+are the comments on lines 9, 12, and 13. The comment on line 9 ended with the
+end of the line, however, while the comments on lines 5 and 13 required a closing comment mark.
+Comments at the Top of Each File
+
+It is a good idea to put a comment block at the top of every file you write. The exact style of this block of comments is a matter of individual taste, but every such header should include at least the following information:
+
+    The name of the function or program.
+
+    The name of the file.
+
+    What the function or program does.
+
+    A description of how the program works.
+
+    The author's name.
+
+    A revision history (notes on each change made).
+
+    What compilers, linkers, and other tools were used to make the program.
+
+    Additional notes as needed. 
+
+For example, the following block of comments might appear at the top of the Hello World program.
+
+/************************************************************
+
+Program:      Hello World
+
+File:         Hello.cpp
+
+Function:     Main (complete program listing in this file)
+
+Description:  Prints the words "Hello world" to the screen
+
+Author:       Jesse Liberty (jl)
+
+Environment:  Turbo C++ version 4, 486/66 32mb RAM, Windows 3.1
+              DOS 6.0.  EasyWin module.
+
+Notes:        This is an introductory, sample program.
+
+Revisions:    1.00  10/1/94 (jl) First release
+              1.01  10/2/94 (jl) Capitalized "World"
+
+************************************************************/
+
+It is very important that you keep the notes and descriptions up-to-date. A common problem with headers like this is that they are neglected after their initial creation, and over time they become increasingly misleading. When properly maintained, however, they can be an invaluable guide to the overall program.
+
+The listings in the rest of this book will leave off the headings in an attempt to save room. That does not diminish their importance, however, so they will appear in the programs provided at the end of each week.
+A Final Word of Caution About Comments
+
+Comments that state the obvious are less than useful. In fact, they can be counterproductive, because the code may change and the programmer may neglect to update the comment. What is obvious to one person may be obscure to another, however, so judgment is required.
+
+The bottom line is that comments should not say what is happening, they should say why it is happening.
+
+    DO add comments to your code. DO keep comments up-to-date. DO use comments to tell what a section of code does. DON'T use comments for self-explanatory code. 
+
+Functions
+
+While main() is a function, it is an unusual one. Typical functions are called, or invoked, during the course of your program. A program is executed line by line in the order it appears in your source code, until a function is reached. Then the program branches off to execute the function. When the function finishes, it returns control to the line of code immediately following the call to the function.
+
+A good analogy for this is sharpening your pencil. If you are drawing a picture, and your pencil breaks, you might stop drawing, go sharpen the pencil, and then return to what you were doing. When a program needs a service performed, it can call a function to perform the service and then pick up where it left off when the function is finished running. Listing 2.4 demonstrates this idea.
+
+Listing 2.4. Demonstrating a call to a function.
+
+1:     #include <iostream.h>
+2:
+3:     // function Demonstration Function
+4:     // prints out a useful message
+5:     void DemonstrationFunction()
+6:     {
+7:         cout << "In Demonstration Function\n";
+8:     }
+9:
+10:    // function main - prints out a message, then
+11:    // calls DemonstrationFunction, then prints out
+12:    // a second message.
+13:    int main()
+14:    {
+15:        cout << "In main\n" ;
+16:        DemonstrationFunction();
+17:        cout << "Back in main\n";
+18:         return 0;
+19: }
+In main
+In Demonstration Function
+Back in main
+
+The function DemonstrationFunction() is defined on lines 5-7. When it is called, it prints a message to the screen and then returns.
+
+Line 13 is the beginning of the actual program. On line 15, main() prints out a message saying it is in main(). After printing the message, line 16 calls DemonstrationFunction(). This call causes the commands in DemonstrationFunction() to execute. In this case, the entire function consists of the code on line 7, which prints another message. When DemonstrationFunction() completes (line 8), it returns back to where it was called from. In this case the program returns to line 17, where main() prints its final line.
+Using Functions
+
+Functions either return a value or they return void, meaning they return nothing. A function that adds two integers might return the sum, and thus would be defined to return an integer value. A function that just prints a message has nothing to return and would be declared to return void.
+
+Functions consist of a header and a body. The header consists, in turn, of the return type, the function name, and the parameters to that function. The parameters to a function allow values to be passed into the function. Thus, if the function were to add two numbers, the numbers would be the parameters to the function. Here's a typical function header:
+
+int Sum(int a, int b)
+
+A parameter is a declaration of what type of value will be passed in; the actual value passed in by the calling function is called the argument. Many programmers use these two terms, parameters and arguments, as synonyms. Others are careful about the technical distinction. This book will use the terms interchangeably.
+
+The body of a function consists of an opening brace, zero or more statements, and a closing brace. The statements constitute the work of the function. A function may return a value, using a return statement. This statement will also cause the function to exit. If you don't put a return statement into your function, it will automatically return void at the end of the function. The value returned must be of the type declared in the function header.
+
+    NOTE: Functions are covered in more detail on Day 5, "Functions." The types that can be returned from a function are covered in more det+[radical][Delta][infinity]on Day 3. The information provided today is to present you with an overview, because functions will be used in almost all of your C++ programs. 
+
+Listing 2.5 demonstrates a function that takes two integer parameters and returns an integer value. Don't worry about the syntax or the specifics of how to work with integer values (for example, int x) for now; that is covered in detail on Day 3.
+
+Listing 2.5. FUNC.CPP demonstrates a simple function.
+
+1:    #include <iostream.h>
+2:    int Add (int x, int y)
+3:    {
+4:
+5:      cout << "In Add(), received " << x << " and " << y << "\n";
+6:      return (x+y);
+7:    }
+8:
+9:    int main()
+10:    {
+11:         cout << "I'm in main()!\n";
+12:         int a, b, c;
+13:         cout << "Enter two numbers: ";
+14:         cin >> a;
+15:         cin >> b;
+16:         cout << "\nCalling Add()\n";
+17:         c=Add(a,b);
+18:         cout << "\nBack in main().\n";
+19:         cout << "c was set to " << c;
+20:         cout << "\nExiting...\n\n";
+21:         return 0;
+22: }
+
+I'm in main()!
+Enter two numbers: 3 5
+
+Calling Add()
+In Add(), received 3 and 5
+
+Back in main().
+c was set to 8
+
+Exiting...
+
+The function Add() is defined on line 2. It takes two integer parameters and returns an integer value. The program itself begins on line 9 and on line 11, where it prints a message. The program prompts the user for two numbers (lines 13 to 15). The user types each number, separated by a space, and then presses the Enter key. main() passes the two numbers typed in by the user as arguments to the Add() function on line 17.
+
+Processing branches to the Add() function, which starts on line 2. The parameters a and b are printed and then added together. The result is returned on line 6, and the function returns.
+
+In lines 14 and 15, the cin object is used to obtain a number for the variables a and b, and cout is used to write the values to the screen. Variables and other aspects of this program are explored in depth in the next few days.
+Summary
+
+The difficulty in learning a complex subject, such as programming, is that so much of what you learn depends on everything else there is to learn. This chapter introduced the basic
+parts of a simple C++ program. It also introduced the development cycle and a number of important new terms.
+Q&A
+
+    Q. What does #include do?
+
+    A. This is a directive to the preprocessor, which runs when you call your compiler. This specific directive causes the file named after the word include to be read in, as if it were typed in at that location in your source code.
+
+    Q. What is the difference between // comments and /* style comments?
+
+    A. The double-slash comments (//) "expire" at the end of the line. Slash-star (/*) comments are in effect until a closing comment (*/). Remember, not even the end of the function terminates a slash-star comment; you must put in the closing comment mark, or you will get a compile-time error.
+
+    Q. What differentiates a good comment from a bad comment?
+
+    A. A good comment tells the reader why this particular code is doing whatever it is doing or explains what a section of code is about to do. A bad comment restates what a particular line of code is doing. Lines of code should be written so that they speak for themselves. Reading the line of code should tell you what it is doing without needing a comment. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is the difference between the compiler and the preprocessor?
+
+    2. Why is the function main() special?
+
+    3. What are the two types of comments, and how do they differ?
+
+    4. Can comments be nested?
+
+    5. Can comments be longer than one line? 
+
+Exercises
+
+    1. Write a program that writes I love C++ to the screen.
+
+    2. Write the smallest program that can be compiled, linked, and run.
+
+    3. BUG BUSTERS: Enter this program and compile it. Why does it fail? How can you fix it? 
+
+1: #include <iostream.h>
+2: void main()
+3: {
+4: cout << Is there a bug here?";
+5: }
+
+    4. Fix the bug in Exercise 3 and recompile, link, and run it.
+
+
+
+

@@ -1,0 +1,454 @@
+In Review
+
+The following program brings together many of the advanced techniques you've learned during the past three weeks of hard work. Week 3 in Review provides a template-based linked list with exception handling. Examine it in detail; if you understand it fully, you are a C++ programmer.
+
+    WARNING: If your compiler does not support templates, or if your compiler does not support try and catch, you will not be able to compile or run this listing. 
+
+Listing R3.1. Week 3 in Review listing.
+
+0:   // **************************************************
+1:   //
+2:   // Title:     Week 3 in Review
+3:   //
+4:   // File:      Week3
+5:   //
+6:   // Description:   Provide a template-based linked list
+7:   //                demonstration program with exception handling
+8:   //
+9:   // Classes:    PART - holds part numbers and potentially other
+10:   //                      information about parts. This will be the
+11:   //                      example class for the list to hold
+12:   //                      Note use of operator<< to print the
+13:   //                      information about a part based on its
+14:   //                      runtime type.
+15:   //
+16:   //               Node - acts as a node in a List
+17:   //
+18:   //               List - template-based list which provides the
+19:   //                      mechanisms for a linked list
+20:   //
+21:   //
+22:   // Author:    Jesse Liberty (jl)
+23:   //
+24:   // Developed:   Pentium 200 Pro. 128MB RAM MVC 5.0
+25:   //
+26:   // Target:    Platform independent
+27:   //
+28:   // Rev History:  9/94 - First release (jl)
+29:   //               4/97 - Updated (jl)
+30:   // **************************************************
+31: 
+32:   #include <iostream.h>
+33: 
+34:   // exception classes
+35:   class Exception {};
+36:   class OutOfMemory :   public Exception{};
+37:   class NullNode :    public Exception{};
+38:   class EmptyList :   public Exception {};
+39:   class BoundsError :   public Exception {};
+40: 
+41: 
+42:   // **************** Part ************
+43:   // Abstract base class of parts
+44:   class Part
+45:   {
+46:   public:
+47:    Part():itsObjectNumber(1) {}
+48:    Part(int ObjectNumber):itsObjectNumber(ObjectNumber){}
+49:    virtual ~Part(){};
+50:    int GetObjectNumber() const { return itsObjectNumber; }
+51:    virtual void Display() const =0;  // must be overridden
+52: 
+53:   private:
+54:    int itsObjectNumber;
+55:   };
+56: 
+57:   // implementation of pure virtual function so that
+58:   // derived classes can chain up
+59:   void Part::Display() const
+60:   {
+61:     cout << "\nPart Number: " << itsObjectNumber << endl;
+62:   }
+63: 
+64:   // this one operator<< will be called for all part objects.
+65:   // It need not be a friend as it does not access private data
+66:   // It calls Display() which uses the required polymorphism
+67:   // We'd like to be able to override this based on the real type
+68:   // of thePart, but C++ does not support contravariance
+69:   ostream& operator<<( ostream& theStream,Part& thePart)
+70:   {
+71:    thePart.Display();  // virtual contravariance!
+72:    return theStream;
+73:   }
+74: 
+75:   // **************** Car Part ************
+76:   class CarPart : public Part
+77:   {
+78:   public:
+79:    CarPart():itsModelYear(94){}
+80:    CarPart(int year, int partNumber);
+81:    int GetModelYear() const { return itsModelYear; }
+82:    virtual void Display() const;
+83:   private:
+84:    int itsModelYear;
+85:   };
+86: 
+87:   CarPart::CarPart(int year, int partNumber):
+88:    itsModelYear(year),
+89:    Part(partNumber)
+90:   {}
+91: 
+92:   void CarPart::Display() const
+93:   {
+94:       Part::Display();
+95:       cout << "Model Year: " << itsModelYear << endl;
+96:   }
+97: 
+98:   // **************** AirPlane Part ************
+99:   class AirPlanePart : public Part
+100:   {
+101:   public:
+102:    AirPlanePart():itsEngineNumber(1){};
+103:    AirPlanePart(int EngineNumber, int PartNumber);
+104:    virtual void Display() const;
+105:    int GetEngineNumber()const { return itsEngineNumber; }
+106:   private:
+107:    int itsEngineNumber;
+108:   };
+109:
+110:   AirPlanePart::AirPlanePart(int EngineNumber, int PartNumber):
+111:    itsEngineNumber(EngineNumber),
+112:    Part(PartNumber)
+113:   {}
+114:
+115:   void AirPlanePart::Display() const
+116:   {
+117:    Part::Display();
+118:    cout << "Engine No.: " << itsEngineNumber << endl;
+119:   }
+120:
+121:   // forward declaration of class List
+122:   template <class T>
+123:   class List;
+124:
+125:   // ****************  Node ************
+126:   // Generic node, can be added to a list
+127:   // ************************************
+128:
+129:   template <class T>
+130:   class Node
+131:   {
+132:   public:
+133:    friend class List<T>;
+134:    Node (T*);
+135:    ~Node();
+136:    void SetNext(Node * node) { itsNext = node; }
+137:    Node * GetNext() const;
+138:    T * GetObject() const;
+139:   private:
+140:    T* itsObject;
+141:    Node * itsNext;
+142:   };
+143:
+144:   // Node Implementations...
+145:
+146:   template <class T>
+147:   Node<T>::Node(T* pOjbect):
+148:   itsObject(pOjbect),
+149:   itsNext(0)
+150:   {}
+151:
+152:   template <class T>
+153:   Node<T>::~Node()
+154:   {
+155:    delete itsObject;
+156:    itsObject = 0;
+157:    delete itsNext;
+158:    itsNext = 0;
+159:   }
+160:
+161:   // Returns NULL if no next Node
+162:   template <class T>
+163:   Node<T> * Node<T>::GetNext() const
+164:   {
+165:       return itsNext;
+166:   }
+167:
+168:   template <class T>
+169:   T * Node<T>::GetObject() const
+170:   {
+171:    if (itsObject)
+172:       return itsObject;
+173:    else
+174:       throw NullNode();
+175:   }
+176:
+177:   // ****************  List ************
+178:   // Generic list template
+179:   // Works with any numbered object
+180:   // ***********************************
+181:   template <class T>
+182:   class List
+183:   {
+184:   public:
+185:    List();
+186:    ~List();
+187:
+188:    T*        Find(int & position, int ObjectNumber)  const;
+189:    T*      GetFirst() const;
+190:    void      Insert(T *);
+191:    T*      operator[](int) const;
+192:    int      GetCount() const { return itsCount; }
+193:   private:
+194:    Node<T> * pHead;
+195:    int      itsCount;
+196:   };
+197:
+198:   // Implementations for Lists...
+199:   template <class T>
+200:   List<T>::List():
+201:    pHead(0),
+202:    itsCount(0)
+203:    {}
+204:
+205:   template <class T>
+206:   List<T>::~List()
+207:   {
+208:    delete pHead;
+209:   }
+210:
+211:   template <class T>
+212:   T*   List<T>::GetFirst() const
+213:   {
+214:    if (pHead)
+215:       return pHead->itsObject;
+216:    else
+217:       throw EmptyList();
+218:   }
+219:
+220:   template <class T>
+221:   T *  List<T>::operator[](int offSet) const
+222:   {
+223:    Node<T>* pNode = pHead;
+224:
+225:    if (!pHead)
+226:       throw EmptyList();
+227:
+228:    if (offSet > itsCount)
+229:       throw BoundsError();
+230:
+231:    for (int i=0;i<offSet; i++)
+232:       pNode = pNode->itsNext;
+233:
+234:   return   pNode->itsObject;
+235:   }
+236:
+237:   // find a given object in list based on its unique number (id)
+238:   template <class T>
+239:   T*   List<T>::Find(int & position, int ObjectNumber)  const
+240:   {
+241:    Node<T> * pNode = 0;
+242:    for (pNode = pHead, position = 0;
+243:          pNode!=NULL;
+244:          pNode = pNode->itsNext, position++)
+245:    {
+246:       if (pNode->itsObject->GetObjectNumber() == ObjectNumber)
+247:          break;
+248:    }
+249:    if (pNode == NULL)
+250:       return NULL;
+251:    else
+252:       return pNode->itsObject;
+253:   }
+254:
+255:   // insert if the number of the object is unique
+256:   template <class T>
+257:   void List<T>::Insert(T* pObject)
+258:   {
+259:    Node<T> * pNode = new Node<T>(pObject);
+260:    Node<T> * pCurrent = pHead;
+261:    Node<T> * pNext = 0;
+262:
+263:    int New =  pObject->GetObjectNumber();
+264:    int Next = 0;
+265:    itsCount++;
+266:
+267:    if (!pHead)
+268:    {
+269:       pHead = pNode;
+270:       return;
+271:    }
+272:
+273:    // if this one is smaller than head
+274:    // this one is the new head
+275:    if (pHead->itsObject->GetObjectNumber() > New)
+276:    {
+277:       pNode->itsNext = pHead;
+278:       pHead = pNode;
+279:       return;
+280:    }
+281:
+282:    for (;;)
+283:    {
+284:       // if there is no next, append this new one
+285:       if (!pCurrent->itsNext)
+286:       {
+287:          pCurrent->itsNext = pNode;
+288:          return;
+289:       }
+290:
+291:       // if this goes after this one and before the next
+292:       // then insert it here, otherwise get the next
+293:       pNext = pCurrent->itsNext;
+294:       Next = pNext->itsObject->GetObjectNumber();
+295:       if (Next > New)
+296:       {
+297:          pCurrent->itsNext = pNode;
+298:          pNode->itsNext = pNext;
+299:          return;
+300:       }
+301:       pCurrent = pNext;
+302:    }
+303:   }
+304:
+305:
+306:   int main()
+307:   {
+308:    List<Part> theList;
+309:    int choice;
+310:    int ObjectNumber;
+311:    int value;
+312:    Part * pPart;
+313:    while (1)
+314:    {
+315:       cout << "(0)Quit (1)Car (2)Plane: ";
+316:       cin >> choice;
+317:
+318:       if (!choice)
+319:          break;
+320:
+321:       cout << "New PartNumber?: ";
+322:       cin >>  ObjectNumber;
+323:
+324:       if (choice == 1)
+325:       {
+326:          cout << "Model Year?: ";
+327:          cin >> value;
+328:          try
+329:          {
+330:             pPart = new CarPart(value,ObjectNumber);
+331:          }
+332:          catch (OutOfMemory)
+333:          {
+334:             cout << "Not enough memory; Exiting..." << endl;
+335:             return 1;
+336:          }
+337:       }
+338:       else
+339:       {
+340:          cout << "Engine Number?: ";
+341:          cin >> value;
+342:          try
+343:          {
+344:             pPart = new AirPlanePart(value,ObjectNumber);
+345:          }
+346:          catch (OutOfMemory)
+347:          {
+348:             cout << "Not enough memory; Exiting..." << endl;
+349:             return 1;
+350:          }
+351:       }
+352:       try
+353:       {
+354:          theList.Insert(pPart);
+355:       }
+356:       catch (NullNode)
+357:       {
+358:          cout << "The list is broken, and the node is null!" << endl;
+359:          return 1;
+360:       }
+361:       catch (EmptyList)
+362:       {
+363:          cout << "The list is empty!" << endl;
+364:          return 1;
+365:       }
+366:    }
+367:    try
+368:    {
+369:       for (int i = 0; i < theList.GetCount(); i++ )
+370:          cout << *(theList[i]);
+371:    }
+372:       catch (NullNode)
+373:       {
+374:          cout << "The list is broken, and the node is null!" << endl;
+375:          return 1;
+376:       }
+377:       catch (EmptyList)
+378:       {
+379:          cout << "The list is empty!" << endl;
+380:          return 1;
+381:       }
+382:       catch (BoundsError)
+383:       {
+384:          cout << "Tried to read beyond the end of the list!" << endl;
+385:          return 1;
+386:       }
+387:   return 0;
+388: }
+
+Output: (0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 2837
+Model Year? 90
+
+ (0)Quit (1)Car (2)Plane: 2
+New PartNumber?: 378
+Engine Number?: 4938
+
+ (0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 4499
+Model Year? 94
+
+ (0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 3000
+Model Year? 93
+
+ (0)Quit (1)Car (2)Plane: 0
+
+Part Number: 378
+Engine No. 4938
+
+Part Number: 2837
+Model Year: 90
+
+Part Number: 3000
+Model Year: 93
+
+Part Number 4499
+Model Year: 94
+
+Analysis: The Week 3 in Review listing modifies the program provided in Week 2 to add templates, ostream processing, and exception handling. The output is identical.
+On lines 35-39, a number of exception classes are declared. In the somewhat primitive exception handling provided by this program, no data or methods are required of these exceptions; they serve as flags to the catch statements, which print out a very simple warning and then exit. A more robust program might pass these exceptions by reference and then extract context or other data from the exception objects in an attempt to recover from the problem.
+
+On line 44, the abstract base class Part is declared exactly as it was in Week 2. The only interesting change here is in the non-class member operator<<(), which is declared on lines 69-73. Note that this is neither a member of Part nor a friend of part, it simply takes a Part reference as one of its arguments.
+
+You might want to have operator<< take a CarPart and an AirPlanePart in the hopes that the correct operator<< would be called, based on whether a car part or an airplane part is passed. Since the program passes a pointer to a part, however, and not a pointer to a car part or an airplane part, C++ would have to call the right function based on the real type of one of the arguments to the function. This is called contravariance and is not supported in C++.
+
+There are only two ways to achieve polymorphism in C++: function polymorphism and virtual functions. Function polymorphism won't work here because in every case you are matching the same signature: the one taking a reference to a Part.
+
+Virtual functions won't work here because operator<< is not a member function of Part. You can't make operator<< a member function of Part because you want to invoke
+
+cout << thePart
+
+and that means that the actual call would be to cout.operator<<(Part&), and cout does not have a version of operator<< that takes a Part reference!
+
+To get around this limitation, the Week 3 program uses just one operator<<, taking a reference to a Part. This then calls Display(), which is a virtual member function, and thus the right version is called.
+
+On lines 129-142, Node is defined as a template. It serves the same function as Node did in the Week 2 Review program, but this version of Node is not tied to a Part object. It can, in fact, be the node for any type of object.
+
+Note that if you try to get the object from Node, and there is no object, this is considered an exception, and the exception is thrown on line 174.
+
+On lines 181-197, a generic List class template is defined. This List class can hold nodes of any objects that have unique identification numbers, and it keeps them sorted in ascending order. Each of the list functions checks for exceptional circumstances and throws the appropriate exceptions as required.
+
+On lines 306-388, the driver program creates a list of two types of Part objects and then prints out the values of the objects in the list by using the standard streams mechanism.
+
+

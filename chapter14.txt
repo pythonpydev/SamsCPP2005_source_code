@@ -1,0 +1,1030 @@
+    Day 14
+        Special Classes and Functions
+            Static Member Data
+            Listing 14.1. Static member data.
+            Listing 14.2. Accessing static members without an object.
+            Listing 14.3. Accessing static members using non-static member functions.
+            Static Member Functions
+            Listing 14.4. Static member functions.
+            Static Member Functions
+            Pointers to Functions
+            Listing 14.5. Pointers to functions.
+            Pointer to Function
+                Why Use Function Pointers? 
+            Listing 14.6. Rewriting Listing 14.5 without the pointer to function.
+            Shorthand Invocation
+                Arrays of Pointers to Functions 
+            Listing 14.7. Demonstrates use of an array of pointers to functions.
+                Passing Pointers to Functions to Other Functions 
+            Listing 14.8. Passing pointers to functions
+            as function arguments.
+                Using typedef with Pointers to Functions 
+            Listing 14.9. Using typedef to make pointers to functions more readable.
+            Pointers to Member Functions
+            Listing 14.10. Pointers to member functions.
+                Arrays of Pointers to Member Functions 
+            Listing 14.11. Array of pointers to member functions.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+
+Day 14
+Special Classes and Functions
+
+C++ offers a number of ways to limit the scope and impact of variables and pointers. So far you've seen how to create global variables, local function variables, pointers to variables, and class member variables. Today you learn
+
+    What static member variables and static member functions are.
+
+    How to use static member variables and static member functions.
+
+    How to create and manipulate pointers to functions and pointers to member functions.
+
+    How to work with arrays of pointers to functions. 
+
+Static Member Data
+
+Until now, you have probably thought of the data in each object as unique to that object and not shared among objects in a class. For example, if you have five Cat objects, each has its own age, weight, and other data. The age of one does not affect the age of another.
+
+There are times, however, when you'll want to keep track of a pool of data. For example, you might want to know how many objects for a specific class have been created in your program, and how many are still in existence. Static member variables are shared among all instances of a class. They are a compromise between global data, which is available to all parts of your program, and member data, which is usually available only to each object.
+
+You can think of a static member as belonging to the class rather than to the object. Normal member data is one per object, but static members are one per class. Listing 14.1 declares a Cat object with a static data member, HowManyCats. This variable keeps track of how many Cat objects have been created. This is done by incrementing the static variable, HowManyCats, with each construction and decrementing it with each destruction.
+
+Listing 14.1. Static member data.
+
+1:     //Listing 14.1 static data members
+2:
+3:     #include <iostream.h>
+4:
+5:     class Cat
+6:     {
+7:     public:
+8:        Cat(int age):itsAge(age){HowManyCats++; }
+9:        virtual ~Cat() { HowManyCats--; }
+10:       virtual int GetAge() { return itsAge; }
+11:       virtual void SetAge(int age) { itsAge = age; }
+12:       static int HowManyCats;
+13:
+14:    private:
+15:       int itsAge;
+16:
+17:    };
+18:
+19:    int Cat::HowManyCats = 0;
+20:
+21:    int main()
+22:    {
+23:       const int MaxCats = 5; int i;
+24:       Cat *CatHouse[MaxCats];
+25:       for (i = 0; i<MaxCats; i++)
+26:          CatHouse[i] = new Cat(i);
+27:
+28:       for (i = 0; i<MaxCats; i++)
+29:       {
+30:          cout << "There are ";
+31:          cout << Cat::HowManyCats;
+32:          cout << " cats left!\n";
+33:          cout << "Deleting the one which is ";
+34:          cout << CatHouse[i]->GetAge();
+35:          cout << " years old\n";
+36:          delete CatHouse[i];
+37:          CatHouse[i] = 0;
+38:       }
+39:     return 0;
+40: }
+
+Output: There are 5 cats left!
+Deleting the one which is 0 years old
+There are 4 cats left!
+Deleting the one which is 1 years old
+There are 3 cats left!
+Deleting the one which is 2 years old
+There are 2 cats left!
+Deleting the one which is 3 years old
+There are 1 cats left!
+Deleting the one which is 4 years old
+
+Analysis: On lines 5 to 17 the simplified class Cat is declared. On line 12, HowManyCats is declared to be a static member variable of type int.
+
+The declaration of HowManyCats does not define an integer; no storage space is set aside. Unlike the non-static member variables, no storage space is set aside by instantiating a Cat object, because the HowManyCats member variable is not in the object. Thus, on line 19 the variable is defined and initialized.
+
+It is a common mistake to forget to define the static member variables of classes. Don't let this happen to you! Of course, if it does, the linker will catch it with a pithy error message such as the following:
+
+undefined symbol Cat::HowManyCats
+
+You don't need to do this for itsAge, because it is a non-static member variable and is defined each time you make a Cat object, which you do here on line 26.
+
+The constructor for Cat increments the static member variable on line 8. The destructor decrements it on line 9. Thus, at any moment, HowManyCats has an accurate measure of how many Cat objects were created but not yet destroyed.
+
+The driver program on lines 21-40 instantiates five Cats and puts them in an array. This calls five Cat constructors, and thus HowManyCats is incremented five times from its initial value of 0.
+
+The program then loops through each of the five positions in the array and prints out the value of HowManyCats before deleting the current Cat pointer. The printout reflects that the starting value is 5 (after all, 5 are constructed), and that each time the loop is run, one fewer Cat remains.
+
+Note that HowManyCats is public and is accessed directly by main(). There is no reason to expose this member variable in this way. It is preferable to make it private along with the other member variables and provide a public accessor method, as long as you will always access the data through an instance of Cat. On the other hand, if you'd like to access this data directly without necessarily having a Cat object available, you have two options: keep it public, as shown in Listing 14.2, or provide a static member function, as discussed later in this chapter.
+
+Listing 14.2. Accessing static members without an object.
+
+1:     //Listing 14.2 static data members
+2:
+3:     #include <iostream.h>
+4:
+5:     class Cat
+6:     {
+7:     public:
+8:        Cat(int age):itsAge(age){HowManyCats++; }
+9:        virtual ~Cat() { HowManyCats--; }
+10:       virtual int GetAge() { return itsAge; }
+11:       virtual void SetAge(int age) { itsAge = age; }
+12:       static int HowManyCats;
+13:
+14:    private:
+15:       int itsAge;
+16:
+17:    };
+18:
+19:    int Cat::HowManyCats = 0;
+20:
+21:    void TelepathicFunction();
+22:
+23:    int main()
+24:    {
+25:       const int MaxCats = 5; int i;
+26:       Cat *CatHouse[MaxCats];
+27:       for (i = 0; i<MaxCats; i++)
+28:       {
+29:          CatHouse[i] = new Cat(i);
+30:          TelepathicFunction();
+31:       }
+32:
+33:       for ( i = 0; i<MaxCats; i++)
+34:       {
+35:          delete CatHouse[i];
+36:          TelepathicFunction();
+37:       }
+38:       return 0;
+39:    }
+40:
+41:    void TelepathicFunction()
+42:    {
+43:       cout << "There are ";
+44:       cout << Cat::HowManyCats << " cats alive!\n";
+45: }
+
+Output: There are 1 cats alive!
+There are 2 cats alive!
+There are 3 cats alive!
+There are 4 cats alive!
+There are 5 cats alive!
+There are 4 cats alive!
+There are 3 cats alive!
+There are 2 cats alive!
+There are 1 cats alive!
+There are 0 cats alive! 
+
+Analysis: Listing 14.2 is much like Listing 14.1 except for the addition of a new function, TelepathicFunction(). This function does not create a Cat object, nor does it take a Cat object as a parameter, yet it can access the HowManyCats member variable. Again, it is worth reemphasizing that this member variable is not in any particular object; it is in the class as a whole, and, if public, can be accessed by any function in the program.
+
+The alternative to making this member variable public is to make it private. If you do, you can access it through a member function, but then you must have an object of that class available. Listing 14.3 shows this approach. The alternative, static member functions, is discussed immediately after the analysis of Listing 14.3.
+
+Listing 14.3. Accessing static members using non-static member functions.
+
+1:     //Listing 14.3 private static data members
+2:
+3:     #include <iostream.h>
+4:
+5:     class Cat
+6:     {
+7:     public:
+8:        Cat(int age):itsAge(age){HowManyCats++; }
+9:        virtual ~Cat() { HowManyCats--; }
+10:       virtual int GetAge() { return itsAge; }
+11:       virtual void SetAge(int age) { itsAge = age; }
+12:       virtual int GetHowMany() { return HowManyCats; }
+13:
+14:
+15:    private:
+16:       int itsAge;
+17:       static int HowManyCats;
+18:    };
+19:
+20:    int Cat::HowManyCats = 0;
+21:
+22:    int main()
+23:    {
+24:       const int MaxCats = 5; int i;
+25:       Cat *CatHouse[MaxCats];
+26:       for (i = 0; i<MaxCats; i++)
+27:          CatHouse[i] = new Cat(i);
+28:
+29:       for (i = 0; i<MaxCats; i++)
+30:       {
+31:          cout << "There are ";
+32:          cout << CatHouse[i]->GetHowMany();
+33:          cout << " cats left!\n";
+34:          cout << "Deleting the one which is ";
+35:          cout << CatHouse[i]->GetAge()+2;
+36:          cout << " years old\n";
+37:          delete CatHouse[i];
+38:          CatHouse[i] = 0;
+39:       }
+40:     return 0;
+41: }
+
+Output: There are 5 cats left!
+Deleting the one which is 2 years old
+There are 4 cats left!
+Deleting the one which is 3 years old
+There are 3 cats left!
+Deleting the one which is 4 years old
+There are 2 cats left!
+Deleting the one which is 5 years old
+There are 1 cats left!
+Deleting the one which is 6 years old
+
+Analysis: On line 17, the static member variable HowManyCats is declared to have private access. Now you cannot access this variable from non-member functions, such as TelepathicFunction from the previous listing.
+
+Even though HowManyCats is static, it is still within the scope of the class. Any class function, such as GetHowMany(), can access it, just as member functions can access any member data. However, for a function to call GetHowMany(), it must have an object on which to call the function.
+
+    DO use static member variables to share data among all instances of a class. DO make static member variables protected or private if you wish to restrict access to them. DON'T use static member variables to store data for one object. Static member data is shared among all objects of its class. 
+
+Static Member Functions
+
+Static member functions are like static member variables: they exist not in an object but in the scope of the class. Thus, they can be called without having an object of that class, as illustrated in Listing 14.4.
+
+Listing 14.4. Static member functions.
+
+1:     //Listing 14.4 static data members
+2:
+3:     #include <iostream.h>
+4:
+5:     class Cat
+6:     {
+7:     public:
+8:        Cat(int age):itsAge(age){HowManyCats++; }
+9:        virtual ~Cat() { HowManyCats--; }
+10:       virtual int GetAge() { return itsAge; }
+11:       virtual void SetAge(int age) { itsAge = age; }
+12:       static int GetHowMany() { return HowManyCats; }
+13:    private:
+14:       int itsAge;
+15:       static int HowManyCats;
+16:    };
+17:
+18:    int Cat::HowManyCats = 0;
+19:
+20:    void TelepathicFunction();
+21:
+22:    int main()
+23:    {
+24:       const int MaxCats = 5;
+25:       Cat *CatHouse[MaxCats]; int i;
+26:       for (i = 0; i<MaxCats; i++)
+27:       {
+28:          CatHouse[i] = new Cat(i);
+29:          TelepathicFunction();
+30:       }
+31:
+32:       for ( i = 0; i<MaxCats; i++)
+33:       {
+34:          delete CatHouse[i];
+35:          TelepathicFunction();
+36:       }
+37:       return 0;
+38:    }
+39:
+40:    void TelepathicFunction()
+41:    {
+42:       cout << "There are " << Cat::GetHowMany() << " cats alive!\n";
+43: }
+
+Output: There are 1 cats alive!
+There are 2 cats alive!
+There are 3 cats alive!
+There are 4 cats alive!
+There are 5 cats alive!
+There are 4 cats alive!
+There are 3 cats alive!
+There are 2 cats alive!
+There are 1 cats alive!
+There are 0 cats alive! 
+
+Analysis: The static member variable HowManyCats is declared to have private access on line 15 of the Cat declaration. The public accessor function, GetHowMany(), is declared to be both public and static on line 12.
+
+Since GetHowMany() is public, it can be accessed by any function, and since it is static there is no need to have an object of type Cat on which to call it. Thus, on line 42, the function TelepathicFunction() is able to access the public static accessor, even though it has no access to a Cat object. Of course, you could have called GetHowMany() on the Cat objects available in main(), just as with any other accessor functions.
+
+    NOTE: Static member functions do not have a this pointer. Therefore, they cannot be declared const. Also, because member data variables are accessed in member functions using the this pointer, static member functions cannot access any non-static member variables! 
+
+Static Member Functions
+
+You can access static member functions by calling them on an object of the class just as you do any other member function, or you can call them without an object by fully qualifying the class and object name. Example
+
+class Cat
+{
+public:
+static int GetHowMany() { return HowManyCats; }
+private:
+static int HowManyCats;
+};
+int Cat::HowManyCats = 0;
+int main()
+{
+int howMany;
+Cat theCat;                       // define a cat
+howMany = theCat.GetHowMany();   // access through an object
+howMany = Cat::GetHowMany();     // access without an object
+}
+
+Pointers to Functions
+
+Just as an array name is a constant pointer to the first element of the array, a function name is a constant pointer to the function. It is possible to declare a pointer variable that points to a function, and to invoke the function by using that pointer. This can be very useful; it allows you to create programs that decide which functions to invoke based on user input.
+
+The only tricky part about function pointers is understanding the type of the object being pointed to. A pointer to int points to an integer variable, and a pointer to a function must point to a function of the appropriate return type and signature.
+
+In the declaration
+
+long (* funcPtr) (int);
+
+funcPtr is declared to be a pointer (note the * in front of the name) that points to a function that takes an integer parameter and returns a long. The parentheses around * funcPtr are necessary because the parentheses around int bind more tightly, that is they have higher precedence than the indirection operator (*). Without the first parentheses this would declare a function that takes an integer and returns a pointer to a long. (Remember that spaces are meaningless here.)
+
+Examine these two declarations:
+
+long * Function (int);
+long (* funcPtr) (int);
+
+The first, Function (), is a function taking an integer and returning a pointer to a variable of type long. The second, funcPtr, is a pointer to a function taking an integer and returning a variable of type long.
+
+The declaration of a function pointer will always include the return type and the parentheses indicating the type of the parameters, if any. Listing 14.5 illustrates the declaration and use of function pointers.
+
+Listing 14.5. Pointers to functions.
+
+1:     // Listing 14.5 Using function pointers
+2:
+3:     #include <iostream.h>
+4:
+5:     void Square (int&,int&);
+6:     void Cube (int&, int&);
+7:     void Swap (int&, int &);
+8:     void GetVals(int&, int&);
+9:     void PrintVals(int, int);
+10:    enum BOOL { FALSE, TRUE };
+11:
+12:    int main()
+13:    {
+14:       void (* pFunc) (int &, int &);
+15:       BOOL fQuit = FALSE;
+16:
+17:       int valOne=1, valTwo=2;
+18:       int choice;
+19:       while (fQuit == FALSE)
+20:       {
+21:          cout << "(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: ";
+22:          cin >> choice;
+23:          switch (choice)
+24:          {
+25:             case 1: pFunc = GetVals; break;
+26:             case 2: pFunc = Square; break;
+27:             case 3: pFunc = Cube; break;
+28:             case 4: pFunc = Swap; break;
+29:             default : fQuit = TRUE; break;
+30:          }
+31:
+32:          if (fQuit)
+33:             break;
+34:
+35:          PrintVals(valOne, valTwo);
+36:          pFunc(valOne, valTwo);
+37:          PrintVals(valOne, valTwo);
+38:       }
+39:     return 0;
+40:    }
+41:
+42:    void PrintVals(int x, int y)
+43:    {
+44:       cout << "x: " << x << " y: " << y << endl;
+45:    }
+46:
+47:    void Square (int & rX, int & rY)
+48:    {
+49:       rX *= rX;
+50:       rY *= rY;
+51:    }
+52: 
+53:    void Cube (int & rX, int & rY)
+54:    {
+55:       int tmp;
+56: 
+57:       tmp = rX;
+58:       rX *= rX;
+59:       rX = rX * tmp;
+60:
+61:       tmp = rY;
+62:       rY *= rY;
+63:       rY = rY * tmp;
+64:    }
+65:
+66:    void Swap(int & rX, int & rY)
+67:    {
+68:       int temp;
+69:       temp = rX;
+70:       rX = rY;
+71:       rY = temp;
+72:    }
+73:
+74:    void GetVals (int & rValOne, int & rValTwo)
+75:    {
+76:       cout << "New value for ValOne: ";
+77:       cin >> rValOne;
+78:       cout << "New value for ValTwo: ";
+79:       cin >> rValTwo;
+80: }
+
+Output: (0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 1
+x: 1 y: 2
+New value for ValOne: 2
+New value for ValTwo: 3
+x: 2 y: 3
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 3
+x: 2 y: 3
+x: 8 y: 27
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 2
+x: 8 y: 27
+x: 64 y: 729
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 4
+x: 64 y: 729
+x: 729 y: 64
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 0
+
+Analysis: On lines 5-8, four functions are declared, each with the same return type and signature, returning void and taking two references to integers.
+
+On line 14, pFunc is declared to be a pointer to a function that returns void and takes two integer reference parameters. Any of the previous functions can be pointed to by pFunc. The user is repeatedly offered the choice of which functions to invoke, and pFunc is assigned accordingly. On lines 35-36, the current value of the two integers is printed, the currently assigned function is invoked, and then the values are printed again.
+Pointer to Function
+
+A pointer to function is invoked exactly like the functions it points to, except that the function pointer name is used instead of the function name. Assign a pointer to function to a specific function by assigning to the function name without the parentheses. The function name is a constant pointer to the function itself. Use the pointer to function just as you would the function name. The pointer to function must agree in return value and signature with the function to which you assign it. Example
+
+long (*pFuncOne) (int, int);
+long SomeFunction (int, int);
+pFuncOne = SomeFunction;
+pFuncOne(5,7); 
+
+Why Use Function Pointers?
+
+You certainly could write the program in Listing 14.5 without function pointers, but the use of these pointers makes the intent and use of the program explicit: pick a function from a list, and then invoke it.
+
+Listing 14.6 uses the function prototypes and definitions from Listing 14.5, but the body of the program does not use a function pointer. Examine the differences between these two listings.
+
+    NOTE: To compile this program, place lines 41-80 from Listing 14.5 immediately after line 56. 
+
+Listing 14.6. Rewriting Listing 14.5 without the pointer to function.
+
+1:     // Listing 14.6 Without function pointers
+2:
+3:     #include <iostream.h>
+4:
+5:     void Square (int&,int&);
+6:     void Cube (int&, int&);
+7:     void Swap (int&, int &);
+8:     void GetVals(int&, int&);
+9:     void PrintVals(int, int);
+10:    enum BOOL { FALSE, TRUE };
+11:
+12:    int main()
+13:    {
+14:       BOOL fQuit = FALSE;
+15:       int valOne=1, valTwo=2;
+16:       int choice;
+17:       while (fQuit == FALSE)
+18:       {
+19:          cout << "(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: ";
+20:          cin >> choice;
+21:          switch (choice)
+22:          {
+23:             case 1:
+24:                PrintVals(valOne, valTwo);
+25:                GetVals(valOne, valTwo);
+26:                PrintVals(valOne, valTwo);
+27:                break;
+28:
+29:             case 2:
+30:                PrintVals(valOne, valTwo);
+31:                Square(valOne,valTwo);
+32:                PrintVals(valOne, valTwo);
+33:                break;
+34:
+35:             case 3:
+36:                PrintVals(valOne, valTwo);
+37:                Cube(valOne, valTwo);
+38:                PrintVals(valOne, valTwo);
+39:                break;
+40:
+41:             case 4:
+42:                PrintVals(valOne, valTwo);
+43:                Swap(valOne, valTwo);
+44:                PrintVals(valOne, valTwo);
+45:                break;
+46:
+47:                default :
+48:                fQuit = TRUE;
+49:                break;
+50:          }
+51: 
+52:          if (fQuit)
+53:             break;
+54:       }
+55:     return 0;
+56: }
+
+Output: (0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 1
+x: 1 y: 2
+New value for ValOne: 2
+New value for ValTwo: 3
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 3
+x: 2 y: 3
+x: 8 y: 27
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 2
+x: 8 y: 27
+x: 64 y: 729
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 4
+x: 64 y: 729
+x: 729 y: 64
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 0
+
+Analysis: The implementation of the functions has been left out, because it is identical to that provided in Listing 14.5. As you can see, the output is unchanged, but the body of the program has expanded from 27 lines to 38. The calls to PrintVals() must be repeated for each case.
+
+It was tempting to put PrintVals() at the top of the while loop and again at the bottom, rather than in each case statement. This would have called PrintVals() even for the exit case, however, and that was not part of the specification.
+
+Setting aside the increased size of the code and the repeated calls to do the same thing, the overall clarity is somewhat diminished. This is an artificial case, however, created to show how pointers to functions work. In real-world conditions the advantages are even clearer: pointers to functions can eliminate duplicate code, clarify your program, and allow you to make tables of functions to call based on runtime conditions.
+Shorthand Invocation
+
+The pointer to function does not need to be dereferenced, though you are free to do so. Therefore, if pFunc is a pointer to a function taking an integer and returning a variable of type long, and you assign pFunc to a matching function, you can invoke that function with either
+
+pFunc(x);
+
+or
+
+(*pFunc)(x);
+
+The two forms are identical. The former is just a shorthand version of the latter.
+Arrays of Pointers to Functions
+
+Just as you can declare an array of pointers to integers, you can declare an array of pointers to functions returning a specific value type and with a specific signature. Listing 14.7 again rewrites Listing 14.5, this time using an array to invoke all the choices at once.
+
+    NOTE: To compile this program, place lines 41-80 of Listing 14.5 immediately after line 39. 
+
+Listing 14.7. Demonstrates use of an array of pointers to functions.
+
+1:     // Listing 14.7 demonstrates use of an array of pointers to functions
+2:
+3:     #include <iostream.h>
+4:
+5:     void Square (int&,int&);
+6:     void Cube (int&, int&);
+7:     void Swap (int&, int &);
+8:     void GetVals(int&, int&);
+9:     void PrintVals(int, int);
+10:    enum BOOL { FALSE, TRUE };
+11:
+12:    int main()
+13:    {
+14:       int valOne=1, valTwo=2;
+15:       int choice, i;
+16:       const MaxArray = 5;
+17:       void (*pFuncArray[MaxArray])(int&, int&);
+18:
+19:       for (i=0;i<MaxArray;i++)
+20:       {
+21:          cout << "(1)Change Values (2)Square (3)Cube (4)Swap: ";
+22:          cin >> choice;
+23:          switch (choice)
+24:          {
+25:             case 1:pFuncArray[i] = GetVals; break;
+26:             case 2:pFuncArray[i] = Square; break;
+27:             case 3:pFuncArray[i] = Cube; break;
+28:             case 4:pFuncArray[i] = Swap; break;
+29:             default:pFuncArray[i] = 0;
+30:          }
+31:       }
+32:
+33:       for (i=0;i<MaxArray; i++)
+34:       {
+35:          pFuncArray[i](valOne,valTwo);
+36:          PrintVals(valOne,valTwo);
+37:       }
+38:     return 0;
+39: }
+
+Output: (1)Change Values (2)Square (3)Cube (4)Swap: 1
+(1)Change Values (2)Square (3)Cube (4)Swap: 2
+(1)Change Values (2)Square (3)Cube (4)Swap: 3
+(1)Change Values (2)Square (3)Cube (4)Swap: 4
+(1)Change Values (2)Square (3)Cube (4)Swap: 2
+New Value for ValOne: 2
+New Value for ValTwo: 3
+x: 2 y: 3
+x: 4 y: 9
+x: 64 y: 729
+x: 729 y: 64
+x: 7153 y:4096
+
+Analysis: Once again the implementation of the functions has been left out to save space, but it is the same as in Listing 14.5. On line 17, the array pFuncArray is de- clared to be an array of 5 pointers to functions that return void and that take two integer references.
+
+On lines 19-31, the user is asked to pick the functions to invoke, and each member of the array is assigned the address of the appropriate function. On lines 33-37, each function is invoked in turn. The result is printed after each invocation.
+Passing Pointers to Functions to Other Functions
+
+The pointers to functions (and arrays of pointers to functions, for that matter) can be passed to other functions, which may take action and then call the right function using the pointer.
+
+For example, you might improve Listing 14.5 by passing the chosen function pointer to another function (outside of main()), which prints the values, invokes the function, and then prints the values again. Listing 14.8 illustrates this variation.
+
+    WARNING: To compile this program, place lines 46-80 of Listing 14.5 immediately after line 45. 
+
+Listing 14.8. Passing pointers to functions as function arguments.
+
+1:     // Listing 14.8 Without function pointers
+2:
+3:     #include <iostream.h>
+4:
+5:     void Square (int&,int&);
+6:     void Cube (int&, int&);
+7:     void Swap (int&, int &);
+8:     void GetVals(int&, int&);
+9:     void PrintVals(void (*)(int&, int&),int&, int&);
+10:    enum BOOL { FALSE, TRUE };
+11:
+12:    int main()
+13:    {
+14:       int valOne=1, valTwo=2;
+15:       int choice;
+16:       BOOL fQuit = FALSE;
+17:
+18:       void (*pFunc)(int&, int&);
+19:
+20:       while (fQuit == FALSE)
+21:       {
+22:          cout << "(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: ";
+23:          cin >> choice;
+24:          switch (choice)
+25:          {
+26:             case 1:pFunc = GetVals; break;
+27:             case 2:pFunc = Square; break;
+28:             case 3:pFunc = Cube; break;
+29:             case 4:pFunc = Swap; break;
+30:             default:fQuit = TRUE; break;
+31:          }
+32:          if (fQuit == TRUE)
+33:             break;
+34:          PrintVals ( pFunc, valOne, valTwo);
+35:       }
+36:
+37:     return 0;
+38:    }
+39:
+40:    void PrintVals( void (*pFunc)(int&, int&),int& x, int& y)
+41:    {
+42:       cout << "x: " << x << " y: " << y << endl;
+43:       pFunc(x,y);
+44:       cout << "x: " << x << " y: " << y << endl;
+45: }
+
+Output: (0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 1
+x: 1 y: 2
+New value for ValOne: 2
+New value for ValTwo: 3
+x: 2 y: 3
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 3
+x: 2 y: 3
+x: 8 y: 27
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 2
+x: 8 y: 27
+x: 64 y: 729
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 4
+x: 64 y: 729
+x: 729 y:64
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 0
+
+Analysis: On line 18, pFunc is declared to be a pointer to a function returning void and taking two parameters, both integer references. On line 9, PrintVals is declared to be a function taking three parameters. The first is a pointer to a function that returns void but takes two integer reference parameters, and the second and third arguments to PrintVals are integer references. The user is again prompted for which functions to call, and then on line 34 PrintVals is called.
+
+Go find a C++ programmer and ask him what this declaration means:
+
+void PrintVals(void (*)(int&, int&),int&, int&);
+
+This is the kind of declaration that you use infrequently and probably look up in the book each time you need it, but it will save your program on those rare occasions when it is exactly the required construct.
+Using typedef with Pointers to Functions
+
+The construct void (*)(int&, int&) is cumbersome, at best. You can use typedef to simplify this, by declaring a type VPF as a pointer to a function returning void and taking two integer references. Listing 14.9 rewrites Listing 14.8 using this typedef statement.
+
+    NOTE: To compile this program, place lines 46-80 of Listing 14.5 immediately after line 45. 
+
+Listing 14.9. Using typedef to make pointers to functions more readable.
+
+1:   // Listing 14.9. Using typedef to make pointers to functions more _readable
+2:
+3:   #include <iostream.h>
+4:
+5:   void Square (int&,int&);
+6:   void Cube (int&, int&);
+7:   void Swap (int&, int &);
+8:   void GetVals(int&, int&);
+9:   typedef  void (*VPF) (int&, int&) ;
+10:   void PrintVals(VPF,int&, int&);
+11:   enum BOOL { FALSE, TRUE };
+12:
+13:   int main()
+14:   {
+15:   int valOne=1, valTwo=2;
+16:   int choice;
+17:   BOOL fQuit = FALSE;
+18:
+19:   VPF pFunc;
+20:
+21:   while (fQuit == FALSE)
+22:   {
+23:   cout << "(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: ";
+24:   cin >> choice;
+25:   switch (choice)
+26:   {
+27:   case 1:pFunc = GetVals; break;
+28:   case 2:pFunc = Square; break;
+29:   case 3:pFunc = Cube; break;
+30:   case 4:pFunc = Swap; break;
+31:   default:fQuit = TRUE; break;
+32:   }
+33:   if (fQuit == TRUE)
+34:   break;
+35:   PrintVals ( pFunc, valOne, valTwo);
+36:   }
+37:   return 0;
+38:   }
+39:
+40:   void PrintVals( VPF pFunc,int& x, int& y)
+41:   {
+42:   cout << "x: " << x << " y: " << y << endl;
+43:   pFunc(x,y);
+44:   cout << "x: " << x << " y: " << y << endl;
+45: }
+
+Output: (0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 1
+x: 1 y: 2
+New value for ValOne: 2
+New value for ValTwo: 3
+x: 2 y: 3
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 3
+x: 2 y: 3
+x: 8 y: 27
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 2
+x: 8 y: 27
+x: 64 y: 729
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 4
+x: 64 y: 729
+x: 729 y: 64
+(0)Quit (1)Change Values (2)Square (3)Cube (4)Swap: 0
+
+Analysis: On line 9, typedef is used to declare VPF to be of the type "function that returns void and takes two parameters, both integer references."
+
+On line 10, the function PrintVals() is declared to take three parameters: a VPF and two integer references. On line 19, pFunc is now declared to be of type VPF.
+
+Once the type VPF is defined, all subsequent uses to declare pFunc and PrintVals() are much cleaner. As you can see, the output is identical.
+Pointers to Member Functions
+
+Up until this point, all of the function pointers you've created have been for general, non-class functions. It is also possible to create pointers to functions that are members of classes.
+
+To create a pointer to member function, use the same syntax as with a pointer to function, but include the class name and the scoping operator (::). Thus, if pFunc points to a member function of the class Shape, which takes two integers and returns void, the declaration for pFunc is the following:
+
+void (Shape::*pFunc) (int, int);
+
+Pointers to member functions are used in exactly the same way as pointers to functions, except that they require an object of the correct class on which to invoke them. Listing 14.10 illustrates the use of pointers to member functions.
+
+Listing 14.10. Pointers to member functions.
+
+1:      //Listing 14.10 Pointers to member functions using virtual methods
+2:
+3:      #include <iostream.h>
+4:
+5:     enum BOOL {FALSE, TRUE};
+6:     class Mammal
+7:     {
+8:     public:
+9:        Mammal():itsAge(1) {  }
+10:       ~Mammal() { }
+11:       virtual void Speak() const = 0;
+12:       virtual void Move() const = 0;
+13:    protected:
+14:       int itsAge;
+15:    };
+16:
+17:    class Dog : public Mammal
+18:    {
+19:    public:
+20:       void Speak()const { cout << "Woof!\n"; }
+21:       void Move() const { cout << "Walking to heel...\n"; }
+22:    };
+23:
+24:
+25:    class Cat : public Mammal
+26:    {
+27:    public:
+28:       void Speak()const { cout << "Meow!\n"; }
+29:       void Move() const { cout << "slinking...\n"; }
+30:    };
+31:
+32:
+33:    class Horse : public Mammal
+34:    {
+35:    public:
+36:       void Speak()const { cout << "Winnie!\n"; }
+37:       void Move() const { cout << "Galloping...\n"; }
+38:    };
+39:
+40: 
+41:    int main()
+42:    {
+43:       void (Mammal::*pFunc)() const =0;
+44:       Mammal* ptr =0;
+45:       int Animal;
+46:       int Method;
+47:       BOOL fQuit = FALSE;
+48:
+49:       while (fQuit == FALSE)
+50:       {
+51:          cout << "(0)Quit (1)dog (2)cat (3)horse: ";
+52:          cin >> Animal;
+53:          switch (Animal)
+54:          {
+55:             case 1: ptr = new Dog; break;
+56:             case 2: ptr = new Cat; break;
+57:             case 3: ptr = new Horse; break;
+58:             default: fQuit = TRUE; break;
+59:          }
+60:          if (fQuit)
+61:             break;
+62:
+63:          cout << "(1)Speak  (2)Move: ";
+64:          cin >> Method;
+65:          switch (Method)
+66:          {
+67:             case 1: pFunc = Mammal::Speak; break;
+68:             default: pFunc = Mammal::Move; break;
+69:          }
+70:
+71:          (ptr->*pFunc)();
+72:          delete ptr;
+73:       }
+74:     return 0;
+75: }
+
+Output: (0)Quit (1)dog (2)cat (3)horse: 1
+(1)Speak (2)Move: 1
+Woof!
+(0)Quit (1)dog (2)cat (3)horse: 2
+(1)Speak (2)Move: 1
+Meow!
+(0)Quit (1)dog (2)cat (3)horse: 3
+(1)Speak (2)Move: 2
+Galloping
+(0)Quit (1)dog (2)cat (3)horse: 0
+
+Analysis: On lines 6-15, the abstract data type Mammal is declared with two pure virtual methods, Speak() and Move(). Mammal is subclassed into Dog, Cat, and Horse, each of which overrides Speak() and Move().
+
+The driver program in main() asks the user to choose which type of animal to create, and then a new subclass of Animal is created on the free store and assigned to ptr on lines 55-57.
+
+The user is then prompted for which method to invoke, and that method is assigned to the pointer pFunc. On line 71, the method chosen is invoked by the object created, by using the pointer ptr to access the object and pFunc to access the function.
+
+Finally, on line 72, delete is called on the pointer ptr to return the memory set aside for the object to the free store. Note that there is no reason to call delete on pFunc because this is a pointer to code, not to an object on the free store. In fact, attempting to do so will generate a compile-time error.
+Arrays of Pointers to Member Functions
+
+As with pointers to functions, pointers to member functions can be stored in an array. The array can be initialized with the addresses of various member functions, and these can be invoked by offsets into the array. Listing 14.11 illustrates this technique.
+
+Listing 14.11. Array of pointers to member functions.
+
+1:      //Listing 14.11 Array of pointers to member functions
+2:
+3:      #include <iostream.h>
+4:
+5:     enum BOOL {FALSE, TRUE};
+6:
+7:     class Dog
+8:     {
+9:     public:
+10:       void Speak()const { cout << "Woof!\n"; }
+11:       void Move() const { cout << "Walking to heel...\n"; }
+12:       void Eat() const { cout << "Gobbling food...\n"; }
+13:       void Growl() const { cout << "Grrrrr\n"; }
+14:       void Whimper() const { cout << "Whining noises...\n"; }
+15:       void RollOver() const { cout << "Rolling over...\n"; }
+16:       void PlayDead() const { cout << "Is this the end of Little Caeser?\n"; }
+17:    };
+18:
+19:    typedef void (Dog::*PDF)()const ;
+20:    int main()
+21:    {
+22:       const int MaxFuncs = 7;
+23:       PDF DogFunctions[MaxFuncs] =
+24:          {  Dog::Speak,
+25:             Dog::Move,
+26:             Dog::Eat,
+27:             Dog::Growl,
+28:             Dog::Whimper,
+29:             Dog::RollOver,
+30:             Dog::PlayDead };
+31:
+32:       Dog* pDog =0;
+33:       int Method;
+34:       BOOL fQuit = FALSE;
+35: 
+36:       while (!fQuit)
+37:       {
+38:          cout <<    "(0)Quit (1)Speak (2)Move (3)Eat (4)Growl";
+39:          cout << " (5)Whimper (6)Roll Over (7)Play Dead: ";
+40:          cin >> Method;
+41:          if (Method == 0)
+42:          {
+43:             fQuit = TRUE;
+44:             break;
+45:          }
+46:          else
+47:          {
+48:             pDog = new Dog;
+49:             (pDog->*DogFunctions[Method-1])();
+50:             delete pDog;
+51:          }
+52:       }
+53:     return 0;
+54: }
+
+ Output: (0)Quit (1)Speak (2)Move (3)Eat (4)Growl (5)Whimper (6)Roll Over (7)Play Dead: 1
+Woof!
+ (0)Quit (1)Speak (2)Move (3)Eat (4)Growl (5)Whimper (6)Roll Over (7)Play Dead: 4
+Grrr
+ (0)Quit (1)Speak (2)Move (3)Eat (4)Growl (5)Whimper (6)Roll Over (7)Play Dead: 7
+Is this the end of Little Caeser?
+ (0)Quit (1)Speak (2)Move (3)Eat (4)Growl (5)Whimper (6)Roll Over (7)Play Dead: 0
+
+Analysis: On lines 7-17, the class Dog is created, with 7 member functions all sharing the same return type and signature. On line 19, a typedef declares PDF to be a pointer to a member function of Dog that takes no parameters and returns no values, and that is const: the signature of the 7 member functions of Dog.
+
+On lines 23-30, the array DogFunctions is declared to hold 7 such member functions, and it is initialized with the addresses of these functions.
+
+On lines 38 and 39, the user is prompted to pick a method. Unless they pick Quit, a new Dog is created on the heap, and then the correct method is invoked on the array on line 49. Here's another good line to show to the hotshot C++ programmers in your company; ask them what this does:
+
+(pDog->*DogFunctions[Method-1])();
+
+Once again, this is a bit esoteric, but when you need a table built from member functions, it can make your program far easier to read and understand.
+
+    DO invoke pointers to member functions on a specific object of a class. DO use typedef to make pointer to member function declarations easier to read. DON'T use pointer to member functions when there are simpler solutions. 
+
+Summary
+
+Today you learned how to create static member variables in your class. Each class, rather than each object, has one instance of the static member variable. It is possible to access this member variable without an object of the class type by fully qualifying the name, assuming you've declared the static member to have public access.
+
+Static member variables can be used as counters across instances of the class. Because they are not part of the object, the declaration of static member variables does not allocate memory, and static member variables must be defined and initialized outside the declaration of the class.
+
+Static member functions are part of the class in the same way that static member variables are. They can be accessed without a particular object of the class, and can be used to access static member data. Static member functions cannot be used to access non-static member data because they do not have a this pointer.
+
+Because static member functions do not have a this pointer, they also cannot be made const. const in a member function indicates that the this pointer is const.
+
+You also learned how to declare and use pointers to functions and pointers to member functions. You saw how to create arrays of these pointers and how to pass them to functions.
+
+Pointers to functions and pointers to member functions can be used to create tables of functions that can be selected from at runtime. This can give your program flexibility that is not easily achieved without these pointers.
+Q&A
+
+    Q. Why use static data when you can use global data?
+
+    A. Static data is scoped to the class. In this manner, static data are available only through an object of the class, through an explicit call using the class name if they are public, or by using a static member function. Static data are typed to the class type, however, and the restricted access and strong typing makes static data safer than global data.
+
+    Q. Why use static member functions when you can use global functions?
+
+    A. Static member functions are scoped to the class, and can be called only by using an object of the class or an explicit full specification (such as ClassName::FunctionName()).
+
+    Q. Is it common to use many pointers to functions and pointers to member functions?
+
+    A. No, these have their special uses, but are not common constructs. Many complex and powerful programs have neither. 
+
+Workshop
+
+The Workshop contains quiz questions to help solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before going to the next chapter.
+Quiz
+
+    1. Can static member variables be private?
+
+    2. Show the declaration for a static member variable.
+
+    3. Show the declaration for a static function pointer.
+
+    4. Show the declaration for a pointer to function returning long and taking an integer parameter.
+
+    5. Modify the pointer in Question 4 so it's a pointer to member function of class Car.
+
+    6. Show the declaration for an array of 10 pointers as defined in Question 5. 
+
+Exercises
+
+    1. Write a short program declaring a class with one member variable and one static member variable. Have the constructor initialize the member variable and increment the static member variable. Have the destructor decrement the member variable.
+
+    2. Using the program from Exercise 1, write a short driver program that makes three objects and then displays their member variables and the static member variable. Then
+    destroy each object and show the effect on the static member variable.
+
+    3. Modify the program from Exercise 2 to use a static member function to access the static member variable. Make the static member variable private.
+
+    4. Write a pointer to member function to access the non-static member data in the program in Exercise 3, and use that pointer to print the value of that data.
+
+    5. Add two more member variables to the class from the previous questions. Add accessor functions that get the value of these values, and give all the member functions the same return values and signatures. Use the pointer to member function to access these functions. 
+
+

@@ -1,0 +1,1062 @@
+    Day 6
+        Basic Classes
+            Creating New Types
+                Why Create a New Type? 
+            Classes and Members
+                Declaring a Class
+                A Word on Naming Conventions
+                Defining an Object
+                Classes Versus Objects 
+            Accessing Class Members
+                Assign to Objects, Not to Classes
+                If You Dont Declare It, Your Class Wont Have It 
+            Private Versus Public
+            Listing 6.1. Accessing the public members
+            of a simple class.
+                Make Member Data Private 
+            Listing 6.2. A class with accessor methods.
+                Privacy Versus Security 
+            The class keyword
+            Implementing Class Methods
+            Listing 6.3. Implementing
+            the methods of a simple class.
+            Constructors and Destructors
+                Default Constructors and Destructors 
+            Listing 6.4. Using constructors and destructors.
+            const Member Functions
+            Interface Versus Implementation
+            Listing 6.5. A demonstration of violations of the interface.
+            Why Use the Compiler to Catch Errors?
+            Where to Put Class Declarations and Method Definitions
+            Inline Implementation
+            Listing 6.6. Cat class declaration in CAT.HPP.
+            Listing 6.7. Cat implementation in CAT.CPP.
+            Classes with Other Classes as Member Data
+            Listing 6.8. Declaring a complete class.
+            Listing 6.9. RECT.CPP.
+            Structures
+                Why Two Keywords Do the Same Thing 
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 6
+Basic Classes
+
+Classes extend the built-in capabilities of C++ to assist you in representing and solving complex, real-world problems. Today you will learn
+
+    What classes and objects are.
+
+    How to define a new class and create objects of that class.
+
+    What member functions and member data are.
+
+    What constructors are and how to use them. 
+
+Creating New Types
+
+You've already learned about a number of variable types, including unsigned integers and characters. The type of a variable tells you quite a bit about it. For example, if you declare Height and Width to be unsigned integers, you know that each one can hold a number between 0 and 65,535, assuming an integer is two bytes. That is the meaning of saying they are unsigned integers; trying to hold anything else in these variables causes an error. You can't store your name in an unsigned short integer, and you shouldn't try.
+
+Just by declaring these variables to be unsigned short integers, you know that it is possible to add Height to Width and to assign that number to another number.
+
+The type of these variables tells you:
+
+    Their size in memory.
+
+    What information they can hold.
+
+    What actions can be performed on them. 
+
+More generally, a type is a category. Familiar types include car, house, person, fruit, and shape. In C++, the programmer can create any type needed, and each of these new types can have all the functionality and power of the built-in types.
+Why Create a New Type?
+
+Programs are usually written to solve real-world problems, such as keeping track of employee records or simulating the workings of a heating system. Although it is possible to solve complex problems by using programs written with only integers and characters, it is far easier to grapple with large, complex problems if you can create representations of the objects that you are talking about. In other words, simulating the workings of a heating system is easier if you can create variables that represent rooms, heat sensors, thermostats, and boilers. The closer these variables correspond to reality, the easier it is to write the program.
+Classes and Members
+
+You make a new type by declaring a class. A class is just a collection of variables--often of different types--combined with a set of related functions.
+
+One way to think about a car is as a collection of wheels, doors, seats, windows, and so forth. Another way is to think about what a car can do: It can move, speed up, slow down, stop, park, and so on. A class enables you to encapsulate, or bundle, these various parts and various functions into one collection, which is called an object.
+
+Encapsulating everything you know about a car into one class has a number of advantages for a programmer. Everything is in one place, which makes it easy to refer to, copy, and manipulate the data. Likewise, clients of your class--that is, the parts of the program that use your class--can use your object without worry about what is in it or how it works.
+
+A class can consist of any combination of the variable types and also other class types. The variables in the class are referred to as the member variables or data members. A Car class might have member variables representing the seats, radio type, tires, and so forth.
+
+    New Term: Member variables , also known as data members , are the variables in your class. Member variables are part of your class, just like the wheels and engine are part of your car. 
+
+The functions in the class typically manipulate the member variables. They are referred to as member functions or methods of the class. Methods of the Car class might include Start() and Brake(). A Cat class might have data members that represent age and weight; its methods might include Sleep(), Meow(), and ChaseMice().
+
+    New Term: Member functions , also known as methods , are the functions in your class. Member functions are as much a part of your class as the member variables. They determine what the objects of your class can do. 
+
+Declaring a Class
+
+To declare a class, use the class keyword followed by an opening brace, and then list the data members and methods of that class. End the declaration with a closing brace and a semicolon. Here's the declaration of a class called Cat:
+
+class Cat
+{
+unsigned int  itsAge;
+unsigned int  itsWeight;
+Meow();
+};
+
+Declaring this class doesn't allocate memory for a Cat. It just tells the compiler what a Cat is, what data it contains (itsAge and itsWeight), and what it can do (Meow()). It also tells the compiler how big a Cat is--that is, how much room the compiler must set aside for each Cat that you create. In this example, if an integer is two bytes, a Cat is only four bytes big: itsAge is two bytes, and itsWeight is another two bytes. Meow() takes up no room, because no storage space is set aside for member functions (methods).
+A Word on Naming Conventions
+
+As a programmer, you must name all your member variables, member functions, and classes. As you learned on Day 3, "Variables and Constants," these should be easily understood and meaningful names. Cat, Rectangle, and Employee are good class names. Meow(), ChaseMice(), and StopEngine() are good function names, because they tell you what the functions do. Many programmers name the member variables with the prefix its, as in itsAge, itsWeight, and itsSpeed. This helps to distinguish member variables from nonmember variables.
+
+C++ is case-sensitive, and all class names should follow the same pattern. That way you never have to check how to spell your class name; was it Rectangle, rectangle, or RECTANGLE? Some programmers like to prefix every class name with a particular letter--for example, cCat or cPerson--whereas others put the name in all uppercase or all lowercase. The convention that I use is to name all classes with initial-capitalization, as in Cat and Person.
+
+Similarly, many programmers begin all functions with capital letters and all variables with lowercase. Words are usually separated with an underbar--as in Chase_Mice--or by capitalizing each word--for example, ChaseMice or DrawCircle.
+
+The important idea is that you should pick one style and stay with it through each program. Over time, your style will evolve to include not only naming conventions, but also indentation, alignment of braces, and commenting style.
+
+    NOTE: It's common for development companies to have house standards for many style issues. This ensures that all developers can easily read one another's code. 
+
+Defining an Object
+
+You define an object of your new type just as you define an integer variable:
+
+unsigned int GrossWeight;         // define an unsigned integer
+Cat Frisky;                       // define a Cat
+
+This code defines a variable called Gross Weight whose type is an unsigned integer. It also defines Frisky, which is an object whose class (or type) is Cat.
+Classes Versus Objects
+
+You never pet the definition of a cat; you pet individual cats. You draw a distinction between the idea of a cat, and the particular cat that right now is shedding all over your living room. In the same way, C++ differentiates between the class Cat, which is the idea of a cat, and each individual Cat object. Thus, Frisky is an object of type Cat in the same way in which GrossWeight is a variable of type unsigned int.
+
+    New Term: An object is an individual instance of a class. 
+
+Accessing Class Members
+
+Once you define an actual Cat object--for example, Frisky--you use the dot operator (.) to access the members of that object. Therefore, to assign 50 to Frisky's Weight member variable, you would write
+
+Frisky.Weight = 50;
+
+In the same way, to call the Meow() function, you would write
+
+Frisky.Meow();
+
+When you use a class method, you call the method. In this example, you are calling Meow() on Frisky.
+Assign to Objects, Not to Classes
+
+In C++ you don't assign values to types; you assign values to variables. For example, you would never write
+
+int = 5;               // wrong
+
+The compiler would flag this as an error, because you can't assign 5 to an integer. Rather, you must define an integer variable and assign 5 to that variable. For example,
+
+int  x;                // define x to be an int
+x = 5;                 // set x's value to 5
+
+This is a shorthand way of saying, "Assign 5 to the variable x, which is of type int." In the same way, you wouldn't write
+
+Cat.age=5;             // wrong
+???
+
+The compiler would flag this as an error, because you can't assign 5 to the age part of a Cat. Rather, you must define a Cat object and assign 5 to that object. For example,
+
+Cat Frisky;            // just like  int x;
+Frisky.age = 5;        // just like  x = 5;
+
+If You Dont Declare It, Your Class Wont Have It
+
+Try this experiment: Walk up to a three-year-old and show her a cat. Then say, "This is Frisky. Frisky knows a trick. Frisky, bark." The child will giggle and say, "No, silly, cats can't bark."
+
+If you wrote
+
+Cat  Frisky;           // make a Cat named Frisky
+Frisky.Bark()          // tell Frisky to bark
+
+the compiler would say, No, silly, Cats can't bark. (Your compiler's wording may vary). The compiler knows that Frisky can't bark because the Cat class doesn't have a Bark() function. The compiler wouldn't even let Frisky meow if you didn't define a Meow() function.
+
+    DO use the keyword class to declare a class. DON'T confuse a declaration with a definition. A declaration says what a class is. A definition sets aside memory for an object. DON'T confuse a class with an object. DON'T assign values to a class. Assign values to the data members of an object. DO use the dot operator (.) to access class members and functions. 
+
+Private Versus Public
+
+Other keywords are used in the declaration of a class. Two of the most important are public and private.
+
+All members of a class--data and methods--are private by default. Private members can be accessed only within methods of the class itself. Public members can be accessed through any object of the class. This distinction is both important and confusing. To make it a bit clearer, consider an example from earlier in this chapter:
+
+class Cat
+{
+unsigned int  itsAge;
+unsigned int  itsWeight;
+Meow();
+};
+
+In this declaration, itsAge, itsWeight, and Meow() are all private, because all members of a class are private by default. This means that unless you specify otherwise, they are private.
+
+However, if you write
+
+Cat  Boots;
+Boots.itsAge=5;        // error! can't access private data!
+
+the compiler flags this as an error. In effect, you've said to the compiler, "I'll access itsAge, itsWeight, and Meow() only from within member functions of the Cat class." Yet here you've accessed the itsAge member variable of the Boots object from outside a Cat method. Just because Boots is an object of class Cat, that doesn't mean that you can access the parts of Boots that are private.
+
+This is a source of endless confusion to new C++ programmers. I can almost hear you yelling, "Hey! I just said Boots is a cat. Why can't Boots access his own age?" The answer is that Boots can, but you can't. Boots, in his own methods, can access all his parts--public and private. Even though you've created a Cat, that doesn't mean that you can see or change the parts of it that are private.
+
+The way to use Cat so that you can access the data members is
+
+class Cat
+{
+public:
+unsigned int  itsAge;
+unsigned int  itsWeight;
+Meow();
+};
+
+Now itsAge, itsWeight, and Meow() are all public. Boots.itsAge=5 compiles without problems.
+
+Listing 6.1 shows the declaration of a Cat class with public member variables.
+
+Listing 6.1. Accessing the public members of a simple class.
+
+1:   // Demonstrates declaration of a class and
+2:   // definition of an object of the class,
+3:
+4:   #include <iostream.h>   // for cout
+5:
+6:   class Cat                // declare the class object
+7:   {
+8:    public:                 // members which follow are public
+9:      int itsAge;
+10:     int itsWeight;
+11:  };
+12:
+13:
+14:  void main()
+15:  {
+16:     Cat Frisky;
+17:     Frisky.itsAge = 5;    // assign to the member variable
+18:     cout << "Frisky is a cat who is " ;
+19:     cout << Frisky.itsAge << " years old.\n";
+20: 
+Output: Frisky is a cat who is 5 years old.
+
+Analysis: Line 6 contains the keyword class. This tells the compiler that what follows is a declaration. The name of the new class comes after the keyword class. In this case, it is Cat.
+The body of the declaration begins with the opening brace in line 7 and ends with a closing brace and a semicolon in line 11. Line 8 contains the keyword public, which indicates that everything that follows is public until the keyword private or the end of the class declaration.
+
+Lines 9 and 10 contain the declarations of the class members itsAge and itsWeight.
+
+Line 14 begins the main function of the program. Frisky is defined in line 16 as an instance of a Cat--that is, as a Cat object. Frisky's age is set in line 17 to 5. In lines 18 and 19, the itsAge member variable is used to print out a message about Frisky.
+
+    NOTE: Try commenting out line 8 and try to recompile. You will receive an error on line 17 because itsAge will no longer have public access. The default for classes is private access. 
+
+Make Member Data Private
+
+As a general rule of design, you should keep the member data of a class private. Therefore, you must create public functions known as accessor methods to set and get the private member variables. These accessor methods are the member functions that other parts of your program call to get and set your private member variables.
+
+    New Term: A public accessor method is a class member function used either to read the value of a private class member variable or to set its value. 
+
+Why bother with this extra level of indirect access? After all, it is simpler and easier to use the data, instead of working through accessor functions.
+
+Accessor functions enable you to separate the details of how the data is stored from how it is used. This enables you to change how the data is stored without having to rewrite functions that use the data.
+
+If a function that needs to know a Cat's age accesses itsAge directly, that function would need to be rewritten if you, as the author of the Cat class, decided to change how that data is stored. By having the function call GetAge(), your Cat class can easily return the right value no matter how you arrive at the age. The calling function doesn't need to know whether you are storing it as an unsigned integer or a long, or whether you are computing it as needed.
+
+This technique makes your program easier to maintain. It gives your code a longer life because design changes don't make your program obsolete.
+
+Listing 6.2 shows the Cat class modified to include private member data and public accessor methods. Note that this is not an executable listing.
+
+Listing 6.2. A class with accessor methods.
+
+1:       // Cat class declaration
+2:       // Data members are private, public accessor methods
+3:       // mediate setting and getting the values of the private data
+4:
+5:  class Cat
+6:  {
+7:  public:
+8:       // public accessors
+9:     unsigned int GetAge();
+10:    void SetAge(unsigned int Age);
+11:
+12:    unsigned int GetWeight();
+13:    void SetWeight(unsigned int Weight);
+14:
+15:      // public member functions
+16:    Meow();
+17:
+18:      // private member data
+19: private:
+20:    unsigned int  itsAge;
+21:    unsigned int  itsWeight;
+22:
+23: }; 
+
+Analysis: This class has five public methods. Lines 9 and 10 contain the accessor methods for itsAge. Lines 12 and 13 contain the accessor methods for itsWeight. These accessor functions set the member variables and return their values.
+The public member function Meow() is declared in line 16. Meow() is not an accessor function. It doesn't get or set a member variable; it performs another service for the class, printing the word Meow.
+
+The member variables themselves are declared in lines 20 and 21.
+
+To set Frisky's age, you would pass the value to the SetAge() method, as in
+
+Cat  Frisky;
+Frisky.SetAge(5);    // set Frisky's age using the public accessor
+
+Privacy Versus Security
+
+Declaring methods or data private enables the compiler to find programming mistakes before they become bugs. Any programmer worth his consulting fees can find a way around privacy if he wants to. Stroustrup, the inventor of C++, said, "The C++ access control mechanisms provide protection against accident--not against fraud." (ARM, 1990.)
+The class keyword
+
+Syntax for the class keyword is as follows.
+
+
+class class_name
+{
+// access control keywords here
+// class variables and methods declared here
+};
+
+You use the class keyword to declare new types. A class is a collection of class member data, which are variables of various types, including other classes. The class also contains class functions--or methods--which are functions used to manipulate the data in the class and to perform other services for the class. You define objects of the new type in much the same way in which you define any variable. State the type (class) and then the variable name (the object). You access the class members and functions by using the dot (.) operator. You use access control keywords to declare sections of the class as public or private. The default for access control is private. Each keyword changes the access control from that point on to the end of the class or until the next access control keyword. Class declarations end with a closing brace and a semicolon. Example 1
+
+class Cat
+{
+public:
+unsigned int Age;
+unsigned int Weight;
+void Meow();
+};
+
+Cat  Frisky;
+Frisky.Age = 8;
+Frisky.Weight = 18;
+Frisky.Meow();
+
+
+Example
+
+class Car
+{
+public:                            // the next five are public
+
+void Start();
+void Accelerate();
+void Brake();
+void SetYear(int year);
+int GetYear();
+
+private:                           // the rest is private
+
+int Year;
+Char Model [255];
+};                                 // end of class declaration
+
+Car OldFaithful;                   // make an instance of car
+int bought;                        // a local variable of type int
+OldFaithful.SetYear(84) ;          // assign 84 to the year
+bought = OldFaithful.GetYear();    // set bought to 84
+OldFaithful.Start();               // call the start method
+
+    DO declare member variables private. DO use public accessor methods. DON'T try to use private member variables from outside the class. DO access private member variables from within class member functions. 
+
+Implementing Class Methods
+
+As you've seen, an accessor function provides a public interface to the private member data of the class. Each accessor function, along with any other class methods that you declare, must have an implementation. The implementation is called the function definition.
+
+A member function definition begins with the name of the class, followed by two colons, the name of the function, and its parameters. Listing 6.3 shows the complete declaration of a simple Cat class and the implementation of its accessor function and one general class member function.
+
+Listing 6.3. Implementing the methods of a simple class.
+
+1:   // Demonstrates declaration of a class and
+2:   // definition of class methods,
+3:
+4:   #include <iostream.h>      // for cout
+5:
+6:   class Cat                   // begin declaration of the class
+7:   {
+8:     public:                   // begin public section
+9:       int GetAge();           // accessor function
+10:      void SetAge (int age);  // accessor function
+11:      void Meow();            // general function
+12:    private:                  // begin private section
+13:      int itsAge;             // member variable
+14:  };
+15:
+16:  // GetAge, Public accessor function
+17:  // returns value of itsAge member
+18:  int Cat::GetAge()
+19:  {
+20:     return itsAge;
+21:  }
+22:
+23:  // definition of SetAge, public
+24:  // accessor function
+25:  // returns sets itsAge member
+26:  void Cat::SetAge(int age)
+27:  {
+28:     // set member variable its age to
+29:     // value passed in by parameter age
+30:     itsAge = age;
+31:  }
+32:
+33:  // definition of Meow method
+34:  // returns: void
+35:  // parameters: None
+36:  // action: Prints "meow" to screen
+37:  void Cat::Meow()
+38:  {
+39:     cout << "Meow.\n";
+40:  }
+41:
+42:  // create a cat, set its age, have it
+43:  // meow, tell us its age, then meow again.
+44:  int main()
+45:  {
+46:     Cat Frisky;
+47:     Frisky.SetAge(5);
+48:     Frisky.Meow();
+49:     cout << "Frisky is a cat who is " ;
+50:     cout << Frisky.GetAge() << " years old.\n";
+51:     Frisky.Meow();
+52;      return 0;
+53: }
+Output: Meow.
+Frisky is a cat who is 5 years old.
+Meow.
+
+Analysis: Lines 6-14 contain the definition of the Cat class. Line 8 contains the keyword public, which tells the compiler that what follows is a set of public members. Line 9 has the declaration of the public accessor method GetAge(). GetAge() provides access to the private member variable itsAge, which is declared in line 13. Line 10 has the public accessor function SetAge(). SetAge() takes an integer as an argument and sets itsAge to the value of that argument.
+Line 11 has the declaration of the class method Meow(). Meow() is not an accessor function. Here it is a general method that prints the word Meow to the screen.
+
+Line 12 begins the private section, which includes only the declaration in line 13 of the private member variable itsAge. The class declaration ends with a closing brace and semicolon in line 14.
+
+Lines 18-21 contain the definition of the member function GetAge(). This method takes no parameters; it returns an integer. Note that class methods include the class name followed by two colons and the function name (Line 18). This syntax tells the compiler that the GetAge() function that you are defining here is the one that you declared in the Cat class. With the exception of this header line, the GetAge() function is created like any other function.
+
+The GetAge() function takes only one line; it returns the value in itsAge. Note that the main() function cannot access itsAge because itsAge is private to the Cat class. The main() function has access to the public method GetAge(). Because GetAge() is a member function of the Cat class, it has full access to the itsAge variable. This access enables GetAge() to return the value of itsAge to main().
+
+Line 26 contains the definition of the SetAge() member function. It takes an integer parameter and sets the value of itsAge to the value of that parameter in line 30. Because it is a member of the Cat class, SetAge() has direct access to the member variable itsAge.
+
+Line 37 begins the definition, or implementation, of the Meow() method of the Cat class. It is a one-line function that prints the word Meow to the screen, followed by a new line. Remember that the \n character prints a new line to the screen.
+
+Line 44 begins the body of the program with the familiar main() function. In this case, it takes no arguments and returns void. In line 46, main() declares a Cat named Frisky. In line 47, the value 5 is assigned to the itsAge member variable by way of the SetAge() accessor method. Note that the method is called by using the class name (Frisky) followed by the member operator (.) and the method name (SetAge()). In this same way, you can call any of the other methods in a class.
+
+Line 48 calls the Meow() member function, and line 49 prints a message using the GetAge() accessor. Line 51 calls Meow() again.
+Constructors and Destructors
+
+There are two ways to define an integer variable. You can define the variable and then assign a value to it later in the program. For example,
+
+int Weight;            // define a variable
+...                    // other code here
+Weight = 7;            // assign it a value
+
+Or you can define the integer and immediately initialize it. For example,
+
+int Weight = 7;        // define and initialize to 7
+
+Initialization combines the definition of the variable with its initial assignment. Nothing stops you from changing that value later. Initialization ensures that your variable is never without a meaningful value.
+
+How do you initialize the member data of a class? Classes have a special member function called a constructor. The constructor can take parameters as needed, but it cannot have a return value--not even void. The constructor is a class method with the same name as the class itself.
+
+Whenever you declare a constructor, you'll also want to declare a destructor. Just as constructors create and initialize objects of your class, destructors clean up after your object and free any memory you might have allocated. A destructor always has the name of the class, preceded by a tilde (~). Destructors take no arguments and have no return value. Therefore, the Cat declaration includes
+
+~Cat();
+
+Default Constructors and Destructors
+
+If you don't declare a constructor or a destructor, the compiler makes one for you. The default constructor and destructor take no arguments and do nothing.
+
+What good is a constructor that does nothing? In part, it is a matter of form. All objects must be constructed and destructed, and these do-nothing functions are called at the right time. However, to declare an object without passing in parameters, such as
+
+Cat Rags;           // Rags gets no parameters
+
+you must have a constructor in the form
+
+Cat();
+
+When you define an object of a class, the constructor is called. If the Cat constructor took two parameters, you might define a Cat object by writing
+
+Cat Frisky (5,7);
+
+If the constructor took one parameter, you would write
+
+Cat Frisky (3);
+
+In the event that the constructor takes no parameters at all, you leave off the parentheses and write
+
+Cat Frisky ;
+
+This is an exception to the rule that states all functions require parentheses, even if they take no parameters. This is why you are able to write
+
+Cat Frisky;
+
+which is a call to the default constructor. It provides no parameters, and it leaves off the parentheses. You don't have to use the compiler-provided default constructor. You are always free to write your own constructor with no parameters. Even constructors with no parameters can have a function body in which they initialize their objects or do other work.
+
+As a matter of form, if you declare a constructor, be sure to declare a destructor, even if your destructor does nothing. Although it is true that the default destructor would work correctly, it doesn't hurt to declare your own. It makes your code clearer.
+
+Listing 6.4 rewrites the Cat class to use a constructor to initialize the Cat object, setting its age to whatever initial age you provide, and it demonstrates where the destructor is called.
+
+Listing 6.4. Using constructors and destructors.
+
+1:   // Demonstrates declaration of a constructors and
+2:   // destructor for the Cat class
+3:
+4:   #include <iostream.h>      // for cout
+5:
+6:   class Cat                   // begin declaration of the class
+7:   {
+8:    public:                    // begin public section
+9:      Cat(int initialAge);     // constructor
+10:     ~Cat();                  // destructor
+11:     int GetAge();            // accessor function
+12:     void SetAge(int age);    // accessor function
+13:     void Meow();
+14:   private:                   // begin private section
+15:     int itsAge;              // member variable
+16:  };
+17:
+18:  // constructor of Cat,
+19:  Cat::Cat(int initialAge)
+20:  {
+21:     itsAge = initialAge;
+22:  }
+23:
+24:  Cat::~Cat()                 // destructor, takes no action
+25:  {
+26:  }
+27:
+28:  // GetAge, Public accessor function
+29:  // returns value of itsAge member
+30:  int Cat::GetAge()
+31:  {
+32:     return itsAge;
+33:  }
+34:
+35:  // Definition of SetAge, public
+36:  // accessor function
+37:
+38:  void Cat::SetAge(int age)
+39:  {
+40:     // set member variable its age to
+41:     // value passed in by parameter age
+42:     itsAge = age;
+43:  }
+44:
+45:  // definition of Meow method
+46:  // returns: void
+47:  // parameters: None
+48:  // action: Prints "meow" to screen
+49:  void Cat::Meow()
+50:  {
+51:     cout << "Meow.\n";
+52:  }
+53:
+54:  // create a cat, set its age, have it
+55   // meow, tell us its age, then meow again.
+56:  int main()
+57:  {
+58:    Cat Frisky(5);
+59:    Frisky.Meow();
+60:    cout << "Frisky is a cat who is " ;
+61:    cout << Frisky.GetAge() << " years old.\n";
+62:    Frisky.Meow();
+63:    Frisky.SetAge(7);
+64:    cout << "Now Frisky is " ;
+65:    cout << Frisky.GetAge() << " years old.\n";
+66;     return 0;
+67: }
+
+Output: Meow.
+Frisky is a cat who is 5 years old.
+Meow.
+Now Frisky is 7 years old.
+
+Analysis: Listing 6.4 is similar to 6.3, except that line 9 adds a constructor that takes an integer. Line 10 declares the destructor, which takes no parameters. Destructors never take parameters, and neither constructors nor destructors return a value--not even void.
+Lines 19-22 show the implementation of the constructor. It is similar to the implementation of the SetAge() accessor function. There is no return value.
+
+Lines 24-26 show the implementation of the destructor ~Cat(). This function does nothing, but you must include the definition of the function if you declare it in the class declaration.
+
+Line 58 contains the definition of a Cat object, Frisky. The value 5 is passed in to Frisky's constructor. There is no need to call SetAge(), because Frisky was created with the value 5 in its member variable itsAge, as shown in line 61. In line 63, Frisky's itsAge variable is reassigned to 7. Line 65 prints the new value.
+
+    DO use constructors to initialize your objects. DON'T give constructors or destructors a return value. DON'T give destructors parameters. 
+
+const Member Functions
+
+If you declare a class method const, you are promising that the method won't change the value of any of the members of the class. To declare a class method constant, put the keyword const after the parentheses but before the semicolon. The declaration of the constant member function SomeFunction() takes no arguments and returns void. It looks like this:
+
+void SomeFunction() const;
+
+Accessor functions are often declared as constant functions by using the const modifier. The Cat class has two accessor functions:
+
+void SetAge(int anAge);
+int GetAge();
+
+SetAge() cannot be const because it changes the member variable itsAge. GetAge(), on the other hand, can and should be const because it doesn't change the class at all. GetAge() simply returns the current value of the member variable itsAge. Therefore, the declaration of these functions should be written like this:
+
+void SetAge(int anAge);
+int GetAge() const;
+
+If you declare a function to be const, and the implementation of that function changes the object by changing the value of any of its members, the compiler flags it as an error. For example, if you wrote GetAge() in such a way that it kept count of the number of times that the Cat was asked its age, it would generate a compiler error. This is because you would be changing the Cat object by calling this method.
+
+    NOTE: Use const whenever possible. Declare member functions to be const whenever they should not change the object. This lets the compiler help you find errors; it's faster and less expensive than doing it yourself. 
+
+It is good programming practice to declare as many methods to be const as possible. Each time you do, you enable the compiler to catch your errors, instead of letting your errors become bugs that will show up when your program is running.
+Interface Versus Implementation
+
+As you've learned, clients are the parts of the program that create and use objects of your class. You can think of the interface to your class--the class declaration--as a contract with these clients. The contract tells what data your class has available and how your class will behave.
+
+For example, in the Cat class declaration, you create a contract that every Cat will have a member variable itsAge that can be initialized in its constructor, assigned to by its SetAge() accessor function, and read by its GetAge() accessor. You also promise that every Cat will know how to Meow().
+
+If you make GetAge() a const function--as you should--the contract also promises that GetAge() won't change the Cat on which it is called.
+
+C++ is strongly typed, which means that the compiler enforces these contracts by giving you a compiler error when you violate them. Listing 6.5 demonstrates a program that doesn't compile because of violations of these contracts.
+
+    WARNING: Listing 6.5 does not compile! 
+
+Listing 6.5. A demonstration of violations of the interface.
+
+1:   // Demonstrates compiler errors
+2:
+3:
+4:   #include <iostream.h>          // for cout
+5:
+6:  class Cat
+7:  {
+8:   public:
+9:      Cat(int initialAge);
+10:     ~Cat();
+11:     int GetAge() const;          // const accessor function
+12:     void SetAge (int age);
+13:     void Meow();
+14:  private:
+15:    int itsAge;
+16: };
+17:
+18:    // constructor of Cat,
+19:    Cat::Cat(int initialAge)
+20:    {
+21:       itsAge = initialAge;
+21:       cout << "Cat Constructor\n";
+22:    }
+23:
+24:    Cat::~Cat()                   // destructor, takes no action
+25:    {
+26:       cout << "Cat Destructor\n";
+27:    }
+28:   // GetAge, const function
+29:   // but we violate const!
+30:   int Cat::GetAge() const
+31:   {
+32:      return (itsAge++);         // violates const!
+33:   }
+34:
+35:   // definition of SetAge, public
+36:   // accessor function
+37:
+38:   void Cat::SetAge(int age)
+39:   {
+40:      // set member variable its age to
+41:      // value passed in by parameter age
+42:      itsAge = age;
+43:   }
+44:
+45:  // definition of Meow method
+46:  // returns: void
+47:  // parameters: None
+48:  // action: Prints "meow" to screen
+49:  void Cat::Meow()
+50:  {
+51:     cout << "Meow.\n";
+52:  }
+53:
+54:  // demonstrate various violations of the
+55   // interface, and resulting compiler errors
+56:  int main()
+57:  {
+58:     Cat Frisky;                 // doesn't match declaration
+59:     Frisky.Meow();
+60:     Frisky.Bark();              // No, silly, cat's can't bark.
+61:     Frisky.itsAge = 7;          // itsAge is private
+62:      return 0;
+63: } 
+
+Analysis: As it is written, this program doesn't compile. Therefore, there is no output.
+This program was fun to write because there are so many errors in it.
+
+Line 11 declares GetAge() to be a const accessor function--as it should be. In the body of GetAge(), however, in line 32, the member variable itsAge is incremented. Because this method is declared to be const, it must not change the value of itsAge. Therefore, it is flagged as an error when the program is compiled.
+
+In line 13, Meow() is not declared const. Although this is not an error, it is bad programming practice. A better design takes into account that this method doesn't change the member variables of Cat. Therefore, Meow() should be const.
+
+Line 58 shows the definition of a Cat object, Frisky. Cats now have a constructor, which takes an integer as a parameter. This means that you must pass in a parameter. Because there is no parameter in line 58, it is flagged as an error.
+
+Line 60 shows a call to a class method, Bark(). Bark() was never declared. Therefore, it is illegal.
+
+Line 61 shows itsAge being assigned the value 7. Because itsAge is a private data member, it is flagged as an error when the program is compiled.
+Why Use the Compiler to Catch Errors?
+
+While it would be wonderful to write 100 percent bug-free code, few programmers have been able to do so. However, many programmers have developed a system to help minimize bugs by catching and fixing them early in the process. Although compiler errors are infuriating and are the bane of a programmer's existence, they are far better than the alternative. A weakly typed language enables you to violate your contracts without a peep from the compiler, but your program will crash at run-time--when, for example, your boss is watching. Compile-time errors--that is, errors found while you are compiling--are far better than run-time errors--that is, errors found while you are executing the program. This is because compile-time errors can be found much more reliably. It is possible to run a program many times without going down every possible code path. Thus, a run-time error can hide for quite a while. Compile-time errors are found every time you compile. Thus, they are easier to identify and fix. It is the goal of quality programming to ensure that the code has no runtime bugs. One tried-and-true technique to accomplish this is to use the compiler to catch your mistakes early in the development process.
+Where to Put Class Declarations and Method Definitions
+
+Each function that you declare for your class must have a definition. The definition is also called the function implementation. Like other functions, the definition of a class method has a function header and a function body.
+
+The definition must be in a file that the compiler can find. Most C++ compilers want that file to end with .C or .CPP. This book uses .CPP, but check your compiler to see what it prefers.
+
+    NOTE: Many compilers assume that files ending with .C are C programs, and that C++ program files end with .CPP. You can use any extension, but .CPP will minimize confusion. 
+
+You are free to put the declaration in this file as well, but that is not good programming practice. The convention that most programmers adopt is to put the declaration into what is called a header file, usually with the same name but ending in .H, .HP, or .HPP. This book names the header files with .HPP, but check your compiler to see what it prefers.
+
+For example, you put the declaration of the Cat class into a file named CAT.HPP, and you put the definition of the class methods into a file called CAT.CPP. You then attach the header file to the .CPP file by putting the following code at the top of CAT.CPP:
+
+#include Cat.hpp
+
+This tells the compiler to read CAT.HPP into the file, just as if you had typed in its contents at this point. Why bother separating them if you're just going to read them back in? Most of the time, clients of your class don't care about the implementation specifics. Reading the header file tells them everything they need to know; they can ignore the implementation files.
+
+    NOTE: The declaration of a class tells the compiler what the class is, what data it holds, and what functions it has. The declaration of the class is called its interface because it tells the user how to interact with the class. The interface is usually stored in an .HPP file, which is referred to as a header file. The function definition tells the compiler how the function works. The function definition is called the implementation of the class method, and it is kept in a .CPP file. The implementation details of the class are of concern only to the author of the class. Clients of the class--that is, the parts of the program that use the class--don't need to know, and don't care, how the functions are implemented. 
+
+Inline Implementation
+
+Just as you can ask the compiler to make a regular function inline, you can make class methods inline. The keyword inline appears before the return value. The inline implementation of the GetWeight() function, for example, looks like this:
+
+inline int Cat::GetWeight()
+{
+return itsWeight;         // return the Weight data member
+}
+
+You can also put the definition of a function into the declaration of the class, which automatically makes that function inline. For example,
+
+class Cat
+{
+public:
+int GetWeight() { return itsWeight; }    // inline
+void SetWeight(int aWeight);
+};
+
+Note the syntax of the GetWeight() definition. The body of the inline function begins im-mediately after the declaration of the class method; there is no semicolon after the paren-theses. Like any function, the definition begins with an opening brace and ends with a closing brace. As usual, whitespace doesn't matter; you could have written the declaration as
+
+class Cat
+{
+public:
+int GetWeight()
+{
+return itsWeight;
+}                           // inline
+void SetWeight(int aWeight);
+};
+
+Listings 6.6 and 6.7 re-create the Cat class, but they put the declaration in CAT.HPP and the implementation of the functions in CAT.CPP. Listing 6.7 also changes the accessor functions and the Meow() function to inline.
+
+Listing 6.6. Cat class declaration in CAT.HPP
+
+1:  #include <iostream.h>
+2:  class Cat
+3:   {
+4:  public:
+5:   Cat (int initialAge);
+6:   ~Cat();
+7:    int GetAge() { return itsAge;}             // inline!
+8:    void SetAge (int age) { itsAge = age;}     // inline!
+9:    void Meow() { cout << "Meow.\n";}             // inline!
+10:  private:
+11: int itsAge;
+12: };
+
+Listing 6.7. Cat implementation in CAT.CPP.
+
+1:   // Demonstrates inline functions
+2:   // and inclusion of header files
+3:
+4:   #include "cat.hpp"  // be sure to include the header files!
+5:
+6:
+7:   Cat::Cat(int initialAge)   //constructor
+8:   {
+9:      itsAge = initialAge;
+10:  }
+11:
+12:  Cat::~Cat()             //destructor, takes no action
+13:  {
+14:  }
+15:
+16:  // Create a cat, set its age, have it
+17:  // meow, tell us its age, then meow again.
+18:  int main()
+19:  {
+20:     Cat Frisky(5);
+21:     Frisky.Meow();
+22:     cout << "Frisky is a cat who is " ;
+23:     cout << Frisky.GetAge() << " years old.\n";
+24:     Frisky.Meow();
+25:     Frisky.SetAge(7);
+26:     cout << "Now Frisky is " ;
+27:     cout << Frisky.GetAge() << " years old.\n";
+28:      return 0;
+29: }
+
+Output: Meow.
+Frisky is a cat who is 5 years old.
+Meow.
+Now Frisky is 7 years old.
+
+Analysis: The code presented in Listing 6.6 and Listing 6.7 is similar to the code in Listing 6.4, except that three of the methods are written inline in the declaration file and the declaration has been separated into CAT.HPP.
+GetAge() is declared in line 7, and its inline implementation is provided. Lines 8 and 9 provide more inline functions, but the functionality of these functions is unchanged from the previous "outline" implementations.
+
+Line 4 of Listing 6.7 shows #include "cat.hpp", which brings in the listings from CAT.HPP. By including cat.hpp, you have told the precompiler to read cat.hpp into the file as if it had been typed there, starting on line 5.
+
+This technique allows you to put your declarations into a different file from your implementation, yet have that declaration available when the compiler needs it. This is a very common technique in C++ programming. Typically, class declarations are in an .HPP file that is then #included into the associated CPP file.
+
+Lines 18-29 repeat the main function from Listing 6.4. This shows that making these functions inline doesn't change their performance.
+Classes with Other Classes as Member Data
+
+It is not uncommon to build up a complex class by declaring simpler classes and including them in the declaration of the more complicated class. For example, you might declare a wheel class, a motor class, a transmission class, and so forth, and then combine them into a car class. This declares a has-a relationship. A car has a motor, it has wheels, and it has a transmission.
+
+Consider a second example. A rectangle is composed of lines. A line is defined by two points. A point is defined by an x-coordinate and a y-coordinate. Listing 6.8 shows a complete declaration of a Rectangle class, as might appear in RECTANGLE.HPP. Because a rectangle is defined as four lines connecting four points and each point refers to a coordinate on a graph, we first declare a Point class, to hold the x,y coordinates of each point. Listing 6.9 shows a complete declaration of both classes.
+
+Listing 6.8. Declaring a complete class.
+
+1:   // Begin Rect.hpp
+2:   #include <iostream.h>
+3:   class Point     // holds x,y coordinates
+4:   {
+5:      // no constructor, use default
+6:      public:
+7:         void SetX(int x) { itsX = x; }
+8:         void SetY(int y) { itsY = y; }
+9:         int GetX()const { return itsX;}
+10:        int GetY()const { return itsY;}
+11:     private:
+12:        int itsX;
+13:        int itsY;
+14:  };    // end of Point class declaration
+15:
+16:
+17:  class  Rectangle
+18:  {
+19:     public:
+20:        Rectangle (int top, int left, int bottom, int right);
+21:        ~Rectangle () {}
+22:
+23:        int GetTop() const { return itsTop; }
+24:        int GetLeft() const { return itsLeft; }
+25:        int GetBottom() const { return itsBottom; }
+26:        int GetRight() const { return itsRight; }
+27:
+28:        Point  GetUpperLeft() const { return itsUpperLeft; }
+29:        Point  GetLowerLeft() const { return itsLowerLeft; }
+30:        Point  GetUpperRight() const { return itsUpperRight; }
+31:        Point  GetLowerRight() const { return itsLowerRight; }
+32:
+33:        void SetUpperLeft(Point Location)  {itsUpperLeft = Location;}
+34:        void SetLowerLeft(Point Location)  {itsLowerLeft = Location;}
+35:        void SetUpperRight(Point Location)  {itsUpperRight = Location;}
+36:        void SetLowerRight(Point Location)  {itsLowerRight = Location;}
+37:
+38:        void SetTop(int top) { itsTop = top; }
+39:        void SetLeft (int left) { itsLeft = left; }
+40:        void SetBottom (int bottom) { itsBottom = bottom; }
+41:        void SetRight (int right) { itsRight = right; }
+42:
+43:        int GetArea() const;
+44:
+45:     private:
+46:        Point  itsUpperLeft;
+47:        Point  itsUpperRight;
+48:        Point  itsLowerLeft;
+49:        Point  itsLowerRight;
+50:        int    itsTop;
+51:        int    itsLeft;
+52:        int    itsBottom;
+53:        int    itsRight;
+54:  };
+55: // end Rect.hpp
+
+Listing 6.9. RECT.CPP.
+
+1:   // Begin rect.cpp
+2:   #include "rect.hpp"
+3:   Rectangle::Rectangle(int top, int left, int bottom, int right)
+4:   {
+5:         itsTop = top;
+6:         itsLeft = left;
+7:         itsBottom = bottom;
+8:         itsRight = right;
+9:
+10:        itsUpperLeft.SetX(left);
+11:        itsUpperLeft.SetY(top);
+12:
+13:        itsUpperRight.SetX(right);
+14:        itsUpperRight.SetY(top);
+15:
+16:        itsLowerLeft.SetX(left);
+17:        itsLowerLeft.SetY(bottom);
+18:
+19:        itsLowerRight.SetX(right);
+20:        itsLowerRight.SetY(bottom);
+21:  }
+22:
+23:
+24:  // compute area of the rectangle by finding corners,
+25:  // establish width and height and then multiply
+26:  int Rectangle::GetArea() const
+27:  {
+28:        int Width = itsRight-itsLeft;
+29:        int Height = itsTop - itsBottom;
+30:        return (Width * Height);
+31:  }
+32:
+33:  int main()
+34:  {
+35:        //initialize a local Rectangle variable
+36:        Rectangle MyRectangle (100, 20, 50, 80 );
+37:
+38:        int Area = MyRectangle.GetArea();
+39:
+40:        cout << "Area: " << Area << "\n";
+41:        cout << "Upper Left X Coordinate: ";
+42:        cout << MyRectangle.GetUpperLeft().GetX();
+43:      return 0;
+44: }
+Output: Area: 3000
+Upper Left X Coordinate: 20
+
+Analysis: Lines 3-14 in Listing 6.8 declare the class Point, which is used to hold a specific x,y coordinate on a graph. As written, this program doesn't use Points much. However, other drawing methods require Points.
+Within the declaration of the class Point, you declare two member variables (itsX and itsY) on lines 12 and 13. These variables hold the values of the coordinates. As the x-coordinate increases, you move to the right on the graph. As the y-coordinate increases, you move upward on the graph. Other graphs use different systems. Some windowing programs, for example, increase the y-coordinate as you move down in the window.
+
+The Point class uses inline accessor functions to get and set the X and Y points declared on lines 7-10. Points use the default constructor and destructor. Therefore, you must set their coordinates explicitly.
+
+Line 17 begins the declaration of a Rectangle class. A Rectangle consists of four points that represent the corners of the Rectangle.
+
+The constructor for the Rectangle (line 20) takes four integers, known as top, left, bottom, and right. The four parameters to the constructor are copied into four member variables (Listing 6.9) and then the four Points are established.
+
+In addition to the usual accessor functions, Rectangle has a function GetArea() declared in line 43. Instead of storing the area as a variable, the GetArea() function computes the area on lines 28-29 of Listing 6.9. To do this, it computes the width and the height of the rectangle, and then it multiplies these two values.
+
+Getting the x-coordinate of the upper-left corner of the rectangle requires that you access the UpperLeft point, and ask that point for its X value. Because GetUpperLeft()is ()a method of Rectangle, it can directly access the private data of Rectangle, including itsUpperLeft. Because itsUpperLeft is a Point and Point's itsX value is private, GetUpperLeft() cannot directly access this data. Rather, it must use the public accessor function GetX() to obtain that value.
+
+Line 33 of Listing 6.9 is the beginning of the body of the actual program. Until line 36, no memory has been allocated, and nothing has really happened. The only thing you've done is tell the compiler how to make a point and how to make a rectangle, in case one is ever needed.
+
+In line 36, you define a Rectangle by passing in values for Top, Left, Bottom, and Right.
+
+In line 38, you make a local variable, Area, of type int. This variable holds the area of the Rectangle that you've created. You initialize Area with the value returned by Rectangle's GetArea() function.
+
+A client of Rectangle could create a Rectangle object and get its area without ever looking at the implementation of GetArea().
+
+RECT.HPP is shown in Listing 6.8. Just by looking at the header file, which contains the declaration of the Rectangle class, the programmer knows that GetArea() returns an int. How GetArea() does its magic is not of concern to the user of class Rectangle. In fact, the author of Rectangle could change GetArea() without affecting the programs that use the Rectangle class.
+Structures
+
+A very close cousin to the class keyword is the keyword struct, which is used to declare a structure. In C++, a structure is exactly like a class, except that its members are public by default. You can declare a structure exactly as you declare a class, and you can give it exactly the same data members and functions. In fact, if you follow the good programming practice of always explicitly declaring the private and public sections of your class, there will be no difference whatsoever.
+
+Try re-entering Listing 6.8 with these changes:
+
+    In line 3, change class Point to struct Point.
+
+    In line 17, change class Rectangle to struct Rectangle. 
+
+Now run the program again and compare the output. There should be no change.
+Why Two Keywords Do the Same Thing
+
+You're probably wondering why two keywords do the same thing. This is an accident of history. When C++ was developed, it was built as an extension of the C language. C has structures, although C structures don't have class methods. Bjarne Stroustrup, the creator of C++, built upon structs, but he changed the name to class to represent the new, expanded functionality.
+
+    DO put your class declaration in an HPP file and your member functions in a CPP file. DO use const whenever you can. DO understand classes before you move on. 
+
+Summary
+
+Today you learned how to create new data types called classes. You learned how to define variables of these new types, which are called objects.
+
+A class has data members, which are variables of various types, including other classes. A class also includes member functions--also known as methods. You use these member functions to manipulate the member data and to perform other services.
+
+Class members, both data and functions, can be public or private. Public members are accessible to any part of your program. Private members are accessible only to the member functions of the class.
+
+It is good programming practice to isolate the interface, or declaration, of the class in a header file. You usually do this in a file with an .HPP extension. The implementation of the class methods is written in a file with a .CPP extension.
+
+Class constructors initialize objects. Class destructors destroy objects and are often used to free memory allocated by methods of the class.
+Q&A
+
+    Q. How big is a class object?
+
+    A. A class object's size in memory is determined by the sum of the sizes of its member variables. Class methods don't take up room as part of the memory set aside for the object.
+    Some compilers align variables in memory in such a way that two-byte variables actually consume somewhat more than two bytes. Check your compiler manual to be sure, but at this point there is no reason to be concerned with these details.
+
+    Q. If I declare a class Cat with a private member itsAge and then define two Cat objects, Frisky and Boots, can Boots access Frisky's itsAge member variable?
+
+    A. No. While private data is available to the member functions of a class, different instances of the class cannot access each other's data. In other words, Frisky's member functions can access Frisky's data, but not Boots'. In fact, Frisky is a completely independent cat from Boots, and that is just as it should be.
+
+    Q. Why shouldn't I make all the member data public?
+
+    A. Making member data private enables the client of the class to use the data without worrying about how it is stored or computed. For example, if the Cat class has a method GetAge(), clients of the Cat class can ask for the cat's age without knowing or caring if the cat stores its age in a member variable, or computes its age on the fly.
+
+    Q. If using a const function to change the class causes a compiler error, why shouldn't I just leave out the word const and be sure to avoid errors?
+
+    A. If your member function logically shouldn't change the class, using the keyword const is a good way to enlist the compiler in helping you find silly mistakes. For example, GetAge() might have no reason to change the Cat class, but your implementation has this line: 
+
+
+if (itsAge = 100) cout << "Hey! You're 100 years old\n";
+
+    Declaring GetAge() to be const causes this code to be flagged as an error. You meant to check whether itsAge is equal to 100, but instead you inadvertently assigned 100 to itsAge. Because this assignment changes the class--and you said this method would not change the class--the compiler is able to find the error.
+    This kind of mistake can be hard to find just by scanning the code. The eye often sees only what it expects to see. More importantly, the program might appear to run correctly, but itsAge has now been set to a bogus number. This will cause problems sooner or later.
+
+    Q. Is there ever a reason to use a structure in a C++ program?
+
+    A. Many C++ programmers reserve the struct keyword for classes that have no functions. This is a throwback to the old C structures, which could not have functions. Frankly, I find it confusing and poor programming practice. Today's methodless structure might need methods tomorrow. Then you'll be forced either to change the type to class or to break your rule and end up with a structure with methods. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is the dot operator, and what is it used for?
+
+    2. Which sets aside memory--declaration or definition?
+
+    3. Is the declaration of a class its interface or its implementation?
+
+    4. What is the difference between public and private data members?
+
+    5. Can member functions be private?
+
+    6. Can member data be public?
+
+    7. If you declare two Cat objects, can they have different values in their itsAge member data?
+
+    8. Do class declarations end with a semicolon? Do class method definitions?
+
+    9. What would the header for a Cat function, Meow, that takes no parameters and returns void look like?
+
+    10. What function is called to initialize a class? 
+
+Exercises
+
+    1. Write the code that declares a class called Employee with these data members: age, yearsOfService, and Salary.
+
+    2. Rewrite the Employee class to make the data members private, and provide public accessor methods to get and set each of the data members.
+
+    3. Write a program with the Employee class that makes two Employees; sets their age, YearsOfService, and Salary; and prints their values.
+
+    4. Continuing from Exercise 3, provide a method of Employee that reports how many thousands of dollars the employee earns, rounded to the nearest 1,000.
+
+    5. Change the Employee class so that you can initialize age, YearsOfService, and Salary when you create the employee.
+
+    6. BUG BUSTERS: What is wrong with the following declaration? 
+
+class Square
+{
+public:
+    int Side;
+}
+
+    7. BUG BUSTERS: Why isn't the following class declaration very useful? 
+
+class Cat
+{
+    int GetAge()const;
+private:
+    int itsAge;
+};
+
+    8. BUG BUSTERS: What three bugs in this code will the compiler find? 
+
+class  TV
+{
+public:
+    void SetStation(int Station);
+    int GetStation() const;
+private:
+    int itsStation;
+};
+main()
+{
+    TV myTV;
+    myTV.itsStation = 9;
+    TV.SetStation(10);
+    TV myOtherTv(2);
+}
+
+

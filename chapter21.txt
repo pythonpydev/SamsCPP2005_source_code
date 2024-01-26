@@ -1,0 +1,900 @@
+    Day 21
+        Whats Next
+            The Standard Libraries
+            String
+            Listing 21.1. strlen().
+                strcpy() and strncpy() 
+            Listing 21.2. Using strcpy.
+            Listing 21.3. Using strncpy().
+                strcat() and strncat() 
+            Listing 21.4. Using strcat() and strncat().
+                Other String Functions 
+            Time and Date
+            Listing 21.5. Using ctime().
+            stdlib
+            Listing 21.6. Using atoi() and related functions.
+                qsort() 
+            Listing 21.7. Using qsort().
+                Other Libraries 
+            Bit Twiddling
+                Operator AND
+                Operator OR
+                Operator Exclusive OR
+                The Complement Operator
+                Setting Bits
+                Clearing Bits
+                Flipping Bits
+                Bit Fields 
+            Listing 21.8. Using bit fields.
+            Style
+                Indenting
+                Braces
+                Long Lines
+                switch Statements
+                Program Text
+                Identifier Names
+                Spelling and Capitalization of Names
+                Comments
+                Access
+                Class Definitions
+                include Files
+                assert()
+                const 
+            Next Steps
+                Where to Get Help and Advice
+                Required Reading
+                Magazines
+                Staying in Touch 
+            Summary
+            Q&A
+                Quiz
+                Exercises 
+
+Day 21
+Whats Next
+
+Congratulations! You are nearly done with a full three-week intensive introduction to C++. By now you should have a solid understanding of C++, but in modern programming there is always more to learn. This chapter will fill in some missing details and then set the course for continued study.
+
+Today you will learn
+
+    What the standard libraries are.
+
+    How to manipulate individual bits and use them as flags.
+
+    What the next steps are in learning to use C++ effectively. 
+
+The Standard Libraries
+
+Every implementation of C++ includes the standard libraries, and most include additional libraries as well. Libraries are sets of functions that can be linked into your code. You've already used a number of standard library functions and classes, most notably from the iostreams library.
+
+To use a library, you typically include a header file in your source code, much as you did by writing #include <iostream.h> in many of the examples in this book. The angle brackets around the filename are a signal to the compiler to look in the directory where you keep the header files for your compiler's standard libraries.
+
+There are dozens of libraries, covering everything from file manipulation to setting the date and time to math functions. Today I will review just a few of the most popular functions and classes in the standard library that have not yet been covered in this book.
+String
+
+The most popular library is almost certainly the string library, with perhaps the function strlen() called most often. strlen() returns the length of a null-terminated string. Listing 21.1 illustrates its use.
+
+Listing 21.1. strlen().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     int main()
+5:     {
+6:        char buffer80];
+7:        do
+8:        {
+9:           cout << "Enter a string up to 80 characters: ";
+10:          cin.getline(buffer,80);
+11:          cout << "Your string is " << strlen(buffer);
+12:          cout << " characters long." << endl;
+13:       }    while (strlen(buffer));
+14:       cout << "\nDone." << endl;
+15:     return 0;
+16: }
+
+Output: Enter a string up to 80 characters: This sentence has 31 characters
+Your string is 31 characters long.
+Enter a string up to 80 characters: This sentence no verb
+Your string is 21 characters long.
+Enter a string up to 80 characters:
+Your string is 0 characters long.
+
+Done.
+
+Analysis: On line 6, a character buffer is created, and on line 9 the user is prompted to enter a string. As long as the user enters a string, the length of the string is reported on line 11.
+
+Note the test in the do...while() statement: while (strlen(buffer)). Since strlen() will return 0 when the buffer is empty, and since 0 evaluates FALSE, this while loop will continue as long as there are any characters in the buffer.
+strcpy() and strncpy()
+
+The second most popular function in string.h probably was strcpy(), which copied one string to another. This may now be diminished somewhat as C-style null-terminated strings have become less important in C++; typically, string manipulation is done from within a vendor-supplied or user-written string class. Nonetheless, your string class must support an assignment operator and a copy constructor, and often these are implemented using strcpy(), as illustrated in Listing 21.2.
+
+Listing 21.2. Using strcpy.
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     int main()
+5:     {
+6:        char stringOne80];
+7:        char stringTwo80];
+8:
+9:        stringOne0]='\0';
+10:       stringTwo0]='\0';
+11:
+12:       cout << "String One: " << stringOne << endl;
+13:       cout << "String Two: " << stringTwo << endl;
+14:
+15:       cout << "Enter a string: ";
+16:       cin.getline(stringOne,80);
+17:
+18:       cout << "\nString One: " << stringOne << endl;
+19:       cout << "String Two: " << stringTwo << endl;
+20:
+21:       cout << "copying..." << endl;
+22:       strcpy(stringTwo,stringOne);
+23:
+24:       cout << "\nString One: " << stringOne << endl;
+25:       cout << "String Two: " << stringTwo << endl;
+26:       cout << "\nDone " << endl;
+27:     return 0;
+28: }
+
+Output: String One:
+String Two:
+Enter a string: Test of strcpy()
+
+String One:  Test of strcpy()
+String Two:
+copying...
+
+String One:  Test of strcpy()
+String Two:  Test of strcpy()
+
+Done
+
+Analysis: Two C-style null-terminated strings are declared on lines 6 and 7. They are initialized to empty on lines 9 and 10, and their values are printed on lines 12 and 13. The user is prompted to enter a string, and the result is put in stringOne; the two strings are printed again, and only stringOne has the input. Strcpy() is then called, and stringOne is copied into stringTwo.
+
+Note that the syntax of strcpy() can be read as "copy into the first parameter the string in the second parameter." What happens if the target string (stringTwo) is too small to hold the copied string? This problem and its solution are illustrated in Listing 21.3.
+
+Listing 21.3. Using strncpy().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     int main()
+5:     {
+6:        char stringOne[80];
+7:        char stringTwo[10];
+8:        char stringThree[80];
+9:
+10:       stringOne[0]='\0';
+11:       stringTwo[0]='\0';
+12:       stringThree[0]='\0';
+13:
+14:       cout << "String One: " << stringOne << endl;
+15:       cout << "String Two: " << stringTwo << endl;
+16:       cout << "String Three: " << stringThree << endl;
+17:
+18:       cout << "Enter a long string: ";
+19:       cin.getline(stringOne,80);
+20:       strcpy(stringThree,stringOne);
+21:      //   strcpy(stringTwo,stringOne);
+22:
+23:       cout << "\nString One: " << stringOne << endl;
+24:       cout << "String Two: " << stringTwo << endl;
+25:       cout << "String Three: " << stringThree << endl;
+26:
+27:       strncpy(stringTwo,stringOne,9);
+28:
+29:       cout << "\nString One: " << stringOne << endl;
+30:       cout << "String Two: " << stringTwo << endl;
+31:       cout << "String Three: " << stringThree << endl;
+32:
+33:       stringTwo[9]='\0';
+34:
+35:       cout << "\nString One: " << stringOne << endl;
+36:       cout << "String Two: " << stringTwo << endl;
+37:       cout << "String Three: " << stringThree << endl;
+38:       cout << "\nDone." << endl;
+39:     return 0;
+40: }
+
+Output: String One:
+String Two:
+String Three:
+Enter a long string: Now is the time for all...
+
+String One: Now is the time for all...
+String Two:
+String Three: Now is the time for all...
+
+String One: Now is the time for all...
+String Two: Now is th_+||
+String Three: Now is the time for all...
+
+String One: Now is the time for all...
+String Two: Now is th
+String Three: Now is the time for all...
+
+Done.
+
+Analysis: On lines 6, 7, and 8, three string buffers are declared. Note that stringTwo is declared to be only 10 characters, while the others are 80. All three are initialized to zero length on lines 10 to 12 and are printed on lines 14 to 16.
+
+The user is prompted to enter a string, and that string is copied to string three on line 20. Line 21 is commented out; copying this long string to stringTwo caused a crash on my computer because it wrote into memory that was critical to the program.
+
+The standard function strcpy() starts copying at the address pointed to by the first parameter (the array name), and it copies the entire string without ensuring that you've allocated room for it!
+
+The standard library offers a second, safer function, strncpy(), which copies only a specified number of characters to the target string. The n in the middle of the function name strncpy() stands for number. This is a convention used throughout the standard libraries.
+
+On line 27, the first nine characters of stringOne are copied to stringTwo and the result is printed. Because strncpy() does not put a null at the end of the copied string, the result is not what was intended. Note that strcpy() does null-terminate the copied string, but strncpy() does not, just to keep life interesting.
+
+The null is added on line 33, and the strings are then printed a final time.
+strcat() and strncat()
+
+Related to strcpy() and strncpy() are the standard functions strcat() and strncat(). The former concatenates one string to another; that is, it appends the string it takes as its second parameter to the end of the string it takes as its first parameter. strncat(), as you might expect, appends the first n characters of one string to the other. Listing 21.4 illustrates their use.
+
+Listing 21.4. Using strcat() and strncat().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:
+5:     int main()
+6:     {
+7:        char stringOne[255];
+8:        char stringTwo[255];
+9:
+10:       stringOne[0]='\0';
+11:       stringTwo[0]='\0';
+12:
+13:       cout << "Enter a  string: ";
+14:       cin.getline(stringOne,80);
+15:
+16:       cout << "Enter a second string: ";
+17:       cin.getline(stringTwo,80);
+18:
+19:       cout << "String One: " << stringOne << endl;
+20:       cout << "String Two: " << stringTwo << endl;
+21:
+22:       strcat(stringOne," ");
+23:       strncat(stringOne,stringTwo,10);
+24:
+25:       cout << "String One: " << stringOne << endl;
+26:       cout << "String Two: " << stringTwo << endl;
+27:
+28:     return 0;
+29: }
+
+Output: Enter a string: Oh beautiful
+Enter a second string: for spacious skies for amber waves of grain
+String One: Oh beautiful
+String Two: for spacious skies for amber waves of grain
+String One: Oh beautiful for spacio
+String Two: for spacious skies for amber waves of grain
+
+Analysis: On lines 7 and 8, two character arrays are created, and the user is prompted for two strings, which are put into the two arrays.
+
+A space is appended to stringOne on line 22, and on line 23, the first ten characters of stringTwo are appended to stringOne. The result is printed on lines 25 and 26.
+Other String Functions
+
+The string library provides a number of other string functions, including those used to find occurrences of various characters or "tokens" within a string. If you need to find a comma or a particular word as it occurs in a string, look to the string library to see whether the function you need already exists.
+Time and Date
+
+The time library provides a number of functions for obtaining a close approximation of the current time and date, and for comparing times and dates to one another.
+
+The center of this library is a structure, tm, which consists of nine integer values for the second, minute, hour, day of the month, number of the month (where January=0), the number of years since 1900, the day (where Sunday=0), the day of the year (0-365), and a Boolean value establishing whether daylight saving time is in effect. (This last may not be supported on some systems.)
+
+Most time functions expect a variable of type time_t or a pointer to a variable of this type. There are conversion routines to turn such a variable into a tm data structure.
+
+The standard library supplies the function time(), which takes a pointer to a time_t variable and fills it with the current time. It also provides ctime(), which takes the time_t variable filled by time() and returns an ASCII string that can be used for printing. If you need more control over the output, however, you can pass the time_t variable to local_time(), which will return a pointer to a tm structure. Listing 21.5 illustrates these various time functions.
+
+Listing 21.5. Using ctime().
+
+1:     #include <time.h>
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        time_t currentTime;
+7:
+8:        // get and print the current time
+9:        time (&currentTime); // fill now with the current time
+10:       cout << "It is now " << ctime(&currentTime) << endl;
+11:
+12:       struct tm * ptm= localtime(&currentTime);
+13:
+14:       cout << "Today is " << ((ptm->tm_mon)+1) << "/";
+15:       cout << ptm->tm_mday << "/";
+16:       cout << ptm->tm_year << endl;
+17:
+18:       cout << "\nDone.";
+19:     return 0;
+20: }
+Output: It is now Mon Mar 31 13:50:10 1997
+
+Today is 3/31/97
+
+Done.
+
+Analysis: On line 6, CurrentTime is declared to be a variable of type time_t. The address of this variable is passed to the standard time library function time(), and the variable currentTime is set to the current date and time. The address of this variable is then passed to ctime(), which returns an ASCII string that is in turn passed to the cout statement on line 12.The address of currentTime is then passed to the standard time library function localtime(), and a pointer to a tm structure is returned, which is used to initialize the local variable ptm. The member data of this structure is then accessed to print the current month, day of the month, and year.
+stdlib
+
+stdlib is something of a miscellaneous collection of functions that did not fit into the other libraries. It includes simple integer math functions, sorting functions (including qsort(), one of the fastest sorts available), and text conversions for moving from ASCII text to integers, long, float, and so forth.
+
+The functions in stdlib you are likely to use most often include atoi(), itoa(), and the family of related functions. atoi() provides ASCII to integer conversion. atoi() takes a single argument: a pointer to a constant character string. It returns an integer (as you might expect). Listing 21.6 illustrates its use.
+
+Listing 21.6. Using atoi() and related functions.
+
+1:     #include <stdlib.h>
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char buffer[80];
+7:        cout << "Enter a number: ";
+8:        cin >> buffer;
+9:
+10:       int number;
+11:       // number = buffer; compile error
+12:       number = atoi(buffer);
+13:       cout << "Here's the number: " << number << endl;
+14:
+15:       // int sum = buffer + 5;
+16:       int sum = atoi(buffer) + 5;
+17:       cout << "Here's sum: " << sum << endl;
+18:     return 0;
+19: }
+
+Output: Enter a number: 9
+Here's the number: 9
+Here's sum: 14
+
+Analysis: On line 6 of this simple program, an 80-character buffer is allocated, and on line 7 the user is prompted for a number. The input is taken as text and written into the buffer.
+On line 10, an int variable, number, is declared, and on line 11 the program attempts to assign the contents of the buffer to the int variable. This generates a compile-time error and is commented out.
+
+On line 12, the problem is solved by invoking the standard library function atoi(), passing in the buffer as the parameter. The return value, the integer value of the text string, is assigned to the integer variable number and printed on line 13.
+
+On line 15, a new integer variable, sum, is declared, and an attempt is made to assign to it the result of adding the integer constant 5 to the buffer. This, too, fails and is solved by calling the standard function atoi().
+
+    NOTE: Some compilers implement standard conversion procedures (such as atoi()) using macros. You can usually use these functions without worrying about how they are implemented. Check your compiler's documentation for details. 
+
+qsort()
+
+At times you may want to sort a table or an array; qsort() provides a quick and easy way to do so. The hard part of using qsort() is setting up the structures to pass in.
+
+qsort() takes four arguments. The first is a pointer to the start of the table to be sorted (an array name works just fine), the second is the number of elements in the table, the third is the size of each element, and the fourth is a pointer to a comparison function.
+
+The comparison function must return an int, and must take as its parameters two constant void pointers. void pointers aren't used very often in C++, as they diminish the type checking, but they have the advantage that they can be used to point to items of any type. If you were writing your own qsort() function, you might consider using templates instead. Listing 21.7 illustrates how to use the standard qsort() function.
+
+Listing 21.7. Using qsort().
+
+1:     /* qsort example */
+2:
+3:     #include <iostream.h>
+4:     #include <stdlib.h>
+5:
+6:     // form of sort_function required by qsort
+7:     int sortFunction( const void *intOne, const void *intTwo);
+8:
+9:     const int TableSize = 10;  // array size
+10:
+11:    int main(void)
+12:    {
+13:       int i,table[TableSize];
+14:
+15:       // fill the table with values
+16:       for (i = 0; i<TableSize; i++)
+17:       {
+18:          cout << "Enter a number: ";
+19:          cin >> table[i];
+20:       }
+21:       cout << "\n";
+22:
+23:       // sort the values
+24:       qsort((void *)table, TableSize, sizeof(table[0]), sortFunction);
+25:
+26:       // print the results
+27:       for (i = 0; i < TableSize; i++)
+28:          cout << "Table [" << i << "]: " << table[i] << endl;
+29:
+30:       cout << "Done." << endl;
+31:     return 0;
+32:    }
+33:
+34:    int sortFunction( const void *a, const void *b)
+35:    {
+36:       int intOne = *((int*)a);
+37:       int intTwo = *((int*)b);
+38:       if (intOne < intTwo)
+39:          return -1;
+40:       if (intOne == intTwo)
+41:          return 0;
+42:       return 1;
+43: }
+Output: Enter a number: 2
+Enter a number: 9
+Enter a number: 12
+Enter a number: 873
+Enter a number: 0
+Enter a number: 45
+Enter a number: 93
+Enter a number: 2
+Enter a number: 66
+Enter a number: 1
+
+Table[0]: 0
+Table[1]: 1
+Table[2]: 2
+Table[3]: 2
+Table[4]: 9
+Table[5]: 12
+Table[6]: 45
+Table[7]: 66
+Table[8]: 93
+Table[9]: 873
+Done.
+
+Analysis: On line 4, the standard library header is included, which is required by the qsort() function. On line 7, the function sortFunction() is declared, which takes the required four parameters.
+
+An array is declared on line 13 and filled by user input on lines 16-20. qsort() is called on line 24, casting the address of the array name table to be a void*.
+
+Note that the parameters for sortFunction are not passed to the call to qsort(). The name of the sortFunction, which is itself a pointer to that function, is the parameter to qsort().
+
+Once qsort() is running, it will fill the constant void pointers a and b with each value of the array. If the first value is smaller than the second, the comparison function must return -1. If it is equal, the comparison function must return 0. Finally, if the first value is greater than the second value, the comparison function must return 1. This is reflected in the sortFunction(), as shown on lines 34 to 43.
+Other Libraries
+
+Your C++ compiler supplies a number of other libraries, among them the standard input and output libraries and the stream libraries that you've been using throughout this book. It is well worth your time and effort to explore the documentation that came with your compiler to find out what these libraries have to offer.
+Bit Twiddling
+
+Often you will want to set flags in your objects to keep track of the state of your object. (Is it in AlarmState? Has this been initialized yet? Are you coming or going?)
+
+You can do this with user-defined Booleans, but when you have many flags, and when storage size is an issue, it is convenient to be able to use the individual bits as flags.
+
+Each byte has eight bits, so in a four-byte long you can hold 32 separate flags. A bit is said to be "set" if its value is 1, and clear if its value is 0. When you set a bit, you make its value 1, and when you clear it, you make its value 0. (Set and clear are both adjectives and verbs). You can set and clear bits by changing the value of the long, but that can be tedious and confusing.
+
+    NOTE: Appendix C, "Binary and Hexadecimal," provides valuable additional information about binary and hexadecimal manipulation. 
+
+C++ provides bitwise operators that act upon the individual bits.These look like, but are different from, the logical operators, so many novice programmers confuse them. The bitwise operators are presented in Table 21.1.
+
+Table 21.1. The Bitwise Operators.
+symbol 	operator
+& 	AND
+| 	OR
+^ 	exclusive OR
+~ 	complement
+Operator AND
+
+The AND operator (&) is a single ampersand, as opposed to the logical AND, which is two ampersands. When you AND two bits, the result is 1 if both bits are 1, but 0 if either or both bits are 0. The way to think of this is: The result is 1 if bit 1 is set and if bit 2 is set.
+Operator OR
+
+The second bitwise operator is OR (|). Again, this is a single vertical bar, as opposed to the logical OR, which is two vertical bars. When you OR two bits, the result is 1 if either bit is set or if both are.
+Operator Exclusive OR
+
+The third bitwise operator is exclusive OR (^). When you exclusive OR two bits, the result is 1 if the two bits are different.
+The Complement Operator
+
+The complement operator (~) clears every bit in a number that is set and sets every bit that is clear. If the current value of the number is 1010 0011, the complement of that number is 0101 1100.
+Setting Bits
+
+When you want to set or clear a particular bit, you use masking operations. If you have a 4-byte flag and you want to set bit 8 TRUE, you need to OR the flag with the value 128. Why? 128 is 1000 0000 in binary; thus the value of the eighth bit is 128. Whatever the current value of that bit (set or clear), if you OR it with the value 128 you will set that bit and not change any of the other bits. Let's assume that the current value of the 8 bits is 1010 0110 0010 0110. ORing 128 to it looks like this:
+
+9 8765 4321
+1010 0110 0010 0110   // bit 8 is clear
+|   0000 0000 1000 0000   // 128
+----------------------
+1010 0110 1010 0110   // bit 8 is set
+
+There are a few things to note. First, as usual, bits are counted from right to left. Second, the value 128 is all zeros except for bit 8, the bit you want to set. Third, the starting number 1010 0110 0010 0110 is left unchanged by the OR operation, except that bit 8 was set. Had bit 8 already been set, it would have remained set, which is what you want.
+Clearing Bits
+
+If you want to clear bit 8, you can AND the bit with the complement of 128. The complement of 128 is the number you get when you take the bit pattern of 128 (1000 0000), set every bit that is clear, and clear every bit that is set (0111 1111). When you AND these numbers, the original number is unchanged, except for the eighth bit, which is forced to zero.
+
+1010 0110 1010 0110  // bit 8 is set
+& 1111 1111 0111 1111  // ~128
+----------------------
+1010 0110 0010 0110  // bit 8 cleared
+
+To fully understand this solution, do the math yourself. Each time both bits are 1, write 1 in the answer. If either bit is 0, write 0 in the answer. Compare the answer with the original number. It should be the same except that bit 8 was cleared.
+Flipping Bits
+
+Finally, if you want to flip bit 8, no matter what its state, you exclusive OR the number with 128. Thus:
+
+1010 0110 1010 0110  // number
+^ 0000 0000 1000 0000  // 128
+----------------------
+1010 0110 0010 0110  // bit flipped
+^ 0000 0000 1000 0000  // 128
+----------------------
+1010 0110 1010 0110  // flipped back
+
+    DO set bits by using masks and the OR operator. DO clear bits by using masks and the AND operator. DO flip bits using masks and the exclusive OR operator. 
+
+Bit Fields
+
+There are circumstances under which every byte counts, and saving six or eight bytes in a class can make all the difference. If your class or structure has a series of Boolean variables, or variables that can have only a very small number of possible values, you may save some room using bit fields.
+
+Using the standard C++ data types, the smallest type you can use in your class is a type char, which is one byte. You will usually end up using an int, which is two, or more often four, bytes. By using bit fields, you can store eight binary values in a char and 32 such values in a long.
+
+Here's how bit fields work: bit fields are named and accessed like any class member. Their type is always declared to be unsigned int. After the bit field name, write a colon followed by a number. The number is an instruction to the compiler as to how many bits to assign to this variable. If you write 1, the bit will represent either the value 0 or 1. If you write 2, the bit can represent 0, 1, 2, or 3, a total of four values. A three-bit field can represent eight values, and so forth. Appendix C reviews binary numbers. Listing 21.8 illustrates the use of bit fields.
+
+Listing 21.8. Using bit fields.
+
+0:        #include <iostream.h>
+1:        #include <string.h>
+2:    
+3:        enum STATUS { FullTime, PartTime } ;
+4:        enum GRADLEVEL { UnderGrad, Grad } ;
+5:        enum HOUSING { Dorm, OffCampus };
+6:        enum FOODPLAN { OneMeal, AllMeals, WeekEnds, NoMeals };
+7:    
+8:        class student
+9:        {
+10:        public:
+11:        student():
+12:            myStatus(FullTime),
+13:            myGradLevel(UnderGrad),
+14:            myHousing(Dorm),
+15:            myFoodPlan(NoMeals)
+16:            {}
+17:            ~student(){}
+18:            STATUS GetStatus();
+19:            void SetStatus(STATUS);
+20:            unsigned GetPlan() { return myFoodPlan; }
+21:    
+22:        private:
+23:           unsigned myStatus : 1;
+24:           unsigned myGradLevel: 1;
+25:           unsigned myHousing : 1;
+26:           unsigned myFoodPlan : 2;
+27:        };
+28:    
+29:        STATUS student::GetStatus()
+30:        {
+31:           if (myStatus)
+32:              return FullTime;
+33:           else
+34:              return PartTime;
+35:        }
+36:        void student::SetStatus(STATUS theStatus)
+37:        {
+38:           myStatus = theStatus;
+39:        }
+40:    
+41:    
+42:        int main()
+43:        {
+44:           student Jim;
+45:    
+46:           if (Jim.GetStatus()== PartTime)
+47:              cout << "Jim is part time" << endl;
+48:           else
+49:              cout << "Jim is full time" << endl;
+50:    
+51:           Jim.SetStatus(PartTime);
+52:    
+53:           if (Jim.GetStatus())
+54:              cout << "Jim is part time" << endl;
+55:           else
+56:              cout << "Jim is full time" << endl;
+57:    
+58:           cout << "Jim is on the " ;
+59:    
+60:           char Plan[80];
+61:           switch (Jim.GetPlan())
+62:           {
+63:              case  OneMeal: strcpy(Plan,"One meal"); break;
+64:              case  AllMeals: strcpy(Plan,"All meals"); break;
+65:              case WeekEnds: strcpy(Plan,"Weekend meals"); break;
+66:              case NoMeals: strcpy(Plan,"No Meals");break;
+67:              default : cout << "Something bad went wrong!\n"; break;
+68:           }
+69:           cout << Plan << " food plan." << endl;
+70:         return 0;
+71: }
+
+Output: Jim is part time
+Jim is full time
+Jim is on the No Meals food plan.
+
+Analysis: On lines 3 to 7, several enumerated types are defined. These serve to define the possible values for the bit fields within the student class.
+
+Student is declared in lines 8-27. While this is a trivial class, it is interesting in that all the data is packed into five bits. The first bit represents the student's status, full-time or part-time. The second bit represents whether or not this is an undergraduate. The third bit represents whether or not the student lives in a dorm. The final two bits represent the four possible food plans.
+
+The class methods are written as for any other class, and are in no way affected by the fact that these are bit fields and not integers or enumerated types.
+
+The member function GetStatus() reads the Boolean bit and returns an enumerated type, but this is not necessary. It could just as easily have been written to return the value of the bit field directly. The compiler would have done the translation.
+
+To prove that to yourself, replace the GetStatus() implementation with this code:
+
+STATUS student::GetStatus()
+{
+return myStatus;
+}
+
+There should be no change whatsoever to the functioning of the program. It is a matter of clarity when reading the code; the compiler isn't particular.
+
+Note that the code on line 46 must check the status and then print the meaningful message. It is tempting to write this:
+
+cout << "Jim is " << Jim.GetStatus() << endl;
+
+That will simply print this:
+
+Jim is 0
+
+The compiler has no way to translate the enumerated constant PartTime into meaningful text.
+
+On line 61, the program switches on the food plan, and for each possible value it puts a reasonable message into the buffer, which is then printed on line 69. Note again that the switch statement could have been written as follows:
+
+case  0: strcpy(Plan,"One meal"); break;
+case  1: strcpy(Plan,"All meals"); break;
+case  2: strcpy(Plan,"Weekend meals"); break;
+case  3: strcpy(Plan,"No Meals");break;
+
+The most important thing about using bit fields is that the client of the class need not worry about the data storage implementation. Because the bit fields are private, you can feel free to change them later and the interface will not need to change.
+Style
+
+As stated elsewhere in this book, it is important to adopt a consistent coding style, though in many ways it doesn't matter which style you adopt. A consistent style makes it easier to guess what you meant by a particular part of the code, and you avoid having to look up whether you spelled the function with an initial cap or not the last time you invoked it.
+
+The following guidelines are arbitrary; they are based on the guidelines used in projects I've worked on in the past, and they've worked well. You can just as easily make up your own, but these will get you started.
+
+As Emerson said, "Foolish consistency is the hobgoblin of small minds," but having some consistency in your code is a good thing. Make up your own, but then treat it as if it were dispensed by the programming gods.
+Indenting
+
+Tab size should be four spaces. Make sure your editor converts each tab to four spaces.
+Braces
+
+How to align braces can be the most controversial topic between C and C++ programmers. Here are the tips I suggest:
+
+    Matching braces should be aligned vertically.
+
+    The outermost set of braces in a definition or declaration should be at the left margin. Statements within should be indented. All other sets of braces should be in line with their leading statements.
+
+    No code should appear on the same line as a brace. For example: 
+
+if (condition==true)
+{
+j = k;
+SomeFunction();
+}
+m++;
+
+Long Lines
+
+Keep lines to the width displayable on a single screen. Code that is off to the right is easily overlooked, and scrolling horizontally is annoying. When a line is broken, indent the following lines. Try to break the line at a reasonable place, and try to leave the intervening operator at the end of the previous line (as opposed to the beginning of the following line) so that it is clear that the line does not stand alone and that there is more coming.
+
+In C++, functions tend to be far shorter than they were in C, but the old, sound advice still applies. Try to keep your functions short enough to print the entire function on one page.
+switch Statements
+
+Indent switches as follows to conserve horizontal space:
+
+switch(variable)
+{
+case ValueOne:
+ActionOne();
+break;
+case ValueTwo:
+ActionTwo();
+break;
+default:
+assert("bad Action");
+break;
+}
+
+Program Text
+
+There are several tips you can use to create code that is easy to read. Code that is easy to read is easy to maintain.
+
+    Use whitespace to help readability.
+
+    Objects and arrays are really referring to one thing. Don't use spaces within object references (., ->, []).
+
+    Unary operators are associated with their operands, so don't put a space between them. Do put a space on the side away from the operand. Unary operators include !, ~, ++, --, -, * (for pointers), & (casts), sizeof.
+
+    Binary operators should have spaces on both sides: +, =, *, /, %, >>, <<, <, >, ==, !=, &, |, &&, ||, ?:, =, +=, and so on.
+
+    Don't use lack of spaces to indicate precedence (4+ 3*2).
+
+    Put a space after commas and semicolons, not before.
+
+    Parentheses should not have spaces on either side.
+
+    Keywords, such as if, should be set off by a space: if (a == b).
+
+    The body of a comment should be set off from the // with a space.
+
+    Place the pointer or reference indicator next to the type name, not the variable name: 
+
+char* foo;
+int& theInt;
+
+    rather than 
+
+char *foo;
+int &theInt;
+
+    Do not declare more than one variable on the same line. 
+
+Identifier Names
+
+Here are some guidelines for working with identifiers.
+
+    Identifier names should be long enough to be descriptive.
+
+    Avoid cryptic abbreviations.
+
+    Take the time and energy to spell things out.
+
+    Do not use Hungarian notation. C++ is strongly typed and there is no reason to put the type into the variable name. With user-defined types (classes), Hungarian notation quickly breaks down. The exceptions to this may be to use a prefix for pointers (p) and references (r), as well as for class member variables (its).
+
+    Short names (i, p, x, and so on) should only be used where their brevity makes the code more readable and where the usage is so obvious that a descriptive name is not needed.
+
+    The length of a variable's name should be proportional to its scope.
+
+    Make sure identifiers look and sound different from one another to minimize confusion.
+
+    Function (or method) names are usually verbs or verb-noun phrases: Search(), Reset(), FindParagraph(), ShowCursor(). Variable names are usually abstract nouns, possibly with an additional noun: count, state, windSpeed, windowHeight. Boolean variables should be named appropriately: windowIconized, fileIsOpen. 
+
+Spelling and Capitalization of Names
+
+Spelling and capitalization should not be overlooked when creating your own style. Some tips for these areas include the following:
+
+    Use all uppercase and underscore to separate the logical words of names, such as SOURCE_FILE_TEMPLATE. Note, however, that these are rare in C++. Consider using constants and templates in most cases.
+
+    All other identifiers should use mixed case--no underscores. Function names, methods, class, typedef, and struct names should begin with a capitalized letter. Elements such as data members or locals should begin with a lowercase letter.
+
+    Enumerated constants should begin with a few lowercase letters as an abbreviation for the enum. For example: 
+
+enum TextStyle
+{
+    tsPlain,
+    tsBold,
+    tsItalic,
+    tsUnderscore,
+};
+
+Comments
+
+Comments can make it much easier to understand a program. Sometimes you will not work on a program for several days or even months. In this time you can forget what certain code does or why it has been included. Problems in understanding code can also occur when someone else reads your code. Comments that are applied in a consistent, well thought out style can be well worth the effort. There are several tips to remember concerning comments:
+
+    Wherever possible, use C++ // comments rather than the /* */ style.
+
+    Higher-level comments are infinitely more important than process details. Add value; do not merely restate the code. 
+
+n++; // n is incremented by one
+
+    This comment isn't worth the time it takes to type it in. Concentrate on the semantics of functions and blocks of code. Say what a function does. Indicate side effects, types of parameters, and return values. Describe all assumptions that are made (or not made), such as "assumes n is non-negative" or "will return -1 if x is invalid". Within complex logic, use comments to indicate the conditions that exist at that point in the code.
+
+    Use complete English sentences with appropriate punctuation and capitalization. The extra typing is worth it. Don't be overly cryptic and don't abbreviate. What seems exceedingly clear to you as you write code will be amazingly obtuse in a few months.
+
+    Use blank lines freely to help the reader understand what is going on. Separate statements into logical groups. 
+
+Access
+
+The way you access portions of your program should also be consistent. Some tips for access include these:
+
+    Always use public:, private:, and protected: labels; don't rely on the defaults.
+
+    List the public members first, then protected, then private. List the data members in a group after the methods.
+
+    Put the constructor(s) first in the appropriate section, followed by the destructor. List overloaded methods with the same name adjacent to each other. Group accessor functions together when possible.
+
+    Consider alphabetizing the method names within each group and alphabetizing the member variables. Be sure to alphabetize the filenames in include statements.
+
+    Even though the use of the virtual keyword is optional when overriding, use it anyway; it helps to remind you that it is virtual, and also keeps the declaration consistent. 
+
+Class Definitions
+
+Try to keep the definitions of methods in the same order as the declarations. It makes things easier to find.
+
+When defining a function, place the return type and all other modifiers on a previous line so that the class name and function name begin on the left margin. This makes it much easier to find functions.
+include Files
+
+Try as hard as you can to keep from including files into header files. The ideal minimum is the header file for the class this one derives from. Other mandatory includes will be those for objects that are members of the class being declared. Classes that are merely pointed to or referenced only need forward references of the form.
+
+Don't leave out an include file in a header just because you assume that whatever CPP file includes this one will also have the needed include.
+
+    TIP: All header files should use inclusion guards. 
+
+assert()
+
+Use assert() freely. It helps find errors, but it also greatly helps a reader by making it clear what the assumptions are. It also helps to focus the writer's thoughts around what is valid and what isn't.
+const
+
+Use const wherever appropriate: for parameters, variables, and methods. Often there is a need for both a const and a non-const version of a method; don't use this as an excuse to leave one out. Be very careful when explicitly casting from const to non-const and vice versa (there are times when this is the only way to do something), but be certain that it makes sense, and include a comment.
+Next Steps
+
+You've spent three long, hard weeks working at C++, and you are now a competent C++ programmer, but you are by no means finished. There is much more to learn and many more places you can get valuable information as you move from novice C++ programmer to expert.
+
+The following sections recommend a number of specific sources of information, and these recommendations reflect only my personal experience and opinions. There are dozens of books on each of these topics, however, so be sure to get other opinions before purchasing.
+Where to Get Help and Advice
+
+The very first thing you will want to do as a C++ programmer will be to tap into one or another C++ conference on an online service. These groups supply immediate contact with hundreds or thousands of C++ programmers who can answer your questions, offer advice, and provide a sounding board for your ideas.
+
+I participate in the C++ Internet newsgroups (comp.lang.c++ and comp.lang.c++.moderated), and I recommend them as excellent sources of information and support.
+
+Also, you may want to look for local user groups. Many cities have C++ interest groups where you can meet other programmers and exchange ideas.
+Required Reading
+
+The very next book I'd run out and buy and read is
+
+Meyers, Scott. Effective C++ (ISBN: 0-201-56364-9). Addison-Wesley Publishing, 1993.
+
+This is by far the most useful book I've ever read, and I've read it three times.
+Magazines
+
+There is one more thing you can do to strengthen your skills: subscribe to a good magazine on C++ programming. The absolute best magazine of this kind, I believe, is C++ Report from SIGS Publications. Every issue is packed with useful articles. Save them; what you don't care about today will become critically important tomorrow.
+
+You can reach C++ Report at SIGS Publications, P.O. Box 2031, Langhorne, PA 19047-9700. I have no affiliation with the magazine (I work for two other publishers!), but their magazine is the best, bar none.
+Staying in Touch
+
+If you have comments, suggestions, or ideas about this book or other books, I'd love to hear them. Please write to me at jliberty@libertyassociates.com, or check out my Web site: www.libertyassociates.com. I look forward to hearing from you.
+
+    DO look at other books. There's plenty to learn and no single book can teach you everything you need to know. DON'T just read code! The best way to learn C++ is to write C++ programs. DO subscribe to a good C++ magazine and join a good C++ user group. 
+
+Summary
+
+Today you saw how some of the standard libraries shipped with your C++ compiler can be used to manage some routine tasks. Strcpy(), strlen(), and related functions can be used to manipulate null-terminated strings. Although these won't work with the string classes you create, you may find that they provide functionality essential to implementing your own classes.
+
+The time and date functions allow you to obtain and manipulate time structures. These can be used to provide access to the system time for your programs, or they can be used to manipulate time and date objects you create.
+
+You also learned how to set and test individual bits, and how to allocate a limited number of bits to class members.
+
+Finally, C++ style issues were addressed, and resources were provided for further study.
+Q&A
+
+    Q. Why are the standard libraries included with C++ compilers, and when would you use them?
+
+    A. They are included for backwards-compatibility with C. They are not type-safe, and they don't work well with user-created classes, so their use is limited. Over time, you might expect all of their functionality to be migrated into C++ specific libraries, at which time the standard C libraries would become obsolete.
+
+    Q. When would you use bit structures rather than simply using integers?
+
+    A. When the size of the object is crucial. If you are working with limited memory or with communications software, you may find that the savings offered by these structures is essential to the success of your product.
+
+    Q. Why do style wars generate so much emotion?
+
+    A. Programmers become very attached to their habits. If you are used to this indentation, 
+
+if (SomeCondition){
+     // statements
+}    // closing brace
+
+    it is a difficult transition to give it up. New styles look wrong and create confusion. If you get bored, try logging onto a popular online service and asking which indentation style works best, which editor is best for C++, or which product is the best word processor. Then sit back and watch as ten thousand messages are generated, all contradicting one another.
+
+    Q. What is the very next thing to read?
+
+    A. Tough question. If you want to review the fundamentals, read one of the other primers. If you want to hone C++, run out and get Scott Meyers' Effective C++. Finally, if you want to write for Windows or the Mac, it might make sense to pick up a primer on the
+    platform.
+
+    Q. Is that it?
+
+    A. Yes! You've learned C++, but...no. Ten years ago it was possible for one person to learn all there was to know about microcomputers, or at least to feel pretty confident that he was close. Today it is out of the question: You can't possibly catch up, and even as you try the industry is changing. Be sure to keep reading, and stay in touch with the resources that will keep you up with the latest changes: magazines and online services. 
+
+Quiz
+
+    1. What is the difference between strcpy() and strncpy()?
+
+    2. What does ctime() do?
+
+    3. What is the function to call to turn an ASCII string into a long?
+
+    4. What does the complement operator do?
+
+    5. What is the difference between OR and exclusive OR?
+
+    6. What is the difference between & and &&?
+
+    7. What is the difference between | and ||? 
+
+Exercises
+
+    1. Write a program to safely copy the contents of a 20-byte string to a 10-byte string, truncating whatever won't fit.
+
+    2. Write a program that tells the current date in the form 7/28/94.
+
+    3. Write a program that creates 26 flags (labeled a-z). Prompt the user to enter a sentence, and then quickly report on which letters were used by setting and then reading the flags.
+
+    4. Write a program that adds two numbers without using the addition operator (+). Hint: use the bit operators!
+
+
+

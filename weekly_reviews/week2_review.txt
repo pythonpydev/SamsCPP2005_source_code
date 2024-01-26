@@ -1,0 +1,410 @@
+
+In Review
+
+The Week in Review program for Week 2 brings together many of the skills you've acquired over the past fortnight and produces a powerful program.
+
+This demonstration of linked lists utilizes virtual functions, pure virtual functions, function overriding, polymorphism, public inheritance, function overloading, forever loops, pointers, references, and more.
+
+The goal of this program is to create a linked list. The nodes on the list are designed to hold parts, as might be used in a factory. While this is not the final form of this program, it does make a good demonstration of a fairly advanced data structure. The code list is 311 lines. Try to analyze the code on your own before reading the analysis that follows the output.
+
+Listing R2.1. Week 2 in Review listing.
+
+0:     // **************************************************
+1:     //
+2:     // Title:       Week 2 in Review
+3:     //
+4:     // File:       Week2
+5:     //
+6:     // Description:   Provide a linked list demonstration program
+7:     //
+8:     // Classes:      PART - holds part numbers and potentially other
+9:     //                     information about parts
+10:     //
+11:     //               PartNode - acts as a node in a PartsList
+12:     //
+13:     //               PartsList - provides the mechanisms for a linked list                                                            Âof parts
+14:     //
+15:     // Author:      Jesse Liberty (jl)
+16:     //
+17:     // Developed:   486/66 32mb RAM  MVC 1.5
+18:     //
+19:     // Target:      Platform independent
+20:     //
+21:     // Rev History:  9/94 - First release (jl)
+22:     //
+23:     // **************************************************
+24:   
+25:     #include <iostream.h>
+26:   
+27:     typedef unsigned long ULONG;
+28:     typedef unsigned short USHORT;
+29:   
+30:   
+31:     // **************** Part ************
+32:   
+33:     // Abstract base class of parts
+34:     class Part
+35:     {
+36:     public:
+37:        Part():itsPartNumber(1) {}
+38:        Part(ULONG PartNumber):itsPartNumber(PartNumber){}
+39:        virtual ~Part(){};
+40:        ULONG GetPartNumber() const { return itsPartNumber; }
+41:        virtual void Display() const =0;  // must be overridden
+42:     private:
+43:        ULONG itsPartNumber;
+44:     };
+45:   
+46:     // implementation of pure virtual function so that
+47:     // derived classes can chain up
+48:     void Part::Display() const
+49:     {
+50:         cout << "\nPart Number: " << itsPartNumber << endl;
+51:     }
+52:   
+53:     // **************** Car Part ************
+54:   
+55:     class CarPart : public Part
+56:     {
+57:     public:
+58:        CarPart():itsModelYear(94){}
+59:        CarPart(USHORT year, ULONG partNumber);
+60:        virtual void Display() const 
+61:       { 
+62:          Part::Display(); cout << "Model Year: ";
+63:          cout << itsModelYear << endl;  
+64:       }
+65:     private:
+66:        USHORT itsModelYear;
+67:     };
+68:   
+69:     CarPart::CarPart(USHORT year, ULONG partNumber):
+70:        itsModelYear(year),
+71:        Part(partNumber)
+72:     {}
+73:   
+74:   
+75:     // **************** AirPlane Part ************
+76:   
+77:     class AirPlanePart : public Part
+78:     {
+79:     public:
+80:        AirPlanePart():itsEngineNumber(1){};
+81:        AirPlanePart(USHORT EngineNumber, ULONG PartNumber);
+82:        virtual void Display() const
+83:       { 
+84:          Part::Display(); cout << "Engine No.: ";
+85:          cout << itsEngineNumber << endl;  
+86:       }
+87:     private:
+88:        USHORT itsEngineNumber;
+89:     };
+90:   
+91:     AirPlanePart::AirPlanePart(USHORT EngineNumber, ULONG PartNumber):
+92:        itsEngineNumber(EngineNumber),
+93:        Part(PartNumber)
+94:     {}
+95:   
+96:     // **************** Part Node ************
+97:     class PartNode
+98:     {
+99:     public:
+100:        PartNode (Part*);
+101:        ~PartNode();
+102:        void SetNext(PartNode * node) { itsNext = node; }
+103:        PartNode * GetNext() const;
+104:        Part * GetPart() const;
+105:     private:
+106:        Part *itsPart;
+107:        PartNode * itsNext;
+108:     };
+109:   
+110:     // PartNode Implementations...
+111:   
+112:     PartNode::PartNode(Part* pPart):
+113:     itsPart(pPart),
+114:     itsNext(0)
+115:     {}
+116:   
+117:     PartNode::~PartNode()
+118:     {
+119:        delete itsPart;
+120:        itsPart = 0;
+121:        delete itsNext;
+122:        itsNext = 0;
+123:     }
+124:   
+125:     // Returns NULL if no next PartNode
+126:     PartNode * PartNode::GetNext() const
+127:     {
+128:           return itsNext;
+129:     }
+130:   
+131:     Part * PartNode::GetPart() const
+132:     {
+133:        if (itsPart)
+134:           return itsPart;
+135:        else
+136:           return NULL; //error
+137:     }
+138:   
+139:     // **************** Part List ************
+140:     class PartsList
+141:     {
+142:     public:
+143:        PartsList();
+144:        ~PartsList();
+145:        // needs copy constructor and operator equals!
+146:        Part*      Find(ULONG & position, ULONG PartNumber)  const;
+147:        ULONG      GetCount() const { return itsCount; }
+148:        Part*      GetFirst() const;
+149:        static     PartsList& GetGlobalPartsList() 
+150:      { 
+151:         return  GlobalPartsList; 
+152:      }
+153:        void       Insert(Part *);
+154:        void       Iterate(void (Part::*f)()const) const;
+155:        Part*      operator[](ULONG) const;
+156:     private:
+157:        PartNode * pHead;
+158:        ULONG itsCount;
+159:        static PartsList GlobalPartsList;
+160:     };
+161:   
+162:     PartsList PartsList::GlobalPartsList;
+163:   
+164:     // Implementations for Lists...
+165:   
+166:     PartsList::PartsList():
+167:        pHead(0),
+168:        itsCount(0)
+169:        {}
+170:   
+171:     PartsList::~PartsList()
+172:     {
+173:        delete pHead;
+174:     }
+175:   
+176:     Part*   PartsList::GetFirst() const
+177:     {
+178:        if (pHead)
+179:           return pHead->GetPart();
+180:        else
+181:           return NULL;  // error catch here
+182:     }
+183:   
+184:     Part *  PartsList::operator[](ULONG offSet) const
+185:     {
+186:        PartNode* pNode = pHead;
+187:   
+188:        if (!pHead)
+189:           return NULL; // error catch here
+190:   
+191:        if (offSet > itsCount)
+192:           return NULL; // error
+193:   
+194:        for (ULONG i=0;i<offSet; i++)
+195:           pNode = pNode->GetNext();
+196:   
+197:       return   pNode->GetPart();
+198:     }
+199:   
+200:     Part*   PartsList::Find(ULONG & position, ULONG PartNumber)  const
+201:     {
+202:        PartNode * pNode = 0;
+203:        for (pNode = pHead, position = 0;
+204:              pNode!=NULL;
+205:              pNode = pNode->GetNext(), position++)
+206:        {
+207:           if (pNode->GetPart()->GetPartNumber() == PartNumber)
+208:              break;
+209:        }
+210:        if (pNode == NULL)
+211:           return NULL;
+212:        else
+213:           return pNode->GetPart();
+214:     }
+215:   
+216:     void PartsList::Iterate(void (Part::*func)()const) const
+217:     {
+218:        if (!pHead)
+219:           return;
+220:        PartNode* pNode = pHead;
+221:        do
+222:           (pNode->GetPart()->*func)();
+223:        while (pNode = pNode->GetNext());
+224:     }
+225:   
+226:     void PartsList::Insert(Part* pPart)
+227:     {
+228:        PartNode * pNode = new PartNode(pPart);
+229:        PartNode * pCurrent = pHead;
+230:        PartNode * pNext = 0;
+231:   
+232:        ULONG New =  pPart->GetPartNumber();
+233:        ULONG Next = 0;
+234:        itsCount++;
+235:   
+236:        if (!pHead)
+237:        {
+238:           pHead = pNode;
+239:           return;
+240:        }
+241:   
+242:        // if this one is smaller than head
+243:        // this one is the new head
+244:        if (pHead->GetPart()->GetPartNumber() > New)
+245:        {
+246:           pNode->SetNext(pHead);
+247:           pHead = pNode;
+248:           return;
+249:        }
+250:   
+251:        for (;;)
+252:        {
+253:           // if there is no next, append this new one
+254:           if (!pCurrent->GetNext())
+255:           {
+256:              pCurrent->SetNext(pNode);
+257:              return;
+258:           }
+259:   
+260:           // if this goes after this one and before the next
+261:           // then insert it here, otherwise get the next
+262:           pNext = pCurrent->GetNext();
+263:           Next = pNext->GetPart()->GetPartNumber();
+264:           if (Next > New)
+265:           {
+266:              pCurrent->SetNext(pNode);
+267:              pNode->SetNext(pNext);
+268:              return;
+269:           }
+270:           pCurrent = pNext;
+271:        }
+272:     }
+273:   
+274:     int main()
+275:     {
+276:        PartsList pl = PartsList::GetGlobalPartsList();
+277:        Part * pPart = 0;
+278:        ULONG PartNumber;
+279:        USHORT value;
+280:        ULONG choice;
+281:   
+282:        while (1)
+283:        {
+284:           cout << "(0)Quit (1)Car (2)Plane: ";
+285:           cin >> choice;
+286:   
+287:           if (!choice)
+288:              break;
+289:   
+290:           cout << "New PartNumber?: ";
+291:           cin >>  PartNumber;
+292:   
+293:           if (choice == 1)
+294:           {
+295:              cout << "Model Year?: ";
+296:              cin >> value;
+297:              pPart = new CarPart(value,PartNumber);
+298:           }
+299:           else
+300:           {
+301:              cout << "Engine Number?: ";
+302:              cin >> value;
+303:              pPart = new AirPlanePart(value,PartNumber);
+304:           }
+305:   
+306:           pl.Insert(pPart);
+307:        }
+308:        void (Part::*pFunc)()const = Part::Display;
+309:        pl.Iterate(pFunc);
+310:       return 0;
+311: }
+
+Output: (0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 2837
+Model Year? 90
+(0)Quit (1)Car (2)Plane: 2
+New PartNumber?: 378
+Engine Number?: 4938
+(0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 4499
+Model Year? 94
+(0)Quit (1)Car (2)Plane: 1
+New PartNumber?: 3000
+Model Year? 93
+(0)Quit (1)Car (2)Plane: 0
+
+Part Number: 378
+Engine No.: 4938
+
+Part Number: 2837
+Model Year: 90
+
+Part Number: 3000
+Model Year: 93
+
+Part Number: 4499
+Model Year: 94
+
+Analysis: The Week 2 in Review listing provides a linked list implementation for Part objects. A linked list is a dynamic data structure; that is, it is like an array but it is sized to fit as objects are added and deleted.
+This particular linked list is designed to hold objects of class Part, where Part is an abstract data type serving as a base class to any objects with a part number. In this example, Part has been subclassed into CarPart and AirPlanePart.
+
+Class Part is declared on lines 34-44, and consists of a part number and some accessors. Presumably this class could be fleshed out to hold other important information about the parts, such as what components they are used in, how many are in stock, and so forth. Part is an abstract data type, enforced by the pure virtual function Display().
+
+Note that Display() does have an implementation, on lines 48-51. It is the designer's intention that derived classes will be forced to create their own Display() method, but may chain up to this method as well.
+
+Two simple derived classes, CarPart and AirPlanePart, are provided on lines 55-67 and 77-89, respectively. Each provides an overridden Display() method, which does in fact chain up to the base class Display() method.
+
+The class PartNode serves as the interface between the Part class and the PartList class. It contains a pointer to a part and a pointer to the next node in the list. Its only methods are to get and set the next node in the list and to return the Part to which it points.
+
+The intelligence of the list is, appropriately, in the class PartsList, whose declaration is on lines 140-160. PartsList keeps a pointer to the first element in the list (pHead) and uses that to access all other methods by walking the list. Walking the list means asking each node in the list for the next node, until you reach a node whose next pointer is NULL.
+
+This is only a partial implementation; a fully developed list would provide either greater access to its first and last nodes, or would provide an iterator object, which allows clients to easily walk the list.
+
+PartsList nonetheless provides a number of interesting methods, which are listed in alphabetical order. This is often a good idea, as it makes finding the functions easier.
+
+Find() takes a PartNumber and a ULONG. If the part corresponding to PartNumber is found, it returns a pointer to the Part and fills the ULONG with the position of that part in the list. If PartNumber is not found, it returns NULL, and the position is meaningless.
+
+GetCount() returns the number of elements in the list. PartsList keeps this number as a member variable, itsCount, though it could, of course, compute this number by walking the list.
+
+GetFirst() returns a pointer to the first Part in the list, or returns NULL if the list is empty.
+
+GetGlobalPartsList() returns a reference to the static member variable GlobalPartsList. This is a static instance of this class; every program with a PartsList also has one GlobalPartsList, though, of course, it is free to make other PartsLists as well. A full implementation of this idea would modify the constructor of Part to ensure that every part is created on the GlobalPartsList.
+
+Insert takes a pointer to a Part, creates a PartNode for it, and adds the Part to the list, ordered by PartNumber.
+
+Iterate takes a pointer to a member function of Part, which takes no parameters, returns void, and is const. It calls that function for every Part object in the list. In the example program this is called on Display(), which is a virtual function, so the appropriate Display() method will be called based on the runtime type of the Part object called.
+
+Operator[] allows direct access to the Part at the offset provided. Rudimentary bounds checking is provided; if the list is NULL or if the offset requested is greater than the size of the list, NULL is returned as an error condition.
+
+Note that in a real program these comments on the functions would be written into the class declaration.
+
+The driver program is on lines 274-311. A pointer to PartsList is declared on line 266 and initialized with GlobalPartsList. Note that GlobalPartsList is initialized on line 162. This is necessary as the declaration of a static member variable does not define it; definition must be done outside the declaration of the class.
+
+On lines 282-307, the user is repeatedly prompted to choose whether to enter a car part or an airplane part. Depending on the choice the right value is requested, and the appropriate part is created. Once created, the part is inserted into the list on line 306.
+
+The implementation for the Insert() method of PartsList is on lines 226-272. When the first part number is entered, 2837, a CarPart with that part number and the model year 90 is created and passed in to LinkedList::Insert().
+
+On line 228, a new PartNode is created with that part, and the variable New is initialized with the part number. The PartsList's itsCount member variable is incremented on line 234.
+
+On line 236, the test that pHead is NULL will evaluate TRUE. Since this is the first node, it is true that the PartsList's pHead pointer has zero. Thus, on line 238, pHead is set to point to the new node and this function returns.
+
+The user is prompted to enter a second part, and this time an AirPlane part with part number 378 and engine number 4938 is entered. Once again PartsList::Insert() is called, and once again pNode is initialized with the new node. The static member variable itsCount is incremented to 2, and pHead is tested. Since pHead was assigned last time, it is no longer null and the test fails.
+
+On line 244, the part number held by pHead, 2837, is compared against the current part number, 378. Since the new one is smaller than the one held by pHead, the new one must become the new head pointer, and the test on line 244 is true.
+
+On line 246, the new node is set to point to the node currently pointed to by pHead. Note that this does not point the new node to pHead, but rather to the node that pHead was pointing to! On line 247, pHead is set to point to the new node.
+
+The third time through the loop, the user enters the part number 4499 for a Car with model year 94. The counter is incremented and the number this time is not less than the number pointed to by pHead, so the for loop that begins on line 251 is entered.
+
+The value pointed to by pHead is 378. The value pointed to by the second node is 2837. The current value is 4499. The pointer pCurrent points to the same node as pHead and so has a next value; pCurrent points to the second node, and so the test on line 254 fails.
+
+The pointer pCurrent is set to point to the next node and the loop repeats. This time the test on line 254 succeeds. There is no next item, so the current node is told to point to the new node on line 256, and the insert is finished.
+
+The fourth time through, the part number 3000 is entered. This proceeds just like the previous iteration, but this time when the current node is pointing to 2837 and the next node has 4499, the test on line 264 returns TRUE and the new node is inserted into position.
+
+When the user finally presses 0, the test on line 287 evaluates true and the while(1) loop breaks. On line 308, the member function Display() is assigned to the pointer to member function pFunc. In a real program this would be assigned dynamically, based on the user's choice of method.
+
+The pointer to member function is passed to the PartsList Iterate() method. On line 216, the Iterate() method ensures that the list is not empty. Then, on lines 221-223, each Part on the list is called using the pointer to member function. This calls the appropriate Display() method for the Part, as shown in the output. 

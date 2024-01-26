@@ -1,0 +1,1775 @@
+    Day 15
+        Advanced Inheritance
+            Containment
+            Listing 15.1. The String class.
+            Listing 15.2. The Employee class and driver program.
+                Accessing Members of the Contained Class
+                Filtering Access to Contained Members
+                Cost of Containment 
+            Listing 15.3. Contained class constructors.
+                Copying by Value 
+            Listing 15.4. Passing by value.
+            Implementation in Terms of Inheritance/Containment Versus Delegation
+                Delegation 
+            Listing 15.5. Delegating to a contained LinkedList.
+            Private Inheritance
+            Listing 15.6. Private
+            inheritance.
+            Friend Classes
+            Listing 15.7. Friend class illustrated.
+            Friend Class
+            Friend Functions
+            Friend Functions and Operator Overloading
+            Listing 15.8. Friendly operator+.
+            Friend Functions
+            Overloading the Insertion Operator
+            Listing 15.9. Overloading operator<<().
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 15
+Advanced Inheritance
+
+So far you have worked with single and multiple inheritance to create is-a relationships. Today you will learn
+
+    What containment is and how to model it.
+
+    What delegation is and how to model it.
+
+    How to implement one class in terms of another.
+
+    How to use private inheritance. 
+
+Containment
+
+As you have seen in previous examples, it is possible for the member data of a class to include objects of another class. C++ programmers say that the outer class contains the inner class. Thus, an Employee class might contain string objects (for the name of the employee), as well as integers (for the employee's salary and so forth).
+
+Listing 15.1 describes an incomplete, but still useful, String class. This listing does not produce any output. Instead Listing 15.1 will be used with later listings.
+
+Listing 15.1. The String class.
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     class String
+5:     {
+6:        public:
+7:           // constructors
+8:           String();
+9:            String(const char *const);
+10:           String(const String &);
+11:          ~String();
+12:
+13:          // overloaded operators
+14:          char & operator[](int offset);
+15:          char operator[](int offset) const;
+16:          String operator+(const String&);
+17:          void operator+=(const String&);
+18:          String & operator= (const String &);
+19:
+20:          // General accessors
+21:          int GetLen()const { return itsLen; }
+22:          const char * GetString() const { return itsString; }
+23:          // static int ConstructorCount;
+24:
+25:       private:
+26:          String (int);         // private constructor
+27:          char * itsString;
+28:          unsigned short itsLen;
+29:
+30:    };
+31:
+32:    // default constructor creates string of 0 bytes
+33:    String::String()
+34:    {
+35:       itsString = new char[1];
+36:       itsString[0] = `\0';
+37:       itsLen=0;
+38:       // cout << "\tDefault string constructor\n";
+39:       // ConstructorCount++;
+40:    }
+41:
+42:    // private (helper) constructor, used only by
+43:    // class methods for creating a new string of
+44:    // required size.  Null filled.
+45:    String::String(int len)
+46:    {
+47:       itsString = new char[len+1];
+48:       for (int i = 0; i<=len; i++)
+49:          itsString[i] = `\0';
+50:       itsLen=len;
+51:       // cout << "\tString(int) constructor\n";
+52:       // ConstructorCount++;
+53:    }
+54:
+55:    // Converts a character array to a String
+56:    String::String(const char * const cString)
+57:    {
+58:       itsLen = strlen(cString);
+59:       itsString = new char[itsLen+1];
+60:       for (int i = 0; i<itsLen; i++)
+61:          itsString[i] = cString[i];
+62:       itsString[itsLen]='\0';
+63:       // cout << "\tString(char*) constructor\n";
+64:       // ConstructorCount++;
+65:    }
+66:
+67:    // copy constructor
+68:    String::String (const String & rhs)
+69:    {
+70:       itsLen=rhs.GetLen();
+71:       itsString = new char[itsLen+1];
+72:       for (int i = 0; i<itsLen;i++)
+73:          itsString[i] = rhs[i];
+74:       itsString[itsLen] = `\0';
+75:       // cout << "\tString(String&) constructor\n";
+76:       // ConstructorCount++;
+77:    }
+78:
+79:    // destructor, frees allocated memory
+80:    String::~String ()
+81:    {
+82:       delete [] itsString;
+83:       itsLen = 0;
+84:       // cout << "\tString destructor\n";
+85:    }
+86:
+87:    // operator equals, frees existing memory
+88:    // then copies string and size
+89:    String& String::operator=(const String & rhs)
+90:    {
+91:       if (this == &rhs)
+92:          return *this;
+93:       delete [] itsString;
+94:       itsLen=rhs.GetLen();
+95:       itsString = new char[itsLen+1];
+96:       for (int i = 0; i<itsLen;i++)
+97:          itsString[i] = rhs[i];
+98:       itsString[itsLen] = `\0';
+99:       return *this;
+100:      // cout << "\tString operator=\n";
+101:   }
+102:
+103:   //non constant offset operator, returns
+104:   // reference to character so it can be
+105:   // changed!
+106:   char & String::operator[](int offset)
+107:   {
+108:      if (offset > itsLen)
+109:         return itsString[itsLen-1];
+110:      else
+111:         return itsString[offset];
+112:   }
+113:
+114:   // constant offset operator for use
+115:   // on const objects (see copy constructor!)
+116:   char String::operator[](int offset) const
+117:   {
+118:      if (offset > itsLen)
+119:         return itsString[itsLen-1];
+120:      else
+121:         return itsString[offset];
+122:   }
+123:
+124:   // creates a new string by adding current
+125:   // string to rhs
+126:   String String::operator+(const String& rhs)
+127:   {
+128:      int  totalLen = itsLen + rhs.GetLen();
+129:      String temp(totalLen);
+130:      int i, j;
+131:      for (i = 0; i<itsLen; i++)
+132:         temp[i] = itsString[i];
+133:      for (j = 0; j<rhs.GetLen(); j++, i++)
+134:         temp[i] = rhs[j];
+135:      temp[totalLen]='\0';
+136:      return temp;
+137:   }
+138:
+139:   // changes current string, returns nothing
+140:   void String::operator+=(const String& rhs)
+141:   {
+142:      unsigned short rhsLen = rhs.GetLen();
+143:      unsigned short totalLen = itsLen + rhsLen;
+144:      String  temp(totalLen);
+145:      for (int i = 0; i<itsLen; i++)
+146:         temp[i] = itsString[i];
+147:      for (int j = 0; j<rhs.GetLen(); j++, i++)
+148:         temp[i] = rhs[i-itsLen];
+149:      temp[totalLen]='\0';
+150:      *this = temp;
+151:   }
+152:
+153: // int String::ConstructorCount = 0;
+
+
+Output: None.
+
+Analysis: Listing 15.1 provides a String class much like the one used in Listing 11.14 of Day 11, "Arrays." The significant difference here is that the constructors and a few other functions in Listing 11.14 have print statements to show their use, which are currently commented out in Listing 15.1. These functions will be used in later examples.
+
+On line 23, the static member variable ConstructorCount is declared, and on line 153 it is initialized. This variable is incremented in each string constructor. All of this is currently commented out; it will be used in a later listing.
+
+Listing 15.2 describes an Employee class that contains three string objects. Note that a number of statements are commented out; they will be used in later listings.
+
+Listing 15.2. The Employee class and driver program.
+
+1:     class Employee
+2:     {
+3:
+4:     public:
+5:        Employee();
+6:        Employee(char *, char *, char *, long);
+7:        ~Employee();
+8:        Employee(const Employee&);
+9:        Employee & operator= (const Employee &);
+10:
+11:       const String & GetFirstName() const 
+12:          { return itsFirstName; }
+13:       const String & GetLastName() const { return itsLastName; }
+14:       const String & GetAddress() const { return itsAddress; }
+15:       long GetSalary() const { return itsSalary; }
+16:
+17:       void SetFirstName(const String & fName) 
+18:           { itsFirstName = fName; }
+19:       void SetLastName(const String & lName) 
+20:          { itsLastName = lName; }
+21:       void SetAddress(const String & address) 
+22:            { itsAddress = address; }
+23:       void SetSalary(long salary) { itsSalary = salary; }
+24:    private:
+25:       String    itsFirstName;
+26:       String    itsLastName;
+27:       String    itsAddress;
+28:       long      itsSalary;
+29:    };
+30:
+31:    Employee::Employee():
+32:       itsFirstName(""),
+33:       itsLastName(""),
+34:       itsAddress(""),
+35:       itsSalary(0)
+36:    {}
+37:
+38:    Employee::Employee(char * firstName, char * lastName,
+39:       char * address, long salary):
+40:       itsFirstName(firstName),
+41:       itsLastName(lastName),
+42:       itsAddress(address),
+43:       itsSalary(salary)
+44:    {}
+45:
+46:    Employee::Employee(const Employee & rhs):
+47:       itsFirstName(rhs.GetFirstName()),
+48:       itsLastName(rhs.GetLastName()),
+49:       itsAddress(rhs.GetAddress()),
+50:       itsSalary(rhs.GetSalary())
+51:    {}
+52:
+53:    Employee::~Employee() {}
+54:
+55:    Employee & Employee::operator= (const Employee & rhs)
+56:    {
+57:       if (this == &rhs)
+58:          return *this;
+59:
+60:       itsFirstName = rhs.GetFirstName();
+61:       itsLastName = rhs.GetLastName();
+62:       itsAddress = rhs.GetAddress();
+63:       itsSalary = rhs.GetSalary();
+64:
+65:       return *this;
+66:    }
+67:
+68:    int main()
+69:    {
+70:       Employee Edie("Jane","Doe","1461 Shore Parkway", 20000);
+71:       Edie.SetSalary(50000);
+72:       String LastName("Levine");
+73:       Edie.SetLastName(LastName);
+74:       Edie.SetFirstName("Edythe");
+75:
+76:       cout << "Name: ";
+77:       cout << Edie.GetFirstName().GetString();
+78:       cout << " " << Edie.GetLastName().GetString();
+79:       cout << ".\nAddress: ";
+80:       cout << Edie.GetAddress().GetString();
+81:       cout << ".\nSalary: " ;
+82:       cout << Edie.GetSalary();
+83:     return 0;
+84: }
+
+    NOTE: Put the code from Listing 15.1 into a file called STRING.HPP. Then any time you need the String class you can include Listing 15.1 by using #include. For example, at the top of Listing 15.2 add the line #include String.hpp. This will add the String class to your program. 
+
+Output: Name: Edythe Levine.
+Address: 1461 Shore Parkway.
+Salary: 50000
+
+Analysis: Listing 15.2 shows the Employee class, which contains three string objects: itsFirstName, itsLastName, and itsAddress.
+
+On line 70, an Employee object is created, and four values are passed in to initialize the Employee object. On line 71, the Employee access function SetSalary() is called, with the constant value 50000. Note that in a real program this would either be a dynamic value (set at runtime) or a constant.
+
+On line 72, a string is created and initialized using a C++ string constant. This string object is then used as an argument to SetLastName() on line 73.
+
+On line 74, the Employee function SetFirstName() is called with yet another string constant. However, if you are paying close attention, you will notice that Employee does not have a function SetFirstName() that takes a character string as its argument; SetFirstName() requires a constant string reference.
+
+The compiler resolves this because it knows how to make a string from a constant character string. It knows this because you told it how to do so on line 9 of Listing 15.1.
+Accessing Members of the Contained Class
+
+Employee objects do not have special access to the member variables of String. If the Employee object Edie tried to access the member variable itsLen of its own itsFirstName member variable, it would get a compile-time error. This is not much of a burden, however. The accessor functions provide an interface for the String class, and the Employee class need not worry about the implementation details, any more than it worries about how the integer variable, itsSalary, stores its information.
+Filtering Access to Contained Members
+
+Note that the String class provides the operator+. The designer of the Employee class has blocked access to the operator+ being called on Employee objects by declaring that all the string accessors, such as GetFirstName(), return a constant reference. Because operator+ is not (and can't be) a const function (it changes the object it is called on), attempting to write the following will cause a compile-time error:
+
+String buffer = Edie.GetFirstName() + Edie.GetLastName();
+
+GetFirstName() returns a constant String, and you can't call operator+ on a constant object.
+
+To fix this, overload GetFirstName() to be non-const:
+
+const String & GetFirstName() const { return itsFirstName; }
+String & GetFirstName()  { return itsFirstName; }
+
+Note that the return value is no longer const and that the member function itself is no longer const. Changing the return value is not sufficient to overload the function name; you must change the constancy of the function itself.
+Cost of Containment
+
+It is important to note that the user of an Employee class pays the price of each of those string objects each time one is constructed, or a copy of the Employee is made.
+
+Uncommenting the cout statements in Listing 15.1, lines 38, 51, 63, 75, 84, and 100, reveals how often these are called. Listing 15.3 rewrites the driver program to add print statements indicating where in the program objects are being created:
+
+    NOTE: To compile this listing, follow these steps: 1. Uncomment lines 38, 51, 63, 75, 84, and 100 in Listing 15.1. 2. Edit Listing 15.2. Remove lines 64-80 and substitute Listing 15.3. 3. Add #include string.hpp as previously noted. 
+
+Listing 15.3. Contained class constructors.
+
+1:     int main()
+2:     {
+3:        cout << "Creating Edie...\n";
+4:        Employee Edie("Jane","Doe","1461 Shore Parkway", 20000);
+5:        Edie.SetSalary(20000);
+6:        cout << "Calling SetFirstName with char *...\n";
+7:        Edie.SetFirstName("Edythe");
+8:        cout << "Creating temporary string LastName...\n";
+9:        String LastName("Levine");
+10:       Edie.SetLastName(LastName);
+11:
+12:       cout << "Name: ";
+13:       cout << Edie.GetFirstName().GetString();
+14:       cout << " " << Edie.GetLastName().GetString();
+15:       cout << "\nAddress: ";
+16:       cout << Edie.GetAddress().GetString();
+17:       cout << "\nSalary: " ;
+18:       cout << Edie.GetSalary();
+19:       cout << endl;
+20:     return 0;
+21: }
+
+Output: 1:   Creating Edie...
+2:           String(char*) constructor
+3:           String(char*) constructor
+4:           String(char*) constructor
+5:   Calling SetFirstName with char *...
+6:           String(char*) constructor
+7:           String destructor
+8:   Creating temporary string LstName...
+9:           String(char*) constructor
+10:  Name: Edythe Levine
+11:  Address: 1461 Shore Parkway
+12:  Salary: 20000
+13:          String destructor
+14:          String destructor
+15:          String destructor
+16:          String destructor
+
+Analysis: Listing 15.3 uses the same class declarations as Listings 15.1 and 15.2. However, the cout statements have been uncommented. The output from Listing 15.3 has been numbered to make analysis easier.
+
+On line 3 of Listing 15.3, the statement Creating Edie... is printed, as reflected on line 1 of the output. On line 4 an Employee object, Edie, is created with four parameters. The output reflects the constructor for String being called three times, as expected.
+
+Line 6 prints an information statement, and then on line 7 is the statement Edie.SetFirstName("Edythe"). This statement causes a temporary string to be created from the character string "Edythe", as reflected on lines 6 and 7 of the output. Note that the temporary is destroyed immediately after it is used in the assignment statement.
+
+On line 9, a String object is created in the body of the program. Here the programmer is doing explicitly what the compiler did implicitly on the previous statement. This time you see the constructor on line 9 of the output, but no destructor. This object will not be destroyed until it goes out of scope at the end of the function.
+
+On lines 13-19, the strings in the employee object are destroyed as the Employee object falls out of scope, and the string LastName, created on line 9, is destroyed as well when it falls out of scope.
+Copying by Value
+
+Listing 15.3 illustrates how the creation of one Employee object caused five string constructor calls. Listing 15.4 again rewrites the driver program. This time the print statements are not used, but the string static member variable ConstructorCount is uncommented and used.
+
+Examination of Listing 15.1 shows that ConstructorCount is incremented each time a string constructor is called. The driver program in 15.4 calls the print functions, passing in the Employee object, first by reference and then by value. ConstructorCount keeps track of how many string objects are created when the employee is passed as a parameter.
+
+    NOTE: To compile this listing: 1. Uncomment lines 23, 39, 52, 64, 76, and 152 in Listing 15.1. 2. Edit Listing 15.2. Remove lines 68-84 and substitute Listing 15.4. 3. Add #include string.hpp as previously noted. 
+
+Listing 15.4. Passing by value
+
+1:     void PrintFunc(Employee);
+2:     void rPrintFunc(const Employee&);
+3:
+4:     int main()
+5:     {
+6:        Employee Edie("Jane","Doe","1461 Shore Parkway", 20000);
+7:        Edie.SetSalary(20000);
+8:        Edie.SetFirstName("Edythe");
+9:        String LastName("Levine");
+10:       Edie.SetLastName(LastName);
+11:
+12:       cout << "Constructor count: " ;
+13:       cout << String::ConstructorCount << endl;
+14:       rPrintFunc(Edie);
+15:       cout << "Constructor count: ";
+16:        cout << String::ConstructorCount << endl;
+17:       PrintFunc(Edie);
+18:       cout << "Constructor count: ";
+19:        cout << String::ConstructorCount << endl;
+20:     return 0;
+21:    }
+22:    void PrintFunc (Employee Edie)
+23:    {
+24:
+25:       cout << "Name: ";
+26:       cout << Edie.GetFirstName().GetString();
+27:       cout << " " << Edie.GetLastName().GetString();
+28:       cout << ".\nAddress: ";
+29:       cout << Edie.GetAddress().GetString();
+30:       cout << ".\nSalary: " ;
+31:       cout << Edie.GetSalary();
+32:       cout << endl;
+33:
+34:    }
+35:
+36:    void rPrintFunc (const Employee& Edie)
+37:    {
+38:       cout << "Name: ";
+39:       cout << Edie.GetFirstName().GetString();
+40:       cout << " " << Edie.GetLastName().GetString();
+41:       cout << "\nAddress: ";
+42:       cout << Edie.GetAddress().GetString();
+43:       cout << "\nSalary: " ;
+44:       cout << Edie.GetSalary();
+45:       cout << endl;
+46: }
+Output: String(char*) constructor
+        String(char*) constructor
+        String(char*) constructor
+        String(char*) constructor
+        String destructor
+        String(char*) constructor
+Constructor count: 5
+Name: Edythe Levine
+Address: 1461 Shore Parkway
+Salary: 20000
+Constructor count: 5
+        String(String&) constructor
+        String(String&) constructor
+        String(String&) constructor
+Name: Edythe Levine.
+Address: 1461 Shore Parkway.
+Salary: 20000
+        String destructor
+        String destructor
+        String destructor
+Constructor count: 8
+String destructor
+        String destructor
+        String destructor
+        String destructor
+
+Analysis: The output shows that five string objects were created as part of creating one Employee object. When the Employee object is passed to rPrintFunc() by reference, no additional Employee objects are created, and so no additional String objects are created. (They too are passed by reference.)
+
+When, on line 14, the Employee object is passed to PrintFunc() by value, a copy of the Employee is created, and three more string objects are created (by calls to the copy constructor).
+Implementation in Terms of Inheritance/Containment Versus Delegation
+
+At times, one class wants to draw on some of the attributes of another class. For example, let's say you need to create a PartsCatalog class. The specification you've been given defines a PartsCatalog as a collection of parts; each part has a unique part number. The PartsCatalog does not allow duplicate entries, and does allow access by part number.
+
+The listing for the Week in Review for Week 2 provides a LinkedList class. This LinkedList is well-tested and understood, and you'd like to build on that technology when making your PartsCatalog, rather than inventing it from scratch.
+
+You could create a new PartsCatalog class and have it contain a LinkedList. The PartsCatalog could delegate management of the linked list to its contained LinkedList object.
+
+An alternative would be to make the PartsCatalog derive from LinkedList and thereby inherit the properties of a LinkedList. Remembering, however, that public inheritance provides an is-a relationship, you should question whether a PartsCatalog really is a type of LinkedList.
+
+One way to answer the question of whether PartsCatalog is a LinkedList is to assume that LinkedList is the base and PartsCatalog is the derived class, and then to ask these other questions:
+
+    1. Is there anything in the base class that should not be in the derived? For example, does the LinkedList base class have functions that are inappropriate for the PartsCatalog
+    class? If so, you probably don't want public inheritance.
+
+    2. Might the class you are creating have more than one of the base? For example, might a PartsCatalog need two LinkedLists in each object? If it might, you almost certainly want to use containment.
+
+    3. Do you need to inherit from the base class so that you can take advantage of virtual functions or access protected members? If so, you must use inheritance, public or private. 
+
+Based on the answers to these questions, you must chose between public inheritance (the is-a relationship) and either private inheritance or containment.
+
+    New Term:
+
+    Contained --An object declared as a member of another class contained by that class.
+
+    Delegation --Using the attributes of a contained class to accomplish functions not otherwise available to the containing class.
+
+    Implemented in terms of --Building one class on the capabilities of another without using public inheritance. 
+
+Delegation
+
+Why not derive PartsCatalog from LinkedList? The PartsCatalog isn't a LinkedList because LinkedLists are ordered collections and each member of the collection can repeat. The PartsCatalog has unique entries that are not ordered. The fifth member of the PartsCatalog is not part number 5.
+
+Certainly it would have been possible to inherit publicly from PartsList and then override Insert() and the offset operators ([]) to do the right thing, but then you would have changed the essence of the PartsList class. Instead you'll build a PartsCatalog that has no offset operator, does not allow duplicates, and defines the operator+ to combine two sets.
+
+The first way to accomplish this is with containment. The PartsCatalog will delegate list management to a contained LinkedList. Listing 15.5 illustrates this approach.
+
+Listing 15.5. Delegating to a contained LinkedList.
+
+0:      #include <iostream.h>
+1:    
+2:      typedef unsigned long ULONG;
+3:      typedef unsigned short USHORT;
+4:    
+5:    
+6:      // **************** Part ************
+7:    
+8:      // Abstract base class of parts
+9:      class Part
+10:      {
+11:      public:
+12:         Part():itsPartNumber(1) {}
+13:         Part(ULONG PartNumber):
+14:             itsPartNumber(PartNumber){}
+15:         virtual ~Part(){}
+16:         ULONG GetPartNumber() const 
+17:             { return itsPartNumber; }
+18:         virtual void Display() const =0; 
+19:      private:
+20:         ULONG itsPartNumber;
+21:      };
+22:    
+23:      // implementation of pure virtual function so that
+24:      // derived classes can chain up
+25:      void Part::Display() const
+26:      {
+27:          cout << "\nPart Number: " << itsPartNumber << endl;
+28:      }
+29:    
+30:      // **************** Car Part ************
+31:    
+32:      class CarPart : public Part
+33:      {
+34:      public:
+35:         CarPart():itsModelYear(94){}
+36:         CarPart(USHORT year, ULONG partNumber);
+37:         virtual void Display() const 
+38:         { 
+39:             Part::Display(); 
+40:             cout << "Model Year: ";
+41:             cout << itsModelYear << endl;  
+42:         }
+43:      private:
+44:         USHORT itsModelYear;
+45:      };
+46:    
+47:      CarPart::CarPart(USHORT year, ULONG partNumber):
+48:         itsModelYear(year),
+49:         Part(partNumber)
+50:      {}
+51:    
+52:    
+53:      // **************** AirPlane Part ************
+54:    
+55:      class AirPlanePart : public Part
+56:      {
+57:      public:
+58:         AirPlanePart():itsEngineNumber(1){};
+59:         AirPlanePart
+60:             (USHORT EngineNumber, ULONG PartNumber);
+61:         virtual void Display() const
+62:         { 
+63:             Part::Display(); 
+64:             cout << "Engine No.: ";
+65:             cout << itsEngineNumber << endl;  
+66:         }
+67:      private:
+68:         USHORT itsEngineNumber;
+69:      };
+70:    
+71:      AirPlanePart::AirPlanePart
+72:          (USHORT EngineNumber, ULONG PartNumber):
+73:         itsEngineNumber(EngineNumber),
+74:         Part(PartNumber)
+75:      {}
+76:    
+77:      // **************** Part Node ************
+78:      class PartNode
+79:      {
+80:      public:
+81:         PartNode (Part*);
+82:         ~PartNode();
+83:         void SetNext(PartNode * node) 
+84:            { itsNext = node; }
+85:         PartNode * GetNext() const;
+86:         Part * GetPart() const;
+87:      private:
+88:         Part *itsPart;
+89:         PartNode * itsNext;
+90:      };
+91:       // PartNode Implementations...
+92:    
+93:       PartNode::PartNode(Part* pPart):
+94:       itsPart(pPart),
+95:       itsNext(0)
+96:       {}
+97:    
+98:       PartNode::~PartNode()
+99:       {
+100:          delete itsPart;
+101:          itsPart = 0;
+102:          delete itsNext;
+103:          itsNext = 0;
+104:       }
+105:    
+106:       // Returns NULL if no next PartNode
+107:       PartNode * PartNode::GetNext() const
+108:       {
+109:             return itsNext;
+110:       }
+111:    
+112:       Part * PartNode::GetPart() const
+113:       {
+114:          if (itsPart)
+115:             return itsPart;
+116:          else
+117:             return NULL; //error
+118:       }
+119:    
+120:    
+121:    
+122:      // **************** Part List ************
+123:      class PartsList
+124:      {
+125:      public:
+126:         PartsList();
+127:         ~PartsList();
+128:         // needs copy constructor and operator equals!
+129:         void     Iterate(void (Part::*f)()const) const;
+130:         Part*    Find(ULONG & position, ULONG PartNumber)  const;
+131:         Part*    GetFirst() const;
+132:         void     Insert(Part *);
+133:         Part*    operator[](ULONG) const;
+134:         ULONG    GetCount() const { return itsCount; }
+135:         static    PartsList& GetGlobalPartsList() 
+136:         { 
+137:             return  GlobalPartsList; 
+138:         }
+139:      private:
+140:         PartNode * pHead;
+141:         ULONG itsCount;
+142:         static PartsList GlobalPartsList;
+143:      };
+144:    
+145:      PartsList PartsList::GlobalPartsList;
+146:    
+147: 
+148:       PartsList::PartsList():
+149:          pHead(0),
+150:          itsCount(0)
+151:          {}
+152:    
+153:       PartsList::~PartsList()
+154:       {
+155:          delete pHead;
+156:       }
+157:    
+158:       Part*   PartsList::GetFirst() const
+159:       {
+160:          if (pHead)
+161:             return pHead->GetPart();
+162:          else
+163:             return NULL;  // error catch here
+164:       }
+165:    
+166:       Part *  PartsList::operator[](ULONG offSet) const
+167:       {
+168:          PartNode* pNode = pHead;
+169:    
+170:          if (!pHead)
+171:             return NULL; // error catch here
+172:    
+173:          if (offSet > itsCount)
+174:             return NULL; // error
+175:    
+176:          for (ULONG i=0;i<offSet; i++)
+177:             pNode = pNode->GetNext();
+178:    
+179:         return   pNode->GetPart();
+180:       }
+181:    
+182:       Part*   PartsList::Find(
+183:           ULONG & position, 
+184:           ULONG PartNumber)  const
+185:       {
+186:          PartNode * pNode = 0;
+187:          for (pNode = pHead, position = 0;
+188:                pNode!=NULL;
+189:                pNode = pNode->GetNext(), position++)
+190:          {
+191:             if (pNode->GetPart()->GetPartNumber() == PartNumber)
+192:                break;
+193:          }
+194:          if (pNode == NULL)
+195:             return NULL;
+196:          else
+197:             return pNode->GetPart();
+198:       }
+199:    
+200:       void PartsList::Iterate(void (Part::*func)()const) const
+201:       {
+202:          if (!pHead)
+203:             return;
+204:          PartNode* pNode = pHead;
+205:          do
+206:             (pNode->GetPart()->*func)();
+207:          while (pNode = pNode->GetNext());
+208:       }
+209:    
+210:       void PartsList::Insert(Part* pPart)
+211:       {
+212:          PartNode * pNode = new PartNode(pPart);
+213:          PartNode * pCurrent = pHead;
+214:          PartNode * pNext = 0;
+215:    
+216:          ULONG New =  pPart->GetPartNumber();
+217:          ULONG Next = 0;
+218:          itsCount++;
+219:    
+220:          if (!pHead)
+221:          {
+222:             pHead = pNode;
+223:             return;
+224:          }
+225:    
+226:          // if this one is smaller than head
+227:          // this one is the new head
+228:          if (pHead->GetPart()->GetPartNumber() > New)
+229:          {
+230:             pNode->SetNext(pHead);
+231:             pHead = pNode;
+232:             return;
+233:          }
+234:    
+235:          for (;;)
+236:          {
+237:             // if there is no next, append this new one
+238:             if (!pCurrent->GetNext())
+239:             {
+240:                pCurrent->SetNext(pNode);
+241:                return;
+242:             }
+243: 
+244:             // if this goes after this one and before the next
+245:             // then insert it here, otherwise get the next
+246:             pNext = pCurrent->GetNext();
+247:             Next = pNext->GetPart()->GetPartNumber();
+248:             if (Next > New)
+249:             {
+250:                pCurrent->SetNext(pNode);
+251:                pNode->SetNext(pNext);
+252:                return;
+253:             }
+254:             pCurrent = pNext;
+255:          }
+256:       }
+257:    
+258:    
+259:    
+260:      class PartsCatalog
+261:      {
+262:      public:
+263:         void Insert(Part *);
+264:         ULONG Exists(ULONG PartNumber);
+265:         Part * Get(int PartNumber);
+266:         operator+(const PartsCatalog &);
+267:         void ShowAll() { thePartsList.Iterate(Part::Display); }
+268:      private:
+269:         PartsList thePartsList;
+270:      };
+271:    
+272:      void PartsCatalog::Insert(Part * newPart)
+273:      {
+274:         ULONG partNumber =  newPart->GetPartNumber();
+275:         ULONG offset;
+276:    
+277:         if (!thePartsList.Find(offset, partNumber))
+278:    
+279:            thePartsList.Insert(newPart);
+280:         else
+281:         {
+282:            cout << partNumber << " was the ";
+283:            switch (offset)
+284:            {
+285:               case 0:  cout << "first "; break;
+286:               case 1:  cout << "second "; break;
+287:               case 2:  cout << "third "; break;
+288:               default: cout << offset+1 << "th ";
+289:            }
+290:            cout << "entry. Rejected!\n";
+291:         }
+292:      }
+293:    
+294:      ULONG PartsCatalog::Exists(ULONG PartNumber)
+295:      {
+296:         ULONG offset;
+297:         thePartsList.Find(offset,PartNumber);
+298:            return offset;
+299:      }
+300:    
+301:      Part * PartsCatalog::Get(int PartNumber)
+302:      {
+303:         ULONG offset;
+304:         Part * thePart = thePartsList.Find(offset, PartNumber);
+305:         return thePart;
+306:      }
+307:    
+308:    
+309:      int main()
+310:      {
+311:         PartsCatalog pc;
+312:         Part * pPart = 0;
+313:         ULONG PartNumber;
+314:         USHORT value;
+315:         ULONG choice;
+316: 
+317:         while (1)
+318:         {
+319:            cout << "(0)Quit (1)Car (2)Plane: ";
+320:            cin >> choice;
+321:    
+322:            if (!choice)
+323:               break;
+324:    
+325:            cout << "New PartNumber?: ";
+326:            cin >>  PartNumber;
+327:    
+328:            if (choice == 1)
+329:            {
+330:               cout << "Model Year?: ";
+331:               cin >> value;
+332:               pPart = new CarPart(value,PartNumber);
+333:            }
+334:            else
+335:            {
+336:               cout << "Engine Number?: ";
+337:               cin >> value;
+338:               pPart = new AirPlanePart(value,PartNumber);
+339:            }
+340:            pc.Insert(pPart);
+341:         }
+342:         pc.ShowAll();
+343:        return 0;
+344: }
+
+Output: (0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 4434
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+1234 was the first entry. Rejected!
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 2345
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  0
+
+Part Number: 1234
+Model Year: 94
+
+Part Number: 2345
+Model Year: 93
+
+Part Number: 4434
+Model Year: 93
+
+Analysis: Listing 15.7 reproduces the interface to the Part, PartNode, and PartList classes from Week 2 in Review, but to save room it does not reproduce the implementation of their methods.
+
+A new class, PartsCatalog, is declared on lines 260-270. PartsCatalog has a PartsList as its data member, to which it delegates list management. Another way to say this is that the PartsCatalog is implemented in terms of this PartsList.
+
+Note that clients of the PartsCatalog do not have access to the PartsList directly. The interface is through the PartsCatalog, and as such the behavior of the PartsList is dramatically changed. For example, the PartsCatalog::Insert() method does not allow duplicate entries into the PartsList.
+
+The implementation of PartsCatalog::Insert() starts on line 272. The Part that is passed in as a parameter is asked for the value of its itsPartNumber member variable. This value is fed to the PartsList's Find() method, and if no match is found the number is inserted; otherwise an informative error message is printed.
+
+Note that PartsCatalog does the actual insert by calling Insert() on its member variable, pl, which is a PartsList. The mechanics of the actual insertion and the maintenance of the linked list, as well as searching and retrieving from the linked list, are maintained in the contained PartsList member of PartsCatalog. There is no reason for PartsCatalog to reproduce this code; it can take full advantage of the well-defined interface.
+
+This is the essence of reusability within C++: PartsCatalog can reuse the PartsList code, and the designer of PartsCatalog is free to ignore the implementation details of PartsList. The interface to PartsList (that is, the class declaration) provides all the information needed by the designer of the PartsCatalog class.
+Private Inheritance
+
+If PartsCatalog needed access to the protected members of LinkedList (in this case there are none), or needed to override any of the LinkedList methods, then PartsCatalog would be forced to inherit from PartsList.
+
+Since a PartsCatalog is not a PartsList object, and since you don't want to expose the entire set of functionality of PartsList to clients of PartsCatalog, you need to use private inheritance.
+
+The first thing to know about private inheritance is that all of the base member variables and functions are treated as if they were declared to be private, regardless of their actual access level in the base. Thus, to any function that is not a member function of PartsCatalog, every function inherited from PartsList is inaccessible. This is critical: private inheritance does not involve inheriting interface, just implementation.
+
+To clients of the PartsCatalog class, the PartsList class is invisible. None of its interface is available: you can't call any of its methods. You can call PartsCatalog methods, however, and they can access all of LinkedLists, because they are derived from LinkedLists.
+
+The important thing here is that the PartsCatalog isn't a PartsList, as would have been implied by public inheritance. It is implemented in terms of a PartsList, just as would have been the case with containment. The private inheritance is just a convenience.
+
+Listing 15.6 demonstrates the use of private inheritance by rewriting the PartsCatalog class as privately derived from PartsList.
+
+    NOTE: To compile this program, replace lines 260-344 of Listing 15.5 with Listing 15.6 and recompile. 
+
+Listing 15.6. Private inheritance.
+
+1:  //listing 15.6 demonstrates private inheritance
+2:
+3:  //rewrites PartsCatalog from listing 15.5
+4:
+5:  //see attached notes on compiling
+6:
+7:     class PartsCatalog : private PartsList
+8:     {
+9:     public:
+10:       void Insert(Part *);
+11:       ULONG Exists(ULONG PartNumber);
+12:       Part * Get(int PartNumber);
+13:       operator+(const PartsCatalog &);
+14:       void ShowAll() { Iterate(Part::Display); }
+15:    private:
+16:    };
+17:
+18:    void PartsCatalog::Insert(Part * newPart)
+19:    {
+20:       ULONG partNumber =  newPart->GetPartNumber();
+21:       ULONG offset;
+22:
+23:       if (!Find(offset, partNumber))
+24:          PartsList::Insert(newPart);
+25:       else
+26:       {
+27:          cout << partNumber << " was the ";
+28:          switch (offset)
+29:          {
+30:             case 0:  cout << "first "; break;
+31:             case 1:  cout << "second "; break;
+32:             case 2:  cout << "third "; break;
+33:             default: cout << offset+1 << "th ";
+34:          }
+35:          cout << "entry. Rejected!\n";
+36:       }
+37:    }
+38:
+39:    ULONG PartsCatalog::Exists(ULONG PartNumber)
+40:    {
+41:       ULONG offset;
+42:       Find(offset,PartNumber);
+43:       return offset;
+44:    }
+45:
+46:    Part * PartsCatalog::Get(int PartNumber)
+47:    {
+48:       ULONG offset;
+49:       return (Find(offset, PartNumber));
+50:
+51:    }
+52:
+53:    int main()
+54:    {
+55:       PartsCatalog pc;
+56:       Part * pPart = 0;
+57:       ULONG PartNumber;
+58:       USHORT value;
+59:       ULONG choice;
+60:
+61:       while (1)
+62:       {
+63:          cout << "(0)Quit (1)Car (2)Plane: ";
+64:          cin >> choice;
+65:
+66:          if (!choice)
+67:             break;
+68:
+69:          cout << "New PartNumber?: ";
+70:          cin >>  PartNumber;
+71:
+72:          if (choice == 1)
+73:          {
+74:             cout << "Model Year?: ";
+75:             cin >> value;
+76:             pPart = new CarPart(value,PartNumber);
+77:          }
+78:          else
+79:          {
+80:             cout << "Engine Number?: ";
+81:             cin >> value;
+82:             pPart = new AirPlanePart(value,PartNumber);
+83:          }
+84:          pc.Insert(pPart);
+85:       }
+86:       pc.ShowAll();
+87:     return 0;
+88: }
+
+Output: (0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 4434
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+1234 was the first entry. Rejected!
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 2345
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  0
+
+Part Number: 1234
+Model Year: 94
+
+Part Number: 2345
+Model Year: 93
+
+Part Number: 4434
+Model Year: 93
+
+Analysis: Listing 15.6 shows only the changed interface to PartsCatalog and the rewritten driver program. The interfaces to the other classes are unchanged from Listing 15.5.
+
+On line 7 of Listing 15.6, PartsCatalog is declared to derive privately from PartsList. The interface to PartsCatalog doesn't change from Listing 15.5, though of course it no longer needs an object of type PartsList as member data.
+
+The PartsCatalog ShowAll() function calls PartsList Iterate() with the appropriate pointer to member function of class Part. ShowAll() acts as a public interface to Iterate(), providing the correct information but preventing client classes from calling Iterate() dir-ectly. Although PartsList might allow other functions to be passed to Iterate(), PartsCatalog does not.
+
+The Insert() function has changed as well. Note, on line 23, that Find() is now called directly, because it is inherited from the base class. The call on line 24 to Insert() must be fully qualified, of course, or it would endlessly recurse into itself.
+
+In short, when methods of PartsCatalog want to call PartsList methods, they may do so directly. The only exception is when PartsCatalog has overridden the method and the PartsList version is needed, in which case the function name must be qualified fully.
+
+Private inheritance allows the PartsCatalog to inherit what it can use, but still provide mediated access to Insert and other methods to which client classes should not have direct access.
+
+    DO inherit publicly when the derived object is a kind of the base class. DO use containment when you want to delegate functionality to another class, but you don't need access to its protected members. DO use private inheritance when you need to implement one class in terms of another, and you need access to the base class's protected members. DON'T use private inheritance when you need to use more than one of the base class. You must use containment. For example, if PartsCatalog needed two PartsLists, you could not have used private inheritance. DON'T use public inheritance when members of the base class should not be available to clients of the derived class. 
+
+Friend Classes
+
+Sometimes you will create classes together, as a set. For example, PartNode and PartsList were tightly coupled, and it would have been convenient if PartsList could have read PartNode's Part pointer, itsPart, directly.
+
+You wouldn't want to make itsPart public, or even protected, because this is an implementation detail of PartNode and you want to keep it private. You do want to expose it to PartsList, however.
+
+If you want to expose your private member data or functions to another class, you must declare that class to be a friend. This extends the interface of your class to include the friend class.
+
+Once PartsNode declares PartsList to be a friend, all of PartsNode's member data and functions are public as far as PartsList is concerned.
+
+It is important to note that friendship cannot be transferred. Just because you are my friend and Joe is your friend doesn't mean Joe is my friend. Friendship is not inherited either. Again, just because you are my friend and I'm willing to share my secrets with you doesn't mean I'm willing to share my secrets with your children.
+
+Finally, friendship is not commutative. Assigning Class One to be a friend of Class Two does not make Class Two a friend of Class One. Just because you are willing to tell me your secrets doesn't mean I am willing to tell you mine.
+
+Listing 15.7 illustrates friendship by rewriting the example from Listing 15.6, making PartsList a friend of PartNode. Note that this does not make PartNode a friend of PartsList.
+
+Listing 15.7. Friend class illustrated.
+
+0:      #include <iostream.h>
+1:    
+2:      typedef unsigned long ULONG;
+3:      typedef unsigned short USHORT;
+4:    
+5:    
+6:      // **************** Part ************
+7:    
+8:      // Abstract base class of parts
+9:      class Part
+10:       {
+11:       public:
+12:          Part():itsPartNumber(1) {}
+13:          Part(ULONG PartNumber):
+14:              itsPartNumber(PartNumber){}
+15:          virtual ~Part(){}
+16:          ULONG GetPartNumber() const 
+17:              { return itsPartNumber; }
+18:          virtual void Display() const =0; 
+19:       private:
+20:          ULONG itsPartNumber;
+21:       };
+22:     
+23:       // implementation of pure virtual function so that
+24:       // derived classes can chain up
+25:       void Part::Display() const
+26:       {
+27:           cout << "\nPart Number: ";
+28:           cout << itsPartNumber << endl;
+29:       }
+30:     
+31:       // **************** Car Part ************
+32:     
+33:       class CarPart : public Part
+34:       {
+35:       public:
+36:          CarPart():itsModelYear(94){}
+37:          CarPart(USHORT year, ULONG partNumber);
+38:          virtual void Display() const 
+39:          { 
+40:              Part::Display(); 
+41:              cout << "Model Year: ";
+42:              cout << itsModelYear << endl;  
+43:          }
+44:       private:
+45:          USHORT itsModelYear;
+46:       };
+47:     
+48:       CarPart::CarPart(USHORT year, ULONG partNumber):
+49:          itsModelYear(year),
+50:          Part(partNumber)
+51:       {}
+52:     
+53: 
+54:       // **************** AirPlane Part ************
+55:     
+56:       class AirPlanePart : public Part
+57:       {
+58:       public:
+59:          AirPlanePart():itsEngineNumber(1){};
+60:          AirPlanePart
+61:              (USHORT EngineNumber, ULONG PartNumber);
+62:          virtual void Display() const
+63:          { 
+64:              Part::Display(); 
+65:              cout << "Engine No.: ";
+66:              cout << itsEngineNumber << endl;  
+67:          }
+68:       private:
+69:          USHORT itsEngineNumber;
+70:       };
+71:     
+72:       AirPlanePart::AirPlanePart
+73:           (USHORT EngineNumber, ULONG PartNumber):
+74:          itsEngineNumber(EngineNumber),
+75:          Part(PartNumber)
+76:       {}
+77:     
+78:     // **************** Part Node ************
+79:     class PartNode
+80:     {
+81:     public:
+82:        friend class PartsList;
+83:        PartNode (Part*);
+84:        ~PartNode();
+85:        void SetNext(PartNode * node) 
+86:            { itsNext = node; }
+87:        PartNode * GetNext() const;
+88:        Part * GetPart() const;
+89:     private:
+90:        Part *itsPart;
+91:        PartNode * itsNext;
+92:     };
+93:    
+94:       
+95:          PartNode::PartNode(Part* pPart):
+96:          itsPart(pPart),
+97:          itsNext(0)
+98:          {}
+99:       
+100:          PartNode::~PartNode()
+101:          {
+102:              delete itsPart;
+103:              itsPart = 0;
+104:              delete itsNext;
+105:              itsNext = 0;
+106:           }
+107:        
+108:           // Returns NULL if no next PartNode
+109:           PartNode * PartNode::GetNext() const
+110:           {
+111:                 return itsNext;
+112:           }
+113:        
+114:           Part * PartNode::GetPart() const
+115:           {
+116:              if (itsPart)
+117:                 return itsPart;
+118:              else
+119:                 return NULL; //error
+120:           }
+121:        
+122:    
+123:     // **************** Part List ************
+124:     class PartsList
+125:     {
+126:     public:
+127:        PartsList();
+128:        ~PartsList();
+129:        // needs copy constructor and operator equals!
+130:        void     Iterate(void (Part::*f)()const) const;
+131:        Part*    Find(ULONG & position, ULONG PartNumber) const;
+132:        Part*    GetFirst() const;
+133:        void       Insert(Part *);
+134:        Part*    operator[](ULONG) const;
+135:        ULONG    GetCount() const { return itsCount; }
+136:        static    PartsList& GetGlobalPartsList() 
+137:                { 
+138:                    return  GlobalPartsList;
+139:                }
+140:     private:
+141:        PartNode * pHead;
+142:        ULONG itsCount;
+143:        static PartsList GlobalPartsList;
+144:     };
+145:    
+146:     PartsList PartsList::GlobalPartsList;
+147:    
+148:     // Implementations for Lists...
+149:    
+150:     PartsList::PartsList():
+151:        pHead(0),
+152:        itsCount(0)
+153:        {}
+154:    
+155:     PartsList::~PartsList()
+156:     {
+157:        delete pHead;
+158:     }
+159:    
+160:     Part*   PartsList::GetFirst() const
+161:     {
+162:        if (pHead)
+163:           return pHead->itsPart;
+164:        else
+165:           return NULL;  // error catch here
+166:     }
+167:    
+168:     Part * PartsList::operator[](ULONG offSet) const
+169:     {
+170:        PartNode* pNode = pHead;
+171:    
+172:        if (!pHead)
+173:           return NULL; // error catch here
+174:    
+175:        if (offSet > itsCount)
+176:           return NULL; // error
+177:    
+178:        for (ULONG i=0;i<offSet; i++)
+179:           pNode = pNode->itsNext;
+180:    
+181:       return   pNode->itsPart;
+182:     }
+183:    
+184:    Part* PartsList::Find(ULONG & position, ULONG PartNumber) const
+185:     {
+186:        PartNode * pNode = 0;
+187:        for (pNode = pHead, position = 0;
+188:              pNode!=NULL;
+189:              pNode = pNode->itsNext, position++)
+190:        {
+191:           if (pNode->itsPart->GetPartNumber() == PartNumber)
+192:              break;
+193:        }
+194:        if (pNode == NULL)
+195:           return NULL;
+196:        else
+197:           return pNode->itsPart;
+198:     }
+199:    
+200:     void PartsList::Iterate(void (Part::*func)()const) const
+201:     {
+202:        if (!pHead)
+203:           return;
+204:        PartNode* pNode = pHead;
+205:        do
+206:           (pNode->itsPart->*func)();
+207:        while (pNode = pNode->itsNext);
+208:     }
+209:    
+210:     void PartsList::Insert(Part* pPart)
+211:     {
+212:        PartNode * pNode = new PartNode(pPart);
+213:        PartNode * pCurrent = pHead;
+214:        PartNode * pNext = 0;
+215:    
+216:        ULONG New =  pPart->GetPartNumber();
+217:        ULONG Next = 0;
+218:        itsCount++;
+219:    
+220:        if (!pHead)
+221:        {
+222:           pHead = pNode;
+223:           return;
+224:        }
+225:    
+226:        // if this one is smaller than head
+227:        // this one is the new head
+228:        if (pHead->itsPart->GetPartNumber() > New)
+229:        {
+230:           pNode->itsNext = pHead;
+231:           pHead = pNode;
+232:           return;
+233:        }
+234:    
+235:        for (;;)
+236:        {
+237:           // if there is no next, append this new one
+238:           if (!pCurrent->itsNext)
+239:           {
+240:              pCurrent->itsNext = pNode;
+241:              return;
+242:           }
+243: 
+244:           // if this goes after this one and before the next
+245:           // then insert it here, otherwise get the next
+246:           pNext = pCurrent->itsNext;
+247:           Next = pNext->itsPart->GetPartNumber();
+248:           if (Next > New)
+249:           {
+250:              pCurrent->itsNext = pNode;
+251:              pNode->itsNext = pNext;
+252:              return;
+253:           }
+254:           pCurrent = pNext;
+255:        }
+256:     }
+257:    
+258:     class PartsCatalog : private PartsList
+259:     {
+260:     public:
+261:        void Insert(Part *);
+262:        ULONG Exists(ULONG PartNumber);
+263:        Part * Get(int PartNumber);
+264:        operator+(const PartsCatalog &);
+265:        void ShowAll() { Iterate(Part::Display); }
+266:     private:
+267:     };
+268:    
+269:     void PartsCatalog::Insert(Part * newPart)
+270:     {
+271:        ULONG partNumber =  newPart->GetPartNumber();
+272:        ULONG offset;
+273:    
+274:        if (!Find(offset, partNumber))
+275:           PartsList::Insert(newPart);
+276:        else
+277:        {
+278:           cout << partNumber << " was the ";
+279:           switch (offset)
+280:           {
+281:              case 0:  cout << "first "; break;
+282:              case 1:  cout << "second "; break;
+283:              case 2:  cout << "third "; break;
+284:              default: cout << offset+1 << "th ";
+285:           }
+286:           cout << "entry. Rejected!\n";
+287:        }
+288:     }
+289:    
+290:     ULONG PartsCatalog::Exists(ULONG PartNumber)
+291:     {
+292:        ULONG offset;
+293:        Find(offset,PartNumber);
+294:        return offset;
+295:     }
+296:    
+297:     Part * PartsCatalog::Get(int PartNumber)
+298:     {
+299:        ULONG offset;
+300:        return (Find(offset, PartNumber));
+301:    
+302:     }
+303:    
+304:     int main()
+305:     {
+306:        PartsCatalog pc;
+307:        Part * pPart = 0;
+308:        ULONG PartNumber;
+309:        USHORT value;
+310:        ULONG choice;
+311:    
+312:        while (1)
+313:        {
+314:           cout << "(0)Quit (1)Car (2)Plane: ";
+315:           cin >> choice;
+316:    
+317:           if (!choice)
+318:              break;
+319:    
+320:           cout << "New PartNumber?: ";
+321:           cin >>  PartNumber;
+322:    
+323:           if (choice == 1)
+324:           {
+325:              cout << "Model Year?: ";
+326:              cin >> value;
+327:              pPart = new CarPart(value,PartNumber);
+328:           }
+329:           else
+330:           {
+331:              cout << "Engine Number?: ";
+332:              cin >> value;
+333:              pPart = new AirPlanePart(value,PartNumber);
+334:           }
+335:           pc.Insert(pPart);
+336:        }
+337:        pc.ShowAll();
+338:       return 0;
+339: }
+
+Output: (0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 4434
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 1234
+Model Year?: 94
+1234 was the first entry. Rejected!
+(0)Quit (1)Car (2)Plane:  1
+New PartNumber?: 2345
+Model Year?: 93
+(0)Quit (1)Car (2)Plane:  0
+
+Part Number: 1234
+Model Year: 94
+
+Part Number: 2345
+Model Year: 93
+
+Part Number: 4434
+Model Year: 93
+
+Analysis: On line 82, the class PartsList is declared to be a friend to the PartNode class. Because PartsList has not yet been declared, the compiler would complain that this type is not known.
+
+This listing places the friend declaration in the public section, but this is not required; it can be put anywhere in the class declaration without changing the meaning of the statement. Because of this statement, all the private member data and functions are available to any member function of class PartsList.
+
+On line 160, the implementation of the member function GetFirst() reflects this change. Rather than returning pHead->GetPart, this function can now return the otherwise private member data by writing pHead->itsPart. Similarly, the Insert() function can now write pNode->itsNext = pHead, rather than writing pNode->SetNext(pHead).
+
+Admittedly these are trivial changes, and there is not a good enough reason to make PartsList a friend of PartNode, but they do serve to illustrate how the keyword friend works.
+
+Declarations of friend classes should be used with extreme caution. If two classes are inextricably entwined, and one must frequently access data in the other, there may be good reason to use this declaration. But use it sparingly; it is often just as easy to use the public accessor methods, and doing so allows you to change one class without having to recompile the other.
+
+    NOTE: You will often hear novice C++ programmers complain that friend declarations "undermine" the encapsulation so important to object-oriented programming. This is, frankly, errant nonsense. The friend declaration makes the declared friend part of the class interface, and is no more an undermining of encapsulation than is public derivation. 
+
+Friend Class
+
+Declare one class to be a friend of another by putting the word friend into the class granting the access rights. That is, I can declare you to be my friend, but you can't declare yourself to be my friend. Example:
+
+class PartNode{
+public:
+friend class PartList;  // declares PartList to be a friend of PartNode
+};
+
+Friend Functions
+
+At times you will want to grant this level of access not to an entire class, but only to one or two functions of that class. You can do this by declaring the member functions of the other class to be friends, rather than declaring the entire class to be a friend. In fact, you can declare any function, whether or not it is a member function of another class, to be a friend function.
+Friend Functions and Operator Overloading
+
+Listing 15.1 provided a String class that overrode the operator+. It also provided a constructor that took a constant character pointer, so that string objects could be created from C-style strings. This allowed you to create a string and add to it with a C-style string.
+
+    NOTE: C-style strings are null-terminated character arrays, such as char myString[] = "Hello World." 
+
+What you could not do, however, was create a C-style string (a character string) and add to it using a string object, as shown in this example:
+
+char cString[] = {"Hello"};
+String sString(" World");
+String sStringTwo = cString + sString;  //error!
+
+C-style strings don't have an overloaded operator+. As discussed on Day 10, "Advanced Functions," when you say cString + sString; what you are really calling is cString.operator+(sString). Since you can't call operator+() on a C-style string, this causes a compile-time error.
+
+You can solve this problem by declaring a friend function in String, which overloads operator+ but takes two string objects. The C-style string will be converted to a string object by the appropriate constructor, and then operator+ will be called using the two string objects.
+
+    NOTE: To compile this listing, copy lines 33-123 from Listing 15.1 after line 33 of Listing 15.8. 
+
+Listing 15.8. Friendly operator+.
+
+1:     //Listing 15.8 - friendly operators
+2:
+3:     #include <iostream.h>
+4:     #include <string.h>
+5:
+6:     // Rudimentary string class
+7:     class String
+8:     {
+9:        public:
+10:          // constructors
+11:          String();
+12:          String(const char *const);
+13:          String(const String &);
+14:          ~String();
+15:
+16:          // overloaded operators
+17:          char & operator[](int offset);
+18:          char operator[](int offset) const;
+19:          String operator+(const String&);
+20:          friend String operator+(const String&, const String&);
+21:          void operator+=(const String&);
+22:          String & operator= (const String &);
+23:
+24:          // General accessors
+25:          int GetLen()const { return itsLen; }
+26:          const char * GetString() const { return itsString; }
+27:
+28:       private:
+29:          String (int);         // private constructor
+30:          char * itsString;
+31:          unsigned short itsLen;
+32:    };
+33:
+34:    // creates a new string by adding current
+35:    // string to rhs
+36:    String String::operator+(const String& rhs)
+37:    {
+38:       int  totalLen = itsLen + rhs.GetLen();
+39:       String temp(totalLen);
+40:       for (int i = 0; i<itsLen; i++)
+41:          temp[i] = itsString[i];
+42:       for (int j = 0; j<rhs.GetLen(); j++, i++)
+43:          temp[i] = rhs[j];
+44:       temp[totalLen]='\0';
+45:       return temp;
+46:    }
+47:
+48:    // creates a new string by adding
+49:    // one string to another
+50:    String operator+(const String& lhs, const String& rhs)
+51:    {
+52:       int  totalLen = lhs.GetLen() + rhs.GetLen();
+53:       String temp(totalLen);
+54:       for (int i = 0; i<lhs.GetLen(); i++)
+55:          temp[i] = lhs[i];
+56:       for (int j = 0; j<rhs.GetLen(); j++, i++)
+57:          temp[i] = rhs[j];
+58:       temp[totalLen]='\0';
+59:       return temp;
+60:    }
+61:
+62:    int main()
+63:    {
+64:       String s1("String One ");
+65:       String s2("String Two ");
+66:       char *c1 = { "C-String One " } ;
+67:       String s3;
+68:       String s4;
+69:       String s5;
+70:
+71:       cout << "s1: " << s1.GetString() << endl;
+72:       cout << "s2: " << s2.GetString() << endl;
+73:       cout << "c1: " << c1 << endl;
+74:       s3 = s1 + s2;
+75:       cout << "s3: " << s3.GetString() << endl;
+76:       s4 = s1 + c1;
+77:       cout << "s4: " << s4.GetString() << endl;
+78:       s5 = c1 + s1;
+79:       cout << "s5: " << s5.GetString() << endl;
+80:     return 0;
+81: }
+
+Output: s1: String One
+s2: String Two
+c1: C-String One
+s3: String One String Two
+s4: String One C-String One
+s5: C-String One String Two
+
+Analysis: The implementation of all of the string methods except operator+ are unchanged from Listing 15.1, and so are left out of this listing. On line 20, a new operator+ is overloaded to take two constant string references and to return a string, and this function is declared to be a friend.
+
+Note that this operator+ is not a member function of this or any other class. It is declared within the declaration of the String class only so that it can be made a friend, but because it is declared no other function prototype is needed.
+
+The implementation of this operator+ is on lines 50-60. Note that it is similar to the earlier operator+, except that it takes two strings and accesses them both through their public accessor methods.
+
+The driver program demonstrates the use of this function on line 78, where operator+ is now called on a C-style string!
+Friend Functions
+
+Declare a function to be a friend by using the keyword friend and then the full specification of the function. Declaring a function to be a friend does not give the friend function access to your this pointer, but it does provide full access to all private and protected member data and functions. Example
+
+class PartNode
+{
+// make another class's member function a          _friend
+friend void PartsList::Insert(Part *);  
+// make a global function a friend };
+friend int SomeFunction();              
+
+Overloading the Insertion Operator
+
+You are finally ready to give your String class the ability to use cout like any other type. Until now, when you've wanted to print a string, you've been forced to write the following:
+
+cout << theString.GetString();
+
+What you would like to do is write this:
+
+cout << theString;
+
+To accomplish this, you must override operator<<(). Day 16, "Streams," presents the ins and outs (cins and couts?) of working with iostreams; for now Listing 15.9 illustrates how operator<< can be overloaded using a friend function.
+
+    NOTE: To compile this listing, copy lines 33-153 from Listing 15.1 after line 31 of Listing 15.9. 
+
+Listing 15.9. Overloading operator<<().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:
+4:     class String
+5:     {
+6:        public:
+7:           // constructors
+8:           String();
+9:            String(const char *const);
+10:           String(const String &);
+11:          ~String();
+12:
+13:          // overloaded operators
+14:          char & operator[](int offset);
+15:          char operator[](int offset) const;
+16:          String operator+(const String&);
+17:          void operator+=(const String&);
+18:          String & operator= (const String &);
+19:          friend ostream& operator<<
+20:             ( ostream& theStream,String& theString);
+21:          // General accessors
+22:          int GetLen()const { return itsLen; }
+23:          const char * GetString() const { return itsString; }
+24:          // static int ConstructorCount;
+25:       private:
+26:          String (int);         // private constructor
+27:          char * itsString;
+28:          unsigned short itsLen;
+29:    };
+30:
+31:    ostream& operator<<
+32:        ( ostream& theStream,String& theString)
+33:    {
+34:        theStream << theString.GetString();
+35:        return theStream;
+36:    }
+37:    int main()
+38:    {
+39:       String theString("Hello world.");
+40:       cout << theString;
+41:     return 0;
+42: }
+Output: Hello world.
+
+Analysis: To save space, the implementation of all of String's methods is left out, as they are unchanged from the previous examples.
+
+On line 19, operator<< is declared to be a friend function that takes an ostream reference and a String reference and then returns an ostream reference. Note that this is not a member function of String. It returns a reference to an ostream so that you can concatenate calls to operator<<, such as this:
+
+cout << "myAge: " << itsAge << " years.";
+
+The implementation of this friend function is on lines 32-35. All this really does is hide the implementation details of feeding the string to the ostream, and that is just as it should be. You'll see more about overloading this operator and operator>> on Day 16.
+Summary
+
+Today you saw how to delegate functionality to a contained object. You also saw how to implement one class in terms of another by using either containment or private inheritance. Containment is restricted in that the new class does not have access to the protected members of the contained class, and it cannot override the member functions of the contained object. Containment is simpler to use than private inheritance, and should be used when possible.
+
+You also saw how to declare both friend functions and friend classes. Using a friend function, you saw how to overload the extraction operator, to allow your new classes to use cout just as the built-in classes do.
+
+Remember that public inheritance expresses is-a, containment expresses has-a, and private inheritance expresses implemented in terms of. The relationship delegates to can be expressed using either containment or private inheritance, though containment is more common.
+Q&A
+
+    Q. Why is it so important to distinguish between is-a, has-a, and implemented in terms of?
+
+    A. The point of C++ is to implement well-designed, object-oriented programs. Keeping these relationships straight helps to ensure that your design corresponds to the reality of what you are modeling. Furthermore, a well-understood design will more likely be reflected in well-designed code.
+
+    Q. Why is containment preferred over private inheritance?
+
+    A. The challenge in modern programming is to cope with complexity. The more you can use objects as black boxes, the fewer details you have to worry about and the more complexity you can manage. Contained classes hide their details; private inheritance exposes the implementation details.
+
+    Q. Why not make all classes friends of all the classes they use?
+
+    A. Making one class a friend of another exposes the implementation details and reduces encapsulation. The ideal is to keep as many of the details of each class hidden from all other classes as possible.
+
+    Q. If a function is overloaded, do you need to declare each form of the function to be a friend?
+
+    A. Yes, if you overload a function and declare it to be a friend of another class, you must declare friend for each form that you wish to grant this access to. 
+
+Workshop
+
+The Workshop contains quiz questions to help solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before going to the next chapter.
+Quiz
+
+    1. How do you establish an is-a relationship?
+
+    2. How do you establish a has-a relationship?
+
+    3. What is the difference between containment and delegation?
+
+    4. What is the difference between delegation and implemented in terms of?
+
+    5. What is a friend function?
+
+    6. What is a friend class?
+
+    7. If Dog is a friend of Boy, is Boy a friend of Dog?
+
+    8. If Dog is a friend of Boy, and Terrier derives from Dog, is Terrier a friend of Boy?
+
+    9. If Dog is a friend of Boy and Boy is a friend of House, is Dog a friend of House?
+
+    10. Where must the declaration of a friend function appear? 
+
+Exercises
+
+    1. Show the declaration of a class, Animal, that contains a datamember that is a string object.
+
+    2. Show the declaration of a class, BoundedArray, that is an array.
+
+    3. Show the declaration of a class, Set, that is declared in terms of an array.
+
+    4. Modify Listing 15.1 to provide the String class with an extraction operator (>>).
+
+    5. BUG BUSTERS: What is wrong with this program? 
+
+
+1:     #include <iostream.h>
+2:
+3:     class Animal;
+4:
+5:     void setValue(Animal& , int);
+6:
+7:
+8:     class Animal
+9:     {
+10:    public:
+11:       int GetWeight()const { return itsWeight; }
+12:       int GetAge() const { return itsAge; }
+13:    private:
+14:       int itsWeight;
+15:       int itsAge;
+16:    };
+17:
+18:    void setValue(Animal& theAnimal, int theWeight)
+19:    {
+20:       friend class Animal;
+21:       theAnimal.itsWeight = theWeight;
+22:    }
+23:
+24:    int main()
+25:    {
+26:       Animal peppy;
+27:       setValue(peppy,5);28:    }
+
+    6. Fix the listing in Exercise 5 so it compiles.
+
+    7. BUG BUSTERS: What is wrong with this code? 
+
+1:     #include <iostream.h>
+2:
+3:     class Animal;
+4:
+5:     void setValue(Animal& , int);
+6:     void setValue(Animal& ,int,int);
+7:
+8:     class Animal
+9:     {
+10:    friend void setValue(Animal& ,int);11:    private:
+12:       int itsWeight;
+13:       int itsAge;
+14:    };
+15:
+16:    void setValue(Animal& theAnimal, int theWeight)
+17:    {
+18:        theAnimal.itsWeight = theWeight;
+19:    }
+20:
+21:
+22:    void setValue(Animal& theAnimal, int theWeight, int theAge)
+23:    {
+24:       theAnimal.itsWeight = theWeight;
+25:       theAnimal.itsAge = theAge;
+26:    }
+27:
+28:    int main()
+29:    {
+30:       Animal peppy;
+31:       setValue(peppy,5);
+32:       setValue(peppy,7,9);
+33:    }
+
+    8. Fix Exercise 7 so it compiles.
+
+

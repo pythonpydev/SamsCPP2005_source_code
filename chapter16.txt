@@ -1,0 +1,1310 @@
+    Day 16
+        Streams
+            Overview of Streams
+                Encapsulation
+                    Figure 16.1. 
+                Buffering
+                    Figure 16.2.
+                    Figure 16.3.
+                    Figure 16.4.
+                    Figure 16.5. 
+            Streams and Buffers
+            Standard I/O Objects
+            Redirection
+            Input Using cin
+            Listing 16.1. cin handles different data types.
+                Strings
+                String Problems 
+            Listing 16.2. Trying to write more than one word to cin.
+            Listing 16.3. Multiple input.
+                operator>> Returns a Reference to an istream Object 
+            Other Member Functions of cin
+                Single Character Input 
+            Listing 16.4. Using get() with no parameters.
+            Listing 16.5 Using get() with parameters.
+                Getting Strings from Standard Input 
+            Listing 16.6. Using get() with a character array
+            .
+            Listing 16.7. Using getline().
+                Using cin.ignore() 
+            Listing 16.8. Using ignore().
+                peek() and putback() 
+            Listing 16.9. Using peek() and putback().
+            Output with cout
+                Flushing the Output 
+            Related Functions
+            Listing 16.10. Using put().
+            Listing 16.11. Using write().
+            Manipulators, Flags, and Formatting Instructions
+                Using cout.width() 
+            Listing 16.12. Adjusting the width of output.
+                Setting the Fill Characters 
+            Listing 16.13. Using fill().
+                Set Flags 
+            Listing 16.14. Using setf.
+            Streams Versus the printf() Function
+            Listing 16.15. Printing with printf().
+            File Input and Output
+            ofstream
+                Condition States
+                Opening Files for Input and Output 
+            Listing 16.16. Opening files for read and write.
+                Changing the Default Behavior of ofstream on Open 
+            Listing 16.17. Appending to the end of a file
+            .
+            Binary Versus Text Files
+            Listing 16.18. Writing a class to a file.
+            Command-Line Processing
+            Listing 16.19. Using command-line arguments.
+            Listing 16.20. Using command-line arguments.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 16
+Streams
+
+Until now, you've been using cout to write to the screen and cin to read from the keyboard, without a full understanding of how they work. Today, you will learn
+
+    What streams are and how they are used.
+
+    How to manage input and output using streams.
+
+    How to write to and read from files using streams. 
+
+Overview of Streams
+
+C++ does not, as part of the language, define how data is written to the screen or to a file, nor how data is read into a program. These are clearly essential parts of working with C++, however, and the standard C++ library now includes the iostream library, which facilitates input and output (I/O).
+
+The advantage of having the input and output kept apart from the language and handled in libraries is that it is easier to make the language "platform-independent." That is, you can write C++ programs on a PC and then recompile them and run them on a Sun Workstation. The compiler manufacturer just supplies the right library, and everything works. At least that's the theory.
+
+    NOTE: A library is a collection of OBJ files that can be linked to your program to provide additional functionality. This is the most basic form of code reuse, and has been around since ancient programmers chiseled 1s and 0s into the walls of caves. 
+
+Encapsulation
+
+The iostream classes view the flow of data from your program to the screen as being a stream of data, one byte following another. If the destination of the stream is a file or the screen, the source is usually some part of your program. If the stream is reversed, the data can come from the keyboard or a disk file and be "poured" into your data variables.
+
+One principal goal of streams is to encapsulate the problems of getting the data to and from the disk or the screen. Once a stream is created, your program works with the stream and the stream sweats the details. Figure 16.1 illustrates this fundamental idea.
+
+Figure 16.1. Encapsulation through streams.
+Buffering
+
+Writing to the disk (and to a lesser extent the screen) is very "expensive." It takes a long time (relatively speaking) to write data to the disk or to read data from the disk, and execution of the program is generally blocked by disk writes and reads. To solve this problem, streams provide "buffering." Data is written into the stream, but it is not written back out to the disk immediately. Instead, the stream's buffer fills and fills, and when it is full it writes to the disk all at once.
+
+Picture water trickling into the top of a tank, and the tank filling and filling, but no water running out of the bottom. Figure 16.2 illustrates this idea.
+
+When the water (data) reaches the top, the valve opens and all the water flows out in a rush. Figure 16.3 illustrates this.
+
+Once the buffer is empty, the bottom valve closes, the top valve opens, and more water flows into the buffer tank. Figure 16.4 illustrates this.
+
+Every once in a while you need to get the water out of the tank even before it is full. This is called "flushing the buffer." Figure 16.5 illustrates this idea.
+
+Figure 16.2. Filling the buffer.
+
+Figure 16.3. Emptying the buffer.
+
+Figure 16.4. Refilling the buffer.
+
+Figure 16.5. Flushing the buffer.
+Streams and Buffers
+
+As you might expect, C++ takes an object-oriented view toward implementing streams and buffers.
+
+    The streambuf class manages the buffer, and its member functions provide the capability to fill, empty, flush, and otherwise manipulate the buffer.
+
+    The ios class is the base class to the input and output stream classes. The ios class has a streambuf object as a member variable.
+
+    The istream and ostream classes derive from the ios class and specialize input and output stream behavior, respectively.
+
+    The iostream class is derived from both the istream and the ostream classes and provides input and output methods for writing to the screen.
+
+    The fstream classes provide input and output from files. 
+
+Standard I/O Objects
+
+When a C++ program that includes the iostream classes starts, four objects are created and initialized:
+
+    NOTE: The iostream class library is added automatically to your program by the compiler. All you need to do to use these functions is to put the appropriate include statement at the top of your program listing. 
+
+    cin (pronounced "see-in") handles input from the standard input, the keyboard.
+
+    cou (pronounced "see-out") handles output to the standard output, the screen.
+
+    cer (pronounced "see-err") handles unbuffered output to the standard error device, the screen. Because this is unbuffered, everything sent to cerr is written to the standard error device immediately, without waiting for the buffer to fill or for a flush command to be received.
+
+    clo (pronounced "see-log") handles buffered error messages that are output to the standard error device, the screen. It is common for this to be "redirected" to a log file, as described in the following section. 
+
+Redirection
+
+Each of the standard devices, input, output, and error, can be redirected to other devices. Standard error is often redirected to a file, and standard input and output can be piped to files using operating system commands.
+
+    New Term: Redirecting refers to sending output (or input) to a place different than the default. The redirection operators for DOS and UNIX are (<) redirect input and (>) redirect output. 
+
+Piping refers to using the output of one program as the input of another.
+
+DOS provides rudimentary redirection commands, such as redirect output (>) and (>)redirect input (<). UNIX provides more advanced redirection capabilities, but the general idea is the same: Take the output intended for the screen and write it to a file, or pipe it into another program. Alternatively, the input for a program can be extracted from a file rather than from the keyboard.
+
+Redirection is more a function of the operating system than of the iostream libraries. C++ just provides access to the four standard devices; it is up to the user to redirect the devices to whatever alternatives are needed.
+Input Using cin
+
+The global object cin is responsible for input and is made available to your program when you include iostream.h. In previous examples, you used the overloaded extraction operator (>>) to put data into your program's variables. How does this work? The syntax, as you may remember, is the following:
+
+int someVariable;
+cout << "Enter a number: ";
+cin >> someVariable;
+
+The global object cout is discussed later today; for now, focus on the third line, cin >> someVariable;. What can you guess about cin?
+
+Clearly it must be a global object, because you didn't define it in your own code. You know from previous operator experience that cin has overloaded the extraction operator (>>) and that the effect is to write whatever data cin has in its buffer into your local variable, someVariable.
+
+What may not be immediately obvious is that cin has overloaded the extraction operator for a great variety of parameters, among them int&, short&, long&, double&, float&, char&, char*, and so forth. When you write cin >> someVariable;, the type of someVariable is assessed. In the example above, someVariable is an integer, so the following function is called:
+
+istream & operator>> (int &)
+
+Note that because the parameter is passed by reference, the extraction operator is able to act on the original variable. Listing 16.1 illustrates the use of cin.
+
+Listing 16.1. cin handles different data types.
+
+1:     //Listing 16.1 -- character strings and cin
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        int myInt;
+8:        long myLong;
+9:        double myDouble;
+10:       float myFloat;
+11:       unsigned int myUnsigned;
+12:
+13:       cout << "int: ";
+14:       cin >> myInt;
+15:       cout << "Long: ";
+16:       cin >> myLong;
+17:       cout << "Double: ";
+18:       cin >> myDouble;
+19:       cout << "Float: ";
+20:       cin >> myFloat;
+21:       cout << "Unsigned: ";
+22:       cin >> myUnsigned;
+23:
+24:       cout << "\n\nInt:\t" << myInt << endl;
+25:       cout << "Long:\t" << myLong << endl;
+26:       cout << "Double:\t" << myDouble << endl;
+27:       cout << "Float:\t" << myFloat << endl;
+28:       cout << "Unsigned:\t" << myUnsigned << endl;
+29:     return 0;
+30: }
+
+Output: int: 2
+Long: 70000
+Double: 987654321
+Float: 3.33
+Unsigned: 25
+
+Int:    2
+Long:   70000
+Double: 9.87654e+08
+Float:  3.33
+Unsigned:       25
+
+Analysis: On lines 7-11, variables of various types are declared. On lines 13-22, the user is prompted to enter values for these variables, and the results are printed (using cout) on lines 24-28.
+
+The output reflects that the variables were put into the right "kinds" of variables, and the program works as you might expect.
+Strings
+
+cin can also handle character pointer (char*) arguments; thus, you can create a character buffer and use cin to fill it. For example, you can write this:
+
+char YourName[50]
+cout << "Enter your name: ";
+cin >> YourName;
+
+If you enter Jesse, the variable YourName will be filled with the characters J, e, s, s, e, \0. The last character is a null; cin automatically ends the string with a null character, and you must have enough room in the buffer to allow for the entire string plus the null. The null signals "end of string" to the standard library functions discussed on Day 21, "What's Next."
+String Problems
+
+After all this success with cin, you might be surprised when you try to enter a full name into a string. cin believes that white space is a separator. When it sees a space or a new line, it assumes the input for the parameter is complete, and in the case of strings it adds a null character right then and there. Listing 16.2 illustrates this problem.
+
+Listing 16.2. Trying to write more than one word to cin.
+
+1:     //Listing 16.2 -- character strings and cin
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        char YourName[50];
+8:        cout << "Your first name: ";
+9:        cin >> YourName;
+10:       cout << "Here it is: " << YourName << endl;
+11:       cout << "Your entire name: ";
+12:       cin >> YourName;
+13:       cout << "Here it is: " << YourName << endl;
+14:     return 0;
+15: }
+
+Output: Your first name: Jesse
+Here it is: Jesse
+Your entire name: Jesse Liberty
+Here it is: Jesse
+
+Analysis: On line 7, a character array is created to hold the user's input. On line 8, the user is prompted to enter one name, and that name is stored properly, as shown in the output.
+
+On line 11, the user is again prompted, this time for a full name. cin reads the input, and when it sees the space between the names, it puts a null character after the first word and terminates input. This is not exactly what was intended.
+
+To understand why this works this way, examine Listing 16.3, which shows input for a number of fields.
+
+Listing 16.3. Multiple input.
+
+1:     //Listing 16.3 - character strings and cin
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        int myInt;
+8:        long myLong;
+9:        double myDouble;
+10:       float myFloat;
+11:       unsigned int myUnsigned;
+12:       char myWord[50];
+13:
+14:       cout << "int: ";
+15:       cin >> myInt;
+16:       cout << "Long: ";
+17:       cin >> myLong;
+18:       cout << "Double: ";
+19:       cin >> myDouble;
+20:       cout << "Float: ";
+21:       cin >> myFloat;
+22:       cout << "Word: ";
+23:       cin >> myWord;
+24:       cout << "Unsigned: ";
+25:       cin >> myUnsigned;
+26:
+27:       cout << "\n\nInt:\t" << myInt << endl;
+28:       cout << "Long:\t" << myLong << endl;
+29:       cout << "Double:\t" << myDouble << endl;
+30:       cout << "Float:\t" << myFloat << endl;
+31:       cout << "Word: \t" << myWord << endl;
+32:       cout << "Unsigned:\t" << myUnsigned << endl;
+33:
+34:       cout << "\n\nInt, Long, Double, Float, Word, Unsigned: ";
+35:       cin >> myInt >> myLong >> myDouble;
+36:       cin >> myFloat >> myWord >> myUnsigned;
+37:       cout << "\n\nInt:\t" << myInt << endl;
+38:       cout << "Long:\t" << myLong << endl;
+39:       cout << "Double:\t" << myDouble << endl;
+40:       cout << "Float:\t" << myFloat << endl;
+41:       cout << "Word: \t" << myWord << endl;
+42:       cout << "Unsigned:\t" << myUnsigned << endl;
+43:
+44:
+45:     return 0;
+46: }
+
+Output: Int: 2
+Long: 30303
+Double: 393939397834
+Float: 3.33
+Word: Hello
+Unsigned: 85
+
+Int:    2
+Long:   30303
+Double: 3.93939e+11
+Float:  3.33
+Word:   Hello
+Unsigned:       85
+
+Int, Long, Double, Float, Word, Unsigned: 3 304938 393847473 6.66 bye -2
+
+Int:    3
+Long:   304938
+Double: 3.93847e+08
+Float:  6.66
+Word:   bye
+
+
+Unsigned:       65534
+
+Analysis: Once again, a number of variables are created, this time including a char array. The user is prompted for input and the output is faithfully printed.
+
+On line 34, the user is prompted for all the input at once, and then each "word" of input is assigned to the appropriate variable. It is in order to facilitate this kind of multiple assignment that cin must consider each word in the input to be the full input for each variable. If cin was to consider the entire input to be part of one variable's input, this kind of concatenated input would be impossible.
+
+Note that on line 35 the last object requested was an unsigned integer, but the user entered -2. Because cin believes it is writing to an unsigned integer, the bit pattern of -2 was evaluated as an unsigned integer, and when written out by cout, the value 65534 was displayed. The unsigned value 65534 has the exact bit pattern of the signed value -2.
+
+Later in this chapter you will see how to enter an entire string into a buffer, including multiple words. For now, the question arises, "How does the extraction operator manage this trick of concatenation?"
+operator>> Returns a Reference to an istream Object
+
+The return value of cin is a reference to an istream object. Because cin itself is an istream object, the return value of one extraction operation can be the input to the next extraction.
+
+int VarOne, varTwo, varThree;
+cout << "Enter three numbers: "
+cin >> VarOne >> varTwo >> varThree;
+
+When you write cin >> VarOne >> varTwo >> varThree;, the first extraction is evaluated (cin >> VarOne). The return value from this is another istream object, and that object's extraction operator gets the variable varTwo. It is as if you had written this:
+
+((cin >> varOne) >> varTwo) >> varThree;
+
+You'll see this technique repeated later when cout is discussed.
+Other Member Functions of cin
+
+In addition to overloading operator>>, cin has a number of other member functions. These are used when finer control over the input is required.
+Single Character Input
+
+operator>> taking a character reference can be used to get a single character from the standard input. The member function get() can also be used to obtain a single character, and can do so in two ways. get() can be used with no parameters, in which case the return value is used, or it can be used with a reference to a character. Using get() with No Parameters The first form of get() is without parameters. This returns the value of the character found, and will return EOF (end of file) if the end of the file is reached. get() with no parameters is not often used. It is not possible to concatenate this use of get() for multiple input, because the return value is not an iostream object. Thus, the following won't work:
+
+cin.get() >>myVarOne >> myVarTwo; //   illegal
+
+The return value of (cin.get() >> myVarOne) is an integer, not an iostream object.
+
+A common use of get() with no parameters is illustrated in Listing 16.4.
+
+Listing 16.4. Using get() with no parameters.
+
+1:     // Listing 16.4 - Using get() with no parameters
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char ch;
+7:        while ( (ch = cin.get()) != EOF)
+8:        {
+9:           cout << "ch: " << ch << endl;
+10:       }
+11:       cout << "\nDone!\n";
+12:     return 0;
+13: }
+
+    NOTE: To exit this program, you must send end of file from the keyboard. On DOS computers use Ctrl+Z; on UNIX units use Ctrl+D. 
+
+Output: Hello
+ch: H
+ch: e
+ch: l
+ch: l
+ch: o
+ch:
+
+World
+ch: W
+ch: o
+ch: r
+ch: l
+ch: d
+ch:
+
+ (ctrl-z)
+Done!
+
+Analysis: On line 6, a local character variable is declared. The while loop assigns the input received from cin.get() to ch, and if it is not EOF the string is printed out. This output is buffered until an end of line is read, however. Once EOF is encountered (by pressing Ctrl+Z on a DOS machine, or Ctrl+D on a UNIX machine), the loop exits.
+
+Note that not every implementation of istream supports this version of get(). Using get() with a Character Reference Parameter When a character is passed as input to get(), that character is filled with the next character in the input stream. The return value is an iostream object, and so this form of get() can be concatenated, as illustrated in Listing 16.5.
+
+Listing 16.5 Using get() with parameters.
+
+1:     // Listing 16.5 - Using get() with parameters
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char a, b, c;
+7:
+8:        cout << "Enter three letters: ";
+9:
+10:       cin.get(a).get(b).get(c);
+11:
+12:       cout << "a: " << a << "\nb: " << b << "\nc: " << c << endl;
+13:     return 0;
+14: }
+
+Output: Enter three letters: one
+a: o
+b: n
+c: e
+
+Analysis: On line 6, three character variables are created. On line 10, cin.get() is called three times, concatenated. First cin.get(a) is called. This puts the first letter into a and returns cin so that when it is done, cin.get(b) is called, putting the next letter into b. The end result of this is that cin.get(c) is called and the third letter is put in c.
+
+Because cin.get(a) evaluates to cin, you could have written this:
+
+cin.get(a) >> b;
+
+In this form, cin.get(a) evaluates to cin, so the second phrase is cin >> b;.
+
+    DO use the extraction operator (>>) when you need to skip over white space. DO use get() with a character parameter when you need to examine every character, including white space. DON'T use get() with no parameters at all; it is more or less obsolete. 
+
+Getting Strings from Standard Input
+
+The extraction operator (>>) can be used to fill a character array, as can the member functions get() and getline().
+
+The final form of get() takes three parameters. The first parameter is a pointer to a character array, the second parameter is the maximum number of characters to read plus one, and the third parameter is the termination character.
+
+If you enter 20 as the second parameter, get() will read 19 characters and then will null-terminate the string, which it will store in the first parameter. The third parameter, the termination character, defaults to newline (`\n'). If a termination character is reached before the maximum number of characters is read, a null is written and the termination character is left in the buffer.
+
+Listing 16.6 illustrates the use of this form of get().
+
+Listing 16.6. Using get() with a character array.
+
+1:     // Listing 16.6 - Using get() with a character array
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char stringOne[256];
+7:        char stringTwo[256];
+8:
+9:        cout << "Enter string one: ";
+10:       cin.get(stringOne,256);
+11:       cout << "stringOne: " << stringOne << endl;
+12:
+13:       cout << "Enter string two: ";
+14:       cin >> stringTwo;
+15:       cout << "StringTwo: " << stringTwo << endl;
+16:     return 0;
+17: }
+
+Output: Enter string one: Now is the time
+stringOne: Now is the time
+Enter string two: For all good
+StringTwo: For
+
+Analysis: On lines 6 and 7, two character arrays are created. On line 9, the user is prompted to enter a string, and cin.get() is called on line 10. The first parameter is the buffer to fill, and the second is one more than the maximum number for get() to accept (the extra position being given to the null character, (`\0')). The defaulted third parameter is a newline.
+
+The user enters Now is the time. Because the user ends the phrase with a newline, that phrase is put into stringOne, followed by a terminating null.
+
+The user is prompted for another string on line 13, and this time the extraction operator is used. Because the extraction operator takes everything up to the first white space, the string For, with a terminating null character, is stored in the second string, which of course is not what was intended.
+
+Another way to solve this problem is to use getline(), as illustrated in Listing 16.7.
+
+Listing 16.7. Using getline().
+
+1:     // Listing 16.7 - Using getline()
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char stringOne[256];
+7:        char stringTwo[256];
+8:        char stringThree[256];
+9:
+10:       cout << "Enter string one: ";
+11:       cin.getline(stringOne,256);
+12:       cout << "stringOne: " << stringOne << endl;
+13:
+14:       cout << "Enter string two: ";
+15:       cin >> stringTwo;
+16:       cout << "stringTwo: " << stringTwo << endl;
+17:
+18:       cout << "Enter string three: ";
+19:       cin.getline(stringThree,256);
+20:       cout << "stringThree: " << stringThree << endl;
+21:     return 0;
+22: }
+
+Output: Enter string one: one two three
+stringOne: one two three
+Enter string two: four five six
+stringTwo: four
+Enter string three: stringThree: five six
+
+Analysis: This example warrants careful examination; there are some potential surprises. On lines 6-8, three character arrays are declared.
+
+On line 10, the user is prompted to enter a string, and that string is read by getline(). Like get(), getline() takes a buffer and a maximum number of characters. Unlike get(), however, the terminating newline is read and thrown away. With get() the terminating newline is not thrown away. It is left in the input buffer.
+
+On line 14, the user is prompted again, and this time the extraction operator is used. The user enters four five six, and the first word, four, is put in stringTwo. The string Enter string three is then displayed, and getline() is called again. Because five six is still in the input buffer, it is immediately read up to the newline; getline() terminates and the string in stringThree is printed on line 20.
+
+The user has no chance to enter string three, because the second getline() call is fulfilled by the string remaining in the input buffer after the call to the extraction operator on line 15.
+
+The extraction operator (>>) reads up to the first white space and puts the word into the character array.
+
+The member function get() is overloaded. In one version, it takes no parameters and returns the value of the character it receives. In the second version, it takes a single character reference and returns the istream object by reference.
+
+In the third and final version, get() takes a character array, a number of characters to get, and a termination character (which defaults to newline). This version of get() reads characters into the array until it gets to one fewer than its maximum number of characters or it encounters the termination character, whichever comes first. If get() encounters the termination character, it leaves that character in the input buffer and stops reading characters.
+
+The member function getline() also takes three parameters: the buffer to fill, one more than the maximum number of characters to get, and the termination character. getline()functions exactly like get() does with these parameters, except getline() throws away the terminating character.
+Using cin.ignore()
+
+At times you want to ignore the remaining characters on a line until you hit either end of line (EOL) or end of file (EOF). The member function ignore() serves this purpose. ignore() takes two parameters, the maximum number of characters to ignore and the termination character. If you write ignore(80,'\n'), up to 80 characters will be thrown away until a newline character is found. The newline is then thrown away and the ignore() statement ends. Listing 16.8 illustrates the use of ignore().
+
+Listing 16.8. Using ignore().
+
+1:     // Listing 16.8 - Using ignore()
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char stringOne[255];
+7:        char stringTwo[255];
+8:
+9:        cout << "Enter string one:";
+10:       cin.get(stringOne,255);
+11:       cout << "String one" << stringOne << endl;
+12:
+13:       cout << "Enter string two: ";
+14:       cin.getline(stringTwo,255);
+15:       cout << "String two: " << stringTwo << endl;
+16:
+17:       cout << "\n\nNow try again...\n";
+18:
+19:       cout << "Enter string one: ";
+20:       cin.get(stringOne,255);
+21:       cout << "String one: " << stringOne<< endl;
+22:
+23:       cin.ignore(255,'\n');
+24:
+25:       cout << "Enter string two: ";
+26:       cin.getline(stringTwo,255);
+27:       cout << "String Two: " << stringTwo<< endl;
+28:     return 0;
+29: }
+
+Output: Enter string one:once upon a time
+String oneonce upon a time
+Enter string two: String two:
+
+Now try again...
+Enter string one: once upon a time
+String one: once upon a time
+Enter string two: there was a
+String Two: there was a
+
+Analysis: On lines 6 and 7, two character arrays are created. On line 9, the user is prompted for input and types once upon a time, followed by Enter. On line 10, get() is used to read this string. get() fills stringOne and terminates on the newline, but leaves the newline character in the input buffer.
+
+On line 13, the user is prompted again, but the getline() on line 14 reads the newline that is already in the buffer and terminates immediately, before the user can enter any input.
+
+On line 19, the user is prompted again and puts in the same first line of input. This time, however, on line 23, ignore() is used to "eat" the newline character. Thus, when the getline() call on line 26 is reached, the input buffer is empty, and the user can input the next line of the story.
+peek() and putback()
+
+The input object cin has two additional methods that can come in rather handy: peek(), which looks at but does not extract the next character, and putback(), which inserts a character into the input stream. Listing 16.9 illustrates how these might be used.
+
+Listing 16.9. Using peek() and putback().
+
+1:     // Listing 16.9 - Using peek() and putback()
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        char ch;
+7:        cout << "enter a phrase: ";
+8:        while ( cin.get(ch) )
+9:        {
+10:          if (ch == `!')
+11:             cin.putback(`$');
+12:          else
+13:             cout << ch;
+14:          while (cin.peek() == `#')
+15:             cin.ignore(1,'#');
+16:       }
+17:     return 0;
+18: }
+
+Output: enter a phrase: Now!is#the!time#for!fun#!
+Now$isthe$timefor$fun$
+
+Analysis: On line 6, a character variable, ch, is declared, and on line 7, the user is prompted to enter a phrase. The purpose of this program is to turn any exclamation marks (!) into dollar signs ($) and to remove any pound symbols (#).
+
+The program loops as long as it is getting characters other than the end of file (remember that cin.get() returns 0 for end of file). If the current character is an exclamation point, it is thrown away and the $ symbol is put back into the input buffer; it will be read the next time through. If the current item is not an exclamation point, it is printed. The next character is "peeked" at, and when pound symbols are found, they are removed.
+
+This is not the most efficient way to do either of these things (and it won't find a pound symbol if it is the first character), but it does illustrate how these methods work. They are relatively obscure, so don't spend a lot of time worrying about when you might really use them. Put them into your bag of tricks; they'll come in handy sooner or later.
+
+    TIP: peek() and putback() are typically used for parsing strings and other data, such as when writing a compiler. 
+
+Output with cout
+
+You have used cout along with the overloaded insertion operator (<<) to write strings, integers, and other numeric data to the screen. It is also possible to format the data, aligning columns and writing the numeric data in decimal and hexadecimal. This section will show you how.
+Flushing the Output
+
+You've already seen that using endl will flush the output buffer. endl calls cout's member function flush(), which writes all of the data it is buffering. You can call the flush() method directly, either by calling the flush() member method or by writing the following:
+
+cout << flush
+
+This can be convenient when you need to ensure that the output buffer is emptied and that the contents are written to the screen.
+Related Functions
+
+Just as the extraction operator can be supplemented with get() and getline(), the insertion operator can be supplemented with put() and write().
+
+The function put() is used to write a single character to the output device. Because put() returns an ostream reference, and because cout is an ostream object, you can concatenate put() just as you do the insertion operator. Listing 16.10 illustrates this idea.
+
+Listing 16.10. Using put().
+
+1:     // Listing 16.10 - Using put()
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        cout.put(`H').put(`e').put(`l').put(`l').put(`o').put(`\n');
+7:     return 0;
+8: }
+Output: Hello
+
+Analysis: Line 6 is evaluated like this: cout.put(`H') writes the letter H to the screen and returns the cout object. This leaves the following:
+
+cout.put(`e').put(`l').put(`l').put(`o').put(`\n');
+
+The letter e is written, leaving cout.put(`l'). This process repeats, each letter being written and the cout object returned until the final character (`\n') is written and the function returns.
+
+The function write() works just like the insertion operator (<<), except that it takes a parameter that tells the function the maximum number of characters to write. Listing 16.11 illustrates its use.
+
+Listing 16.11. Using write().
+
+1:     // Listing 16.11 - Using write()
+2:     #include <iostream.h>
+3:     #include <string.h>
+4:
+5:     int main()
+6:     {
+7:        char One[] = "One if by land";
+8:
+9:
+10:
+11:       int fullLength = strlen(One);
+12:       int tooShort = fullLength -4;
+13:       int tooLong = fullLength + 6;
+14:
+15:       cout.write(One,fullLength) << "\n";
+16:       cout.write(One,tooShort) << "\n";
+17:       cout.write(One,tooLong) << "\n";
+18:     return 0;
+19: }
+
+Output: One if by land
+One if by
+One if by land i?!
+
+    NOTE: The last line of output may look different on your computer. 
+
+Analysis: On line 7, one phrase is created. On line 11, the integer fullLength is set to the length of the phrase and tooShort is set to that length minus four, while tooLong is set to fullLength plus six.
+
+On line 15, the complete phrase is printed using write(). The length is set to the actual length of the phrase, and the correct phrase is printed.
+
+On line 16, the phrase is printed again, but is four characters shorter than the full phrase, and that is reflected in the output.
+
+On line 17, the phrase is printed again, but this time write() is instructed to write an extra six characters. Once the phrase is written, the next six bytes of contiguous memory are written.
+Manipulators, Flags, and Formatting Instructions
+
+The output stream maintains a number of state flags, determining which base (decimal or hexadecimal) to use, how wide to make the fields, and what character to use to fill in fields. A state flag is just a byte whose individual bits are each assigned a special meaning. Manipulating bits in this way is discussed on Day 21. Each of ostream's flags can be set using member functions and manipulators.
+Using cout.width()
+
+The default width of your output will be just enough space to print the number, character, or string in the output buffer. You can change this by using width(). Because width() is a member function, it must be invoked with a cout object. It only changes the width of the very next output field and then immediately reverts to the default. Listing 16.12 illustrates its use.
+
+Listing 16.12. Adjusting the width of output.
+
+1:     // Listing 16.12 - Adjusting the width of output
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        cout << "Start >";
+7:        cout.width(25);
+8:        cout << 123 << "< End\n";
+9:
+10:       cout << "Start >";
+11:       cout.width(25);
+12:       cout << 123<< "< Next >";
+13:       cout << 456 << "< End\n";
+14:
+15:       cout << "Start >";
+16:       cout.width(4);
+17:       cout << 123456 << "< End\n";
+18:
+19:     return 0;
+20: }
+
+Output: Start >                  123< End
+Start >                  123< Next >456< End
+Start >123456< End
+
+Analysis: The first output, on lines 6-8, prints the number 123 within a field whose width is set to 25 on line 7. This is reflected in the first line of output.
+
+The second line of output first prints the value 123 in the same field whose width is set to 25, and then prints the value 456. Note that 456 is printed in a field whose width is reset to just large enough; as stated, the effect of width() lasts only as long as the very next output.
+
+The final output reflects that setting a width that is smaller than the output is exactly like setting a width that is just large enough.
+Setting the Fill Characters
+
+Normally cout fills the empty field created by a call to width() with spaces, as shown above. At times you may want to fill the area with other characters, such as asterisks. To do this, you call fill() and pass in as a parameter the character you want used as a fill character. Listing 16.13 illustrates this.
+
+Listing 16.13. Using fill().
+
+1:     // Listing 16.3 - fill()
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        cout << "Start >";
+8:        cout.width(25);
+9:        cout << 123 << "< End\n";
+10:
+11:
+12:        cout << "Start >";
+13:       cout.width(25);
+14:       cout.fill(`*');
+15:       cout << 123 << "< End\n";
+16:     return 0;
+17: }
+
+Output: Start >                  123< End
+Start >******************123< End
+
+Analysis: Lines 7-9 repeat the functionality from the previous example. Lines 12-15 repeat this again, but this time, on line 14, the fill character is set to asterisks, as reflected in the output.
+Set Flags
+
+The iostream objects keep track of their state by using flags. You can set these flags by calling setf() and passing in one or another of the predefined enumerated constants.
+
+    New Term: Objects are said to have state when some or all of their data represents a condition that can change during the course of the program. 
+
+For example, you can set whether or not to show trailing zeros (so that 20.00 does not become truncated to 20). To turn trailing zeros on, call setf(ios::showpoint).
+
+The enumerated constants are scoped to the iostream class (ios) and thus are called with the full qualification ios::flagname, such as ios::showpoint.
+
+You can turn on the plus sign (+) before positive numbers by using ios::showpos. You can change the alignment of the output by using ios::left, ios::right, or ios::internal.
+
+Finally, you can set the base of the numbers for display by using ios::dec (decimal), ios::oct (octal--base eight), or ios::hex (hexadecimal--base sixteen). These flags can also be concatenated into the insertion operator. Listing 16.14 illustrates these settings. As a bonus, Listing 16.14 also introduces the setw manipulator, which sets the width but can also be concatenated with the insertion operator.
+
+Listing 16.14. Using setf.
+
+1:     // Listing 16.14 - Using setf
+2:     #include <iostream.h>
+3:     #include <iomanip.h>
+4:
+5:     int main()
+6:     {
+7:        const int number = 185;
+8:        cout << "The number is " << number << endl;
+9:
+10:       cout << "The number is " << hex <<  number << endl;
+11:
+12:       cout.setf(ios::showbase);
+13:       cout << "The number is " << hex <<  number << endl;
+14:
+15:       cout << "The number is " ;
+16:       cout.width(10);
+17:       cout << hex << number << endl;
+18:
+19:       cout << "The number is " ;
+20:       cout.width(10);
+21:       cout.setf(ios::left);
+22:       cout << hex << number << endl;
+23:
+24:       cout << "The number is " ;
+25:       cout.width(10);
+26:       cout.setf(ios::internal);
+27:       cout << hex << number << endl;
+28:
+29:       cout << "The number is:" << setw(10) << hex << number << endl;
+30:     return 0;
+31: }
+
+Output: The number is 185
+The number is b9
+The number is 0xb9
+The number is         0xb9
+The number is 0xb9
+The number is 0x        b9
+The number is:0x        b9
+
+Analysis: On line 7, the constant int number is initialized to the value 185. This is displayed on line 8.
+
+The value is displayed again on line 10, but this time the manipulator hex is concatenated, causing the value to be displayed in hexadecimal as b9. (b=11; 11*16=176+9=185).
+
+On line 12, the flag showbase is set. This causes the prefix 0x to be added to all hexadecimal numbers, as reflected in the output.
+
+On line 16, the width is set to 10, and the value is pushed to the extreme right. On line 20, the width is again set to 10, but this time the alignment is set to the left, and the number is again printed flush left.
+
+On line 25, once again the width is set to 10, but this time the alignment is internal. Thus the 0x is printed flush left, but the value, b9, is printed flush right.
+
+Finally, on line 29, the concatenation operator setw() is used to set the width to 10, and the value is printed again.
+Streams Versus the printf() Function
+
+Most C++ implementations also provide the standard C I/O libraries, including the printf() statement. Although printf() is in some ways easier to use than cout, it is far less desirable.
+
+printf() does not provide type safety, so it is easy to inadvertently tell it to display an integer as if it was a character and vice versa. printf() also does not support classes, and so it is not possible to teach it how to print your class data; you must feed each class member to printf() one by one.
+
+On the other hand, printf() does make formatting much easier, because you can put the formatting characters directly into the printf() statement. Because printf() has its uses and many programmers still make extensive use of it, this section will briefly review its use.
+
+To use printf(), be sure to include the STDIO.H header file. In its simplest form, printf() takes a formatting string as its first parameter and then a series of values as its remaining parameters.
+
+The formatting string is a quoted string of text and conversion specifiers. All conversion specifiers must begin with the percent symbol (%). The common conversion specifiers are presented in Table 16.1.
+
+Table 16.1. The Common Conversion Specifiers.
+Specifier 	Used For
+%s 	strings
+%d 	integers
+%l 	long integer
+%ld 	long integers
+%f 	float
+
+
+Each of the conversion specifiers can also provide a width statement and a precision statement, expressed as a float, where the digits to the left of the decimal are used for the total width, and the digits to the right of the decimal provide the precision for floats. Thus, %5d is the specifier for a five-digit-wide integer, and %15.5f is the specifier for a 15-digit-wide float, of which the final five digits are dedicated to the decimal portion. Listing 16.15 illustrates various uses of printf().
+
+Listing 16.15. Printing with printf().
+
+1:     #include <stdio.h>
+2:     int main()
+3:     {
+4:        printf("%s","hello world\n");
+5:
+6:        char *phrase = "Hello again!\n";
+7:        printf("%s",phrase);
+8:
+9:        int x = 5;
+10:       printf("%d\n",x);
+11:
+12:       char *phraseTwo = "Here's some values: ";
+13:       char *phraseThree = " and also these: ";
+14:       int y = 7, z = 35;
+15:       long longVar = 98456;
+16:       float floatVar =  8.8;
+17:
+18:       printf("%s %d %d %s %ld %f\n",phraseTwo,y,z,phraseThree,longVar,floatVar);
+19:
+20:       char *phraseFour = "Formatted: ";
+21:       printf("%s %5d %10d  %10.5f\n",phraseFour,y,z,floatVar);
+22:     return 0;
+23: }
+
+Output: hello world
+Hello again!
+5
+Here's some values: 7 35  and also these: 98456 8.800000
+Formatted:      7        35     8.800000
+
+Analysis: The first printf() statement, on line 4, uses the standard form: the term printf, followed by a quoted string with a conversion specifier (in this case %s), followed by a value to insert into the conversion specifier.
+
+The %s indicates that this is a string, and the value for the string is, in this case, the quoted string "hello world".
+
+The second printf() statement is just like the first, but this time a char pointer is used, rather than quoting the string right in place in the printf() statement.
+
+The third printf(), on line 10, uses the integer conversion specifier, and for its value the integer variable x. The fourth printf() statement, on line 18, is more complex. Here six values are concatenated. Each conversion specifier is supplied, and then the values are provided, separated by commas.
+
+Finally, on line 21, format specifications are used to specify width and precision. As you can see, all of this is somewhat easier than using manipulators.
+
+As stated previously, however, the limitation here is that there is no type checking and printf() cannot be declared a friend or member function of a class. So if you want to print the various member data of a class, you must feed each accessor method to the printf() statement explicitly.
+File Input and Output
+
+Streams provide a uniform way of dealing with data coming from the keyboard or the hard disk and going out to the screen or hard disk. In either case, you can use the insertion and extraction operators or the other related functions and manipulators. To open and close files, you create ifstream and ofstream objects as described in the next few sections.
+ofstream
+
+The particular objects used to read from or write to files are called ofstream objects. These are derived from the iostream objects you've been using so far.
+
+To get started with writing to a file, you must first create an ofstream object, and then associate that object with a particular file on your disk. To use ofstream objects, you must be sure to include fstream.h in your program.
+
+    NOTE: Because fstream.h includes iostream.h, there is no need for you to include iostream explicitly. 
+
+Condition States
+
+The iostream objects maintain flags that report on the state of your input and output. You can check each of these flags using the Boolean functions eof(), bad(), fail(), and good(). The function eof() returns true if the iostream object has encountered EOF, end of file. The function bad() returns TRUE if you attempt an invalid operation. The function fail() returns TRUE anytime bad() is true or an operation fails. Finally, the function good() returns TRUE anytime all three of the other functions are FALSE.
+Opening Files for Input and Output
+
+To open the file myfile.cpp with an ofstream object, declare an instance of an ofstream object and pass in the filename as a parameter:
+
+ofstream fout("myfile.cpp");
+
+Opening this file for input works exactly the same way, except it uses an ifstream object:
+
+ifstream fin("myfile.cpp");
+
+Note that fout and fin are names you assign; here fout has been used to reflect its similarity to cout, and fin has been used to reflect its similarity to cin.
+
+One important file stream function that you will need right away is close(). Every file stream object you create opens a file for either reading or writing (or both). It is important to close() the file after you finish reading or writing; this ensures that the file won't be corrupted and that the data you've written is flushed to the disk.
+
+Once the stream objects are associated with files, they can be used like any other stream objects. Listing 16.16 illustrates this.
+
+Listing 16.16. Opening files for read and write.
+
+1:     #include <fstream.h>
+2:     int main()
+3:     {
+4:        char fileName[80];
+5:        char buffer[255];    // for user input
+6:        cout << "File name: ";
+7:        cin >> fileName;
+8:
+9:        ofstream fout(fileName);  // open for writing
+10:       fout << "This line written directly to the file...\n";
+11:       cout << "Enter text for the file: ";
+12:       cin.ignore(1,'\n');  // eat the newline after the file name
+13:       cin.getline(buffer,255);  // get the user's input
+14:       fout << buffer << "\n";   // and write it to the file
+15:       fout.close();             // close the file, ready for reopen
+16:
+17:       ifstream fin(fileName);    // reopen for reading
+18:       cout << "Here's the contents of the file:\n";
+19:       char ch;
+20:       while (fin.get(ch))
+21:          cout << ch;
+22:
+23:       cout << "\n***End of file contents.***\n";
+24:
+25:       fin.close();            // always pays to be tidy
+26:     return 0;
+27: }
+
+Output: File name: test1
+Enter text for the file: This text is written to the file!
+Here's the contents of the file:
+This line written directly to the file...
+This text is written to the file!
+
+***End of file contents.***
+
+Analysis: On line 4, a buffer is set aside for the filename, and on line 5 another buffer is set aside for user input. The user is prompted to enter a filename on line 6, and this response is written to the fileName buffer. On line 9, an ofstream object is created, fout, which is associated with the new filename. This opens the file; if the file already exists, its contents are thrown away.
+
+On line 10, a string of text is written directly to the file. On line 11, the user is prompted for input. The newline character left over from the user's input of the filename is eaten on line 12, and the user's input is stored into buffer on line 13. That input is written to the file along with a newline character on line 14, and then the file is closed on line 15.
+
+On line 17, the file is reopened, this time in input mode, and the contents are read, one character at a time, on lines 20 and 21.
+Changing the Default Behavior of ofstream on Open
+
+The default behavior upon opening a file is to create the file if it doesn't yet exist and to truncate the file (that is, delete all its contents) if it does exist. If you don't want this default behavior, you can explicitly provide a second argument to the constructor of your ofstream object.
+
+Valid arguments include:
+
+    ios::app--Appends to the end of existing files rather than truncating them.
+
+    ios::at--Places you at the end of the file, but you can write data anywhere in the file.
+
+    ios::trun--The default. Causes existing files to be truncated.
+
+    ios::nocreat--If the file does not exist, the open fails.
+
+    ios::noreplac--If the file does already exist, the open fails. 
+
+Note that app is short for append; ate is short for at end, and trunc is short for truncate. Listing 16.17 illustrates using append by reopening the file from Listing 16.16 and appending to it.
+
+Listing 16.17. Appending to the end of a file.
+
+1:     #include <fstream.h>
+2:     int main()   // returns 1 on error
+3:     {
+4:        char fileName[80];
+5:        char buffer[255];
+6:        cout << "Please re-enter the file name: ";
+7:        cin >> fileName;
+8:
+9:        ifstream fin(fileName);
+10:       if (fin)                // already exists?
+11:       {
+12:          cout << "Current file contents:\n";
+13:          char ch;
+14:          while (fin.get(ch))
+15:             cout << ch;
+16:          cout << "\n***End of file contents.***\n";
+17:       }
+18:       fin.close();
+19:
+20:       cout << "\nOpening " << fileName << " in append mode...\n";
+21:
+22:       ofstream fout(fileName,ios::app);
+23:       if (!fout)
+24:       {
+25:          cout << "Unable to open " << fileName << " for appending.\n";
+26:          return(1);
+27:       }
+28:
+29:       cout << "\nEnter text for the file: ";
+30:       cin.ignore(1,'\n');
+31:       cin.getline(buffer,255);
+32:       fout << buffer << "\n";
+33:       fout.close();
+34:
+35:       fin.open(fileName);  // reassign existing fin object!
+36:       if (!fin)
+37:       {
+38:          cout << "Unable to open " << fileName << " for reading.\n";
+39:          return(1);
+40:       }
+41:       cout << "\nHere's the contents of the file:\n";
+42:       char ch;
+43:       while (fin.get(ch))
+44:          cout << ch;
+45:       cout << "\n***End of file contents.***\n";
+46:       fin.close();
+47:       return 0;
+48: }
+
+Output: Please re-enter the file name: test1
+Current file contents:
+This line written directly to the file...
+This text is written to the file!
+
+***End of file contents.***
+
+Opening test1 in append mode...
+
+Enter text for the file: More text for the file!
+
+Here's the contents of the file:
+This line written directly to the file...
+This text is written to the file!
+More text for the file!
+
+***End of file contents.***
+
+Analysis: The user is again prompted to enter the filename. This time an input file stream object is created on line 9. That open is tested on line 10, and if the file already exists, its contents are printed on lines 12 to 16. Note that if(fin) is synonymous with if (fin.good()).
+
+The input file is then closed, and the same file is reopened, this time in append mode, on line 22. After this open (and every open), the file is tested to ensure that the file was opened properly. Note that if(!fout) is the same as testing if (fout.fail()). The user is then prompted to enter text, and the file is closed again on line 33.
+
+Finally, as in Listing 16.16, the file is reopened in read mode; however, this time fin does not need to be redeclared. It is just reassigned to the same filename. Again the open is tested, on line 36, and if all is well, the contents of the file are printed to the screen and the file is closed for the final time.
+
+    DO test each open of a file to ensure that it opened successfully. DO reuse existing ifstream and ofstream objects. DO close all fstream objects when you are done using them. DON'T try to close or reassign cin or cout. 
+
+Binary Versus Text Files
+
+Some operating systems, such as DOS, distinguish between text files and binary files. Text files store everything as text (as you might have guessed), so large numbers such as 54,325 are stored as a string of numerals (`5', `4', `,', `3', `2', `5'). This can be inefficient, but has the advantage that the text can be read using simple programs such as the DOS program type.
+
+To help the file system distinguish between text and binary files, C++ provides the ios::binary flag. On many systems, this flag is ignored because all data is stored in binary format. On some rather prudish systems, the ios::binary flag is illegal and won't compile!
+
+Binary files can store not only integers and strings, but entire data structures. You can write all the data at one time by using the write() method of fstream.
+
+If you use write(), you can recover the data using read(). Each of these functions expects a pointer to character, however, so you must cast the address of your class to be a pointer to character.
+
+The second argument to these functions is the number of characters to write, which you can determine using sizeof(). Note that what is being written is just the data, not the methods. What is recovered is just data. Listing 16.18 illustrates writing the contents of a class to a file.
+
+Listing 16.18. Writing a class to a file.
+
+1:     #include <fstream.h>
+2:
+3:     class Animal
+4:     {
+5:     public:
+6:        Animal(int weight, long days):itsWeight(weight),itsNumberDaysAlive(days){}
+7:        ~Animal(){}
+8:
+9:        int GetWeight()const { return itsWeight; }
+10:       void SetWeight(int weight) { itsWeight = weight; }
+11:
+12:       long GetDaysAlive()const { return  itsNumberDaysAlive; }
+13:       void SetDaysAlive(long days) { itsNumberDaysAlive = days; }
+14:
+15:    private:
+16:       int itsWeight;
+17:       long itsNumberDaysAlive;
+18:    };
+19:
+20:    int main()   // returns 1 on error
+21:    {
+22:       char fileName[80];
+23:       char buffer[255];
+24:
+25:       cout << "Please enter the file name: ";
+26:       cin >> fileName;
+27:       ofstream fout(fileName,ios::binary);
+28:       if (!fout)
+29:       {
+30:          cout << "Unable to open " << fileName << " for writing.\n";
+31:          return(1);
+32:       }
+33:
+34:       Animal Bear(50,100);
+35:       fout.write((char*) &Bear,sizeof Bear);
+36:
+37:       fout.close();
+38:
+39:       ifstream fin(fileName,ios::binary);
+40:       if (!fin)
+41:       {
+42:          cout << "Unable to open " << fileName << " for reading.\n";
+43:          return(1);
+44:       }
+45:
+46:       Animal BearTwo(1,1);
+47:
+48:       cout << "BearTwo weight: " << BearTwo.GetWeight() << endl;
+49:       cout << "BearTwo days: " << BearTwo.GetDaysAlive() << endl;
+50:
+51:       fin.read((char*) &BearTwo, sizeof BearTwo);
+52:
+53:       cout << "BearTwo weight: " << BearTwo.GetWeight() << endl;
+54:       cout << "BearTwo days: " << BearTwo.GetDaysAlive() << endl;
+55:       fin.close();
+56:       return 0;
+
+57: }
+
+
+Output: Please enter the file name: Animals
+BearTwo weight: 1
+BearTwo days: 1
+BearTwo weight: 50
+BearTwo days: 100
+
+Analysis: On lines 3-18, a stripped-down Animal class is declared. On lines 22-32, a file is created and opened for output in binary mode. An animal whose weight is 50 and who is 100 days old is created on line 34, and its data is written to the file on line 35.
+
+The file is closed on line 37 and reopened for reading in binary mode on line 39. A second animal is created on line 46 whose weight is 1 and who is only one day old. The data from the file is read into the new animal object on line 51, wiping out the existing data and replacing it with the data from the file.
+Command-Line Processing
+
+Many operating systems, such as DOS and UNIX, enable the user to pass parameters to your program when the program starts. These are called command-line options, and are typically separated by spaces on the command line. For example:
+
+SomeProgram Param1 Param2 Param3
+
+These parameters are not passed to main() directly. Instead, every program's main() function is passed two parameters. The first is an integer count of the number of arguments on the command line. The program name itself is counted, so every program has at least one parameter. The example command line shown previously has four. (The name SomeProgram plus the three parameters make a total of four command-line arguments.)
+
+The second parameter passed to main() is an array of pointers to character strings. Because an array name is a constant pointer to the first element of the array, you can declare this argument to be a pointer to a pointer to char, a pointer to an array of char, or an array of arrays of char.
+
+Typically, the first argument is called argc (argument count), but you may call it anything you like. The second argument is often called argv (argument vector), but again this is just a convention.
+
+It is common to test argc to ensure you've received the expected number of arguments, and to use argv to access the strings themselves. Note that argv[0] is the name of the program, and argv[1] is the first parameter to the program, represented as a string. If your program takes two numbers as arguments, you will need to translate these numbers to strings. On Day 21 you will see how to use the standard library conversions. Listing 16.19 illustrates how to use the command-line arguments.
+
+Listing 16.19. Using command-line arguments.
+
+1:     #include <iostream.h>
+2:     int main(int argc, char **argv)
+3:     {
+4:        cout << "Received " << argc << " arguments...\n";
+5:        for (int i=0; i<argc; i++)
+6:           cout << "argument " << i << ": " << argv[i] << endl;
+7:     return 0;
+8: }
+
+Output: TestProgram  Teach Yourself C++ In 21 Days
+Received 7 arguments...
+argumnet 0: TestProgram.exe
+argument 1: Teach
+argument 2: Yourself
+argument 3: C++
+argument 4: In
+argument 5: 21
+argument 6: Days
+
+Analysis: The function main() declares two arguments: argc is an integer that contains the count of command-line arguments, and argv is a pointer to the array of strings. Each string in the array pointed to by argv is a command-line argument. Note that argv could just as easily have been declared as char *argv[] or char argv[][]. It is a matter of programming style how you declare argv; even though this program declared it as a pointer to a pointer, array offsets were still used to access the individual strings.
+
+On line 4, argc is used to print the number of command-line arguments: seven in all, counting the program name itself.
+
+On lines 5 and 6, each of the command-line arguments is printed, passing the null-terminated strings to cout by indexing into the array of strings.
+
+A more common use of command-line arguments is illustrated by modifying Listing 16.18 to take the filename as a command-line argument. This listing does not include the class declaration, which is unchanged.
+
+Listing 16.20. Using command-line arguments.
+
+1:     #include <fstream.h>
+2:     int main(int argc, char *argv[])   // returns 1 on error
+3:     {
+4:        if (argc != 2)
+5:        {
+6:           cout << "Usage: " << argv[0] << " <filename>" << endl;
+7:           return(1);
+8:        }
+9:
+10:       ofstream fout(argv[1],ios::binary);
+11:       if (!fout)
+12:       {
+13:          cout << "Unable to open " << argv[1] << " for writing.\n";
+14:          return(1);
+15:       }
+16:
+17:       Animal Bear(50,100);
+18:       fout.write((char*) &Bear,sizeof Bear);
+19:
+20:       fout.close();
+21:
+22:       ifstream fin(argv[1],ios::binary);
+23:       if (!fin)
+24:       {
+25:          cout << "Unable to open " << argv[1] << " for reading.\n";
+26:          return(1);
+27:       }
+28:
+29:       Animal BearTwo(1,1);
+30:
+31:       cout << "BearTwo weight: " << BearTwo.GetWeight() << endl;
+32:       cout << "BearTwo days: " << BearTwo.GetDaysAlive() << endl;
+33:
+34:       fin.read((char*) &BearTwo, sizeof BearTwo);
+35:
+36:       cout << "BearTwo weight: " << BearTwo.GetWeight() << endl;
+37:       cout << "BearTwo days: " << BearTwo.GetDaysAlive() << endl;
+38:       fin.close();
+39:       return 0;
+40: }
+
+Output: BearTwo weight: 1
+BearTwo days: 1
+BearTwo weight: 50
+BearTwo days: 100
+
+Analysis: The declaration of the Animal class is the same as in Listing 16.18, and so is left out of this example. This time, however, rather than prompting the user for the filename, command-line arguments are used. On line 2, main() is declared to take two parameters: the count of the command-line arguments and a pointer to the array of command-line argument strings.
+
+On lines 4-8, the program ensures that the expected number of arguments (exactly two) is received. If the user fails to supply a single filename, an error message is printed:
+
+Usage TestProgram <filename>
+
+Then the program exits. Note that by using argv[0] rather than hard-coding a program name, you can compile this program to have any name, and this usage statement will work automatically.
+
+On line 10, the program attempts to open the supplied filename for binary output. There is no reason to copy the filename into a local temporary buffer. It can be used directly by accessing argv[1].
+
+This technique is repeated on line 22 when the same file is reopened for input, and is used in the error condition statements when the files cannot be opened, on lines 13 and 25.
+Summary
+
+Today streams were introduced, and the global objects cout and cin were described. The goal of the istream and ostream objects is to encapsulate the work of writing to device drivers and buffering input and output.
+
+There are four standard stream objects created in every program: cout, cin, cerr, and clog. Each of these can be "redirected" by many operating systems.
+
+The istream object cin is used for input, and its most common use is with the overloaded extraction operator (>>). The ostream object cout is used for output, and its most common use is with the overloaded insertion operator (<<).
+
+Each of these objects has a number of other member functions, such as get() and put(). Because the common forms of each of these methods returns a reference to a stream object, it is easy to concatenate each of these operators and functions.
+
+The state of the stream objects can be changed by using manipulators. These can set the formatting and display characteristics and various other attributes of the stream objects.
+
+File I/O can be accomplished by using the fstream classes, which derive from the stream classes. In addition to supporting the normal insertion and extraction operators, these objects also support read() and write() for storing and retrieving large binary objects.
+Q&A
+
+    Q. How do you know when to use the insertion and extraction operators and when to use the other member functions of the stream classes?
+
+    A. In general, it is easier to use the insertion and extraction operators, and they are preferred when their behavior is what is needed. In those unusual circumstances when these operators don't do the job (such as reading in a string of words), the other functions can be used.
+
+    Q. What is the difference between cerr and clog?
+
+    A. cerr is not buffered. Everything written to cerr is immediately written out. This is fine for errors to be written to the screen, but may have too high a performance cost for writing logs to disk. clog buffers its output, and thus can be more efficient.
+
+    Q. Why were streams created if printf() works well?
+
+    A. printf() does not support the strong type system of C++, and it does not support user-defined classes.
+
+    Q. When would you ever use putback()?
+
+    A. When one read operation is used to determine whether or not a character is valid, but a different read operation (perhaps by a different object) needs the character to be in the buffer. This is most often used when parsing a file; for example, the C++ compiler might use putback().
+
+    Q. When would you use ignore()?
+
+    A. A common use of this is after using get(). Because get() leaves the terminating character in the buffer, it is not uncommon to immediately follow a call to get() with a call to ignore(1,'\n');. Once again, this is often used in parsing.
+
+    Q. My friends use printf() in their C++ programs. Can I?
+
+    A. Sure. You'll gain some convenience, but you'll pay by sacrificing type safety. 
+
+Workshop
+
+The Workshop contains quiz questions to help solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before going to the next chapter.
+Quiz
+
+    1. What is the insertion operator, and what does it do?
+
+    2. What is the extraction operator, and what does it do?
+
+    3. What are the three forms of cin.get(), and what are their differences?
+
+    4. What is the difference between cin.read() and cin.getline()?
+
+    5. What is the default width for outputting a long integer using the insertion operator?
+
+    6. What is the return value of the insertion operator?
+
+    7. What parameter does the constructor to an ofstream object take?
+
+    8. What does the ios::ate argument do? 
+
+Exercises
+
+    1. Write a program that writes to the four standard iostream objects: cin, cout, cerr, and clog.
+
+    2. Write a program that prompts the user to enter her full name and then displays it on the screen.
+
+    3. Rewrite Listing 16.9 to do the same thing, but without using putback() or ignore().
+
+    4. Write a program that takes a filename as a parameter and opens the file for reading. Read every character of the file and display only the letters and punctuation to the screen. (Ignore all nonprinting characters.) Then close the file and exit.
+
+    5. Write a program that displays its command-line arguments in reverse order and does not display the program name.
+
+

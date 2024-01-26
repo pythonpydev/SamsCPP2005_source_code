@@ -1,0 +1,54 @@
+Appendix B
+
+C++ Keywords
+
+Keywords are reserved to the compiler for use by the language. You cannot define classes, variables, or functions that have these keywords as their names. The list is a bit arbitrary, as some of the keywords are specific to a given compiler. Your mileage may vary slightly:
+
+    auto
+    break
+    case
+    catch
+    char
+    class
+    const
+    continue
+    default
+    delete
+    do
+    double
+    else
+    enum
+    extern
+    float
+    for
+    friend
+    goto
+    if
+    int
+    long
+    mutable
+    new
+    operator
+    private
+    protected
+    public
+    register
+    return
+    short
+    signed
+    sizeof
+    static
+    struct
+    switch
+    template
+    this
+    throw
+    typedef
+    union
+    unsigned
+    virtual
+    void
+    volatile
+    while
+
+

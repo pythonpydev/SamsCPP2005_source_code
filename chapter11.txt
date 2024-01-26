@@ -1,0 +1,1314 @@
+    Day 11
+        Arrays
+            What Is an Array?
+                Figure 11.1. 
+            Array Elements
+            Listing 11.1. Using an integer array.
+            Writing Past the End of an Array
+            Listing 11.2. Writing past the end of an array.
+            Fence Post Errors
+                Figure 11.2. 
+            Initializing Arrays
+            Declaring Arrays
+            Listing 11.3. Using consts and enums in arrays.
+            Arrays
+            Arrays of Objects
+            Listing 11.4. Creating an array of objects.
+            Multidimensional Arrays
+                Figure 11.3. 
+            Initializing Multidimensional Arrays
+            Listing 11.5. Creating a multidimensional array.
+                Figure 11.4. 
+            A Word About Memory
+            Arrays of Pointers
+            Listing 11.6. Storing an array on the free store.
+            Declaring Arrays on the Free Store
+            A Pointer to an Array Versus an Array of Pointers
+            Pointers and Array Names
+            Listing 11.7. Creating an array by using new.
+            Deleting Arrays on the Free Store
+            char Arrays
+            Listing 11.8. Filling an array.
+            Listing 11.9. Filling an array.
+            strcpy() and strncpy()
+            Listing 11.10. Using strcpy().
+            Listing 11.11. Using strncpy().
+            String Classes
+            Listing 11.12. Using a String class.
+            Linked Lists and Other Structures
+                Figure 11.5. 
+            Listing 11.13. Implementing a linked list.
+                Figure 11.6. 
+            Array Classes
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 11
+Arrays
+
+In previous chapters, you declared a single int, char, or other object. You often want to declare a collection of objects, such as 20 ints or a litter of CATs. Today, you learn
+
+    What arrays are and how to declare them.
+
+    What strings are and how to use character arrays to make them.
+
+    The relationship between arrays and pointers.
+
+    How to use pointer arithmetic with arrays. 
+
+What Is an Array?
+
+An array is a collection of data storage locations, each of which holds the same type of data. Each storage location is called an element of the array.
+
+You declare an array by writing the type, followed by the array name and the subscript. The subscript is the number of elements in the array, surrounded by square brackets. For example,
+
+long LongArray[25];
+
+declares an array of 25 long integers, named LongArray. When the compiler sees this declaration, it sets aside enough memory to hold all 25 elements. Because each long integer requires 4 bytes, this declaration sets aside 100 contiguous bytes of memory, as illustrated in Figure 11.1.
+
+Figure 11.1. Declaring an array.
+Array Elements
+
+You access each of the array elements by referring to an offset from the array name. Array elements are counted from zero. Therefore, the first array element is arrayName[0]. In the LongArray example, LongArray[0] is the first array element, LongArray[1] the second, and so forth.
+
+This can be somewhat confusing. The array SomeArray[3] has three elements. They are SomeArray[0], SomeArray[1], and SomeArray[2]. More generally, SomeArray[n] has n elements that are numbered SomeArray[0] through SomeArray[n-1].
+
+Therefore, LongArray[25] is numbered from LongArray[0] through LongArray[24]. Listing 11.1 shows how to declare an array of five integers and fill each with a value.
+
+Listing 11.1. Using an integer array.
+
+
+1:     //Listing 11.1 - Arrays
+2:     #include <iostream.h>
+3:
+4:     int main()
+5:     {
+6:        int myArray[5];
+7:        int i;
+8:        for ( i=0; i<5; i++)  // 0-4
+9:        {
+10:           cout << "Value for myArray[" << i << "]: ";
+11:          cin >> myArray[i];
+12:       }
+13:       for (i = 0; i<5; i++)
+14:          cout << i << ": " << myArray[i] << "\n";
+15:     return 0;
+16: }
+Output: Value for myArray[0]:  3
+Value for myArray[1]:  6
+Value for myArray[2]:  9
+Value for myArray[3]:  12
+Value for myArray[4]:  15
+0: 3
+1: 6
+2: 9
+3: 12
+4: 15
+
+Analysis: Line 6 declares an array called myArray, which holds five integer variables. Line 8 establishes a loop that counts from 0 through 4, which is the proper set of offsets for a five-element array. The user is prompted for a value, and that value is saved at the correct offset into the array.
+
+The first value is saved at myArray[0], the second at myArray[1], and so forth. The second for loop prints each value to the screen.
+
+    NOTE: Arrays count from 0, not from 1. This is the cause of many bugs in programs written by C++ novices. Whenever you use an array, remember that an array with 10 elements counts from ArrayName[0] to ArrayName[9]. There is no ArrayName[10]. 
+
+Writing Past the End of an Array
+
+When you write a value to an element in an array, the compiler computes where to store the value based on the size of each element and the subscript. Suppose that you ask to write over the value at LongArray[5], which is the sixth element. The compiler multiplies the offset (5) by the size of each element--in this case, 4. It then moves that many bytes (20) from the beginning of the array and writes the new value at that location.
+
+If you ask to write at LongArray[50], the compiler ignores the fact that there is no such element. It computes how far past the first element it should look (200 bytes) and then writes over whatever is at that location. This can be virtually any data, and writing your new value there might have unpredictable results. If you're lucky, your program will crash immediately. If you're unlucky, you'll get strange results much later in your program, and you'll have a difficult time figuring out what went wrong.
+
+The compiler is like a blind man pacing off the distance from a house. He starts out at the first house, MainStreet[0]. When you ask him to go to the sixth house on Main Street, he says to himself, "I must go five more houses. Each house is four big paces. I must go an additional 20 steps." If you ask him to go to MainStreet[100], and Main Street is only 25 houses long, he will pace off 400 steps. Long before he gets there, he will, no doubt, step in front of a moving bus. So be careful where you send him.
+
+Listing 11.2 shows what happens when you write past the end of an array.
+
+    WARNING: Do not run this program; it may crash your system! 
+
+Listing 11.2. Writing past the end of an array.
+
+
+1:     //Listing 11.2
+2:     // Demonstrates what happens when you write past the end
+3:     // of an array
+4:
+5:     #include <iostream.h>
+6:     int main()
+7:     {
+8:        // sentinels
+9:        long sentinelOne[3];
+10:       long TargetArray[25]; // array to fill
+11:       long sentinelTwo[3];
+12:       int i;
+13:       for (i=0; i<3; i++)
+14:          sentinelOne[i] = sentinelTwo[i] = 0;
+15:
+16:       for (i=0; i<25; i++)
+17:          TargetArray[i] = 0;
+18:
+19:       cout << "Test 1: \n";  // test current values (should be 0)
+20:       cout << "TargetArray[0]: " << TargetArray[0] << "\n";
+21:       cout << "TargetArray[24]: " << TargetArray[24] << "\n\n";
+22:
+23:       for (i = 0; i<3; i++)
+24:       {
+25:          cout << "sentinelOne[" << i << "]: ";
+26:          cout << sentinelOne[i] << "\n";
+27:          cout << "sentinelTwo[" << i << "]: ";
+28:           cout << sentinelTwo[i]<< "\n";
+29:       }
+30:
+31:       cout << "\nAssigning...";
+32:       for (i = 0; i<=25; i++)
+33:          TargetArray[i] = 20;
+34:
+35:       cout << "\nTest 2: \n";
+36:       cout << "TargetArray[0]: " << TargetArray[0] << "\n";
+37:       cout << "TargetArray[24]: " << TargetArray[24] << "\n";
+38:       cout << "TargetArray[25]: " << TargetArray[25] << "\n\n";
+39:       for (i = 0; i<3; i++)
+40:       {
+41:          cout << "sentinelOne[" << i << "]: ";
+42:          cout << sentinelOne[i]<< "\n";
+43:          cout << "sentinelTwo[" << i << "]: ";
+44:          cout << sentinelTwo[i]<< "\n";
+45:       }
+46:
+47:     return 0;
+48: }
+
+Output: Test 1:
+TargetArray[0]: 0
+TargetArray[24]: 0
+
+SentinelOne[0]: 0
+SentinelTwo[0]: 0
+SentinelOne[1]: 0
+SentinelTwo[1]: 0
+SentinelOne[2]: 0
+SentinelTwo[2]: 0
+
+Assigning...
+Test 2:
+TargetArray[0]: 20
+TargetArray[24]: 20
+TargetArray[25]: 20
+
+SentinelOne[0]: 20
+SentinelTwo[0]: 0
+SentinelOne[1]: 0
+SentinelTwo[1]: 0
+SentinelOne[2]: 0
+SentinelTwo[2]: 0
+
+Analysis: Lines 9 and 10 declare two arrays of three integers that act as sentinels around TargetArray. These sentinel arrays are initialized with the value 0. If memory is written to beyond the end of TargetArray, the sentinels are likely to be changed. Some compilers count down in memory; others count up. For this reason, the sentinels are placed on both sides of TargetArray.
+
+Lines 19-29 confirm the sentinel values in Test 1. In line 33 TargetArray's members are all initialized to the value 20, but the counter counts to TargetArray offset 25, which doesn't exist in TargetArray.
+
+Lines 36-38 print TargetArray's values in Test 2. Note that TargetArray[25] is perfectly happy to print the value 20. However, when SentinelOne and SentinelTwo are printed, SentinelTwo[0] reveals that its value has changed. This is because the memory that is 25 elements after TargetArray[0] is the same memory that is at SentinelTwo[0]. When the nonexistent TargetArray[0] was accessed, what was actually accessed was SentinelTwo[0].
+
+This nasty bug can be very hard to find, because SentinelTwo[0]'s value was changed in a part of the code that was not writing to SentinelTwo at all.
+
+This code uses "magic numbers" such as 3 for the size of the sentinel arrays and 25 for the size of TargetArray. It is safer to use constants, so that you can change all these values in one place.
+Fence Post Errors
+
+It is so common to write to one past the end of an array that this bug has its own name. It is called a fence post error. This refers to the problem in counting how many fence posts you need for a 10-foot fence if you need one post for every foot. Most people answer 10, but of course you need 11. Figure 11.2 makes this clear.
+
+Figure 11.2. Fence post errors.
+
+This sort of "off by one" counting can be the bane of any programmer's life. Over time, however, you'll get used to the idea that a 25-element array counts only to element 24, and that everything counts from 0. (Programmers are often confused why office buildings don't have a floor zero. Indeed, some have been known to push the 4 elevator button when they want to get to the fifth floor.)
+
+    NOTE: Some programmers refer to ArrayName[0] as the zeroth element. Getting into this habit is a big mistake. If ArrayName[0] is the zeroth element, what is ArrayName[1]? The oneth? If so, when you see ArrayName[24], will you realize that it is not the 24th element, but rather the 25th? It is far better to say that ArrayName[0] is at offset zero and is the first element. 
+
+Initializing Arrays
+
+You can initialize a simple array of built-in types, such as integers and characters, when you first declare the array. After the array name, you put an equal sign (=) and a list of comma-separated values enclosed in braces. For example,
+
+int IntegerArray[5] = { 10, 20, 30, 40, 50 };
+
+declares IntegerArray to be an array of five integers. It assigns IntegerArray[0] the value 10, IntegerArray[1] the value 20, and so forth.
+
+If you omit the size of the array, an array just big enough to hold the initialization is created. Therefore, if you write
+
+int IntegerArray[] = { 10, 20, 30, 40, 50 };
+
+you will create exactly the same array as you did in the previous example.
+
+If you need to know the size of the array, you can ask the compiler to compute it for you. For example,
+
+const USHORT IntegerArrayLength;
+IntegerArrayLength = sizeof(IntegerArray)/sizeof(IntegerArray[0]);
+
+sets the constant USHORT variable IntegerArrayLength to the result obtained from dividing the size of the entire array by the size of each individual entry in the array. That quotient is the number of members in the array.
+
+You cannot initialize more elements than you've declared for the array. Therefore,
+
+int IntegerArray[5] = { 10, 20, 30, 40, 50, 60};
+
+generates a compiler error because you've declared a five-member array and initialized six values. It is legal, however, to write
+
+int IntegerArray[5] = { 10, 20};
+
+Although uninitialized array members have no guaranteed values, actually, aggregates will be initialized to 0. If you don't initialize an array member, its value will be set to 0.
+
+    DO let the compiler set the size of initialized arrays. DON'T write past the end of the array. DO give arrays meaningful names, as you would with any variable.DO remember that the first member of the array is at offset 0. 
+
+Declaring Arrays
+
+Arrays can have any legal variable name, but they cannot have the same name as another variable or array within their scope. Therefore, you cannot have an array named myCats[5] and a variable named myCats at the same time.
+
+You can dimension the array size with a const or with an enumeration. Listing 11.3 illustrates this.
+
+Listing 11.3. Using consts and enums in arrays.
+
+1:     // Listing 11.3
+2:     // Dimensioning arrays with consts and enumerations
+3:
+4:     #include <iostream.h>
+5:     int main()
+6:     {
+7:        enum WeekDays { Sun, Mon, Tue, 
+8:             Wed, Thu, Fri, Sat, DaysInWeek };
+9:        int ArrayWeek[DaysInWeek] = { 10, 20, 30, 40, 50, 60, 70 };
+10:
+11:       cout << "The value at Tuesday is: " << ArrayWeek[Tue];
+12:     return 0;
+13: }
+Output: The value at Tuesday is: 30
+
+Analysis: Line 7 creates an enumeration called WeekDays. It has eight members. Sunday is equal to 0, and DaysInWeek is equal to 7.
+
+Line 11 uses the enumerated constant Tue as an offset into the array. Because Tue evaluates to 2, the third element of the array, DaysInWeek[2], is returned and printed in line 11.
+Arrays
+
+To declare an array, write the type of object stored, followed by the name of the array and a subscript with the number of objects to be held in the array. Example 1
+
+int MyIntegerArray[90];
+
+Example 2
+
+long * ArrayOfPointersToLongs[100];
+
+To access members of the array, use the subscript operator. Example 1
+
+int theNinethInteger = MyIntegerArray[8];
+
+Example 2
+
+long * pLong = ArrayOfPointersToLongs[8]
+
+Arrays count from zero. An array of n items is numbered from 0 to n-1.
+Arrays of Objects
+
+Any object, whether built-in or user-defined, can be stored in an array. When you declare the array, you tell the compiler the type of object to store and the number of objects for which to allocate room. The compiler knows how much room is needed for each object based on the class declaration. The class must have a default constructor that takes no arguments so that the objects can be created when the array is defined.
+
+Accessing member data in an array of objects is a two-step process. You identify the member of the array by using the index operator ([ ]), and then you add the member operator (.) to access the particular member variable. Listing 11.4 demonstrates how you would create an array of five CATs.
+
+Listing 11.4. Creating an array of objects.
+
+
+1:     // Listing 11.4 - An array of objects
+2:
+3:     #include <iostream.h>
+4:
+5:     class CAT
+6:     {
+7:        public:
+8:           CAT() { itsAge = 1; itsWeight=5; } 
+9:           ~CAT() {}        
+10:          int GetAge() const { return itsAge; }
+11:          int GetWeight() const { return itsWeight; }
+12:          void SetAge(int age) { itsAge = age; }
+13:
+14:       private:
+15:          int itsAge;
+16:          int itsWeight;
+17:    };
+18:
+19:    int main()
+20:    {
+21:       CAT Litter[5];
+22:       int i;
+23:       for (i = 0; i < 5; i++)
+24:          Litter[i].SetAge(2*i +1);
+25:
+26:       for (i = 0; i < 5; i++)
+27:       {
+28:          cout << "Cat #" << i+1<< ": ";
+29:          cout << Litter[i].GetAge() << endl;
+30:       }
+31:     return 0;
+32: }
+
+Output: cat #1: 1
+cat #2: 3
+cat #3: 5
+cat #4: 7
+cat #5: 9
+
+Analysis: Lines 5-17 declare the CAT class. The CAT class must have a default constructor so that CAT objects can be created in an array. Remember that if you create any other constructor, the compiler-supplied default constructor is not created; you must create your own.
+
+The first for loop (lines 23 and 24) sets the age of each of the five CATs in the array. The second for loop (lines 26 and 27) accesses each member of the array and calls GetAge().
+
+Each individual CAT's GetAge() method is called by accessing the member in the array, Litter[i], followed by the dot operator (.), and the member function.
+Multidimensional Arrays
+
+It is possible to have arrays of more than one dimension. Each dimension is represented as a subscript in the array. Therefore, a two-dimensional array has two subscripts; a three-dimensional array has three subscripts; and so on. Arrays can have any number of dimensions, although it is likely that most of the arrays you create will be of one or two dimensions.
+
+A good example of a two-dimensional array is a chess board. One dimension represents the eight rows; the other dimension represents the eight columns. Figure 11.3 illustrates this idea.
+
+Suppose that you have a class named SQUARE. The declaration of an array named Board that represents it would be
+
+SQUARE Board[8][8];
+
+You could also represent the same data with a one-dimensional, 64-square array. For example,
+
+SQUARE Board[64]
+
+This doesn't correspond as closely to the real-world object as the two-dimension. When the game begins, the king is located in the fourth position in the first row. Counting from zero array, that position corresponds to
+
+Board[0][3];
+
+assuming that the first subscript corresponds to row, and the second to column. The layout of positions for the entire board is illustrated in Figure 11.3.
+
+Figure 11.3. A chess board and a two-dimensional array.
+Initializing Multidimensional Arrays
+
+You can initialize multidimensional arrays. You assign the list of values to array elements in order, with the last array subscript changing while each of the former holds steady. Therefore, if you have an array
+
+int theArray[5][3]
+
+the first three elements go into theArray[0]; the next three into theArray[1]; and so forth.
+
+You initialize this array by writing
+
+int theArray[5][3] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 }
+
+For the sake of clarity, you could group the initializations with braces. For example,
+
+int theArray[5][3] = {  {1,2,3},
+{4,5,6},
+{7,8,9},
+{10,11,12},
+{13,14,15} };
+
+The compiler ignores the inner braces, which make it easier to understand how the numbers are distributed.
+
+Each value must be separated by a comma, without regard to the braces. The entire initialization set must be within braces, and it must end with a semicolon.
+
+Listing 11.5 creates a two-dimensional array. The first dimension is the set of numbers from 0 to 5. The second dimension consists of the double of each value in the first dimension.
+
+Listing 11.5. Creating a multidimensional array.
+
+
+1:     #include <iostream.h>
+2:     int main()
+3:     {
+4:        int SomeArray[5][2] = { {0,0}, {1,2}, {2,4}, {3,6}, {4,8}};
+5:        for (int i = 0; i<5; i++)
+6:           for (int j=0; j<2; j++)
+7:           {
+8:              cout << "SomeArray[" << i << "][" << j << "]: ";
+9:              cout << SomeArray[i][j]<< endl;
+10:          }
+11:
+12:     return 0;
+13: }
+
+Output: SomeArray[0][0]: 0
+SomeArray[0][1]: 0
+SomeArray[1][0]: 1
+SomeArray[1][1]: 2
+SomeArray[2][0]: 2
+SomeArray[2][1]: 4
+SomeArray[3][0]: 3
+SomeArray[3][1]: 6
+SomeArray[4][0]: 4
+SomeArray[4][1]: 8
+
+Analysis: Line 4 declares SomeArray to be a two-dimensional array. The first dimension consists of five integers; the second dimension consists of two integers. This creates a 5x2 grid, as Figure 11.4 shows.
+
+Figure 11.4. A 5x2 array.
+
+The values are initialized in pairs, although they could be computed as well. Lines 5 and 6 create a nested for loop. The outer for loop ticks through each member of the first dimension. For every member in that dimension, the inner for loop ticks through each member of the second dimension. This is consistent with the printout. SomeArray[0][0] is followed by SomeArray[0][1]. The first dimension is incremented only after the second dimension is incremented by 1. Then the second dimension starts over.
+A Word About Memory
+
+When you declare an array, you tell the compiler exactly how many objects you expect to store in it. The compiler sets aside memory for all the objects, even if you never use it. This isn't a problem with arrays for which you have a good idea of how many objects you'll need. For example, a chess board has 64 squares, and cats have between 1 and 10 kittens. When you have no idea of how many objects you'll need, however, you must use more advanced data structures.
+
+This book looks at arrays of pointers, arrays built on the free store, and various other collections. Other more advanced data structures that solve large data storage problems are beyond the scope of this book. Two of the great things about programming are that there are always more things to learn and that there are always more books from which to learn.
+Arrays of Pointers
+
+The arrays discussed so far store all their members on the stack. Usually stack memory is severely limited, whereas free store memory is far larger. It is possible to declare each object on the free store and then to store only a pointer to the object in the array. This dramatically reduces the amount of stack memory used. Listing 11.6 rewrites the array from Listing 11.4, but it stores all the objects on the free store. As an indication of the greater memory that this enables, the array is expanded from 5 to 500, and the name is changed from Litter to Family.
+
+Listing 11.6. Storing an array on the free store.
+
+
+1:     // Listing 11.6 - An array of pointers to objects
+2:
+3:     #include <iostream.h>
+4:
+5:     class CAT
+6:     {
+7:        public:
+8:           CAT() { itsAge = 1; itsWeight=5; }   
+9:           ~CAT() {}                                 // destructor
+10:          int GetAge() const { return itsAge; }
+11:          int GetWeight() const { return itsWeight; }
+12:          void SetAge(int age) { itsAge = age; }
+13:
+14:       private:
+15:          int itsAge;
+16:          int itsWeight;
+17:    };
+18:
+19:    int main()
+20:    {
+21:       CAT * Family[500];
+22:       int i;
+23:       CAT * pCat;
+24:       for (i = 0; i < 500; i++)
+25:       {
+26:          pCat = new CAT;
+27:          pCat->SetAge(2*i +1);
+28:          Family[i] = pCat;
+29:       }
+30:
+31:       for (i = 0; i < 500; i++)
+32:       {
+33:          cout << "Cat #" << i+1 << ": ";
+34:          cout << Family[i]->GetAge() << endl;
+35:       }
+36:     return 0;
+37: }
+
+Output: Cat #1: 1
+Cat #2: 3
+Cat #3: 5
+...
+Cat #499: 997
+Cat #500: 999
+
+Analysis: The CAT object declared in lines 5-17 is identical with the CAT object declared in Listing 11.4. This time, however, the array declared in line 21 is named Family, and it is declared to hold 500 pointers to CAT objects.
+
+In the initial loop (lines 24-29), 500 new CAT objects are created on the free store, and each one has its age set to twice the index plus one. Therefore, the first CAT is set to 1, the second CAT to 3, the third CAT to 5, and so on. Finally, the pointer is added to the array.
+
+Because the array has been declared to hold pointers, the pointer--rather than the dereferenced value in the pointer--is added to the array.
+
+The second loop (lines 31 and 32) prints each of the values. The pointer is accessed by using the index, Family[i]. That address is then used to access the GetAge() method.
+
+In this example, the array Family and all its pointers are stored on the stack, but the 500 CATs that are created are stored on the free store.
+Declaring Arrays on the Free Store
+
+It is possible to put the entire array on the free store, also known as the heap. You do this by calling new and using the subscript operator. The result is a pointer to an area on the free store that holds the array. For example,
+
+CAT *Family = new CAT[500];
+
+declares Family to be a pointer to the first in an array of 500 CATs. In other words, Family points to--or has the address of--Family[0].
+
+The advantage of using Family in this way is that you can use pointer arithmetic to access each member of Family. For example, you can write
+
+CAT *Family = new CAT[500];
+CAT *pCat = Family;              //pCat points to Family[0]
+pCat->SetAge(10);                // set Family[0] to 10
+pCat++;                          // advance to Family[1]
+pCat->SetAge(20);                // set Family[1] to 20
+
+This declares a new array of 500 CATs and a pointer to point to the start of the array. Using that pointer, the first CAT's SetAge() function is called with a value of 10. The pointer is then incremented to point to the next CAT, and the second Cat's SetAge() method is then called.
+A Pointer to an Array Versus an Array of Pointers
+
+Examine these three declarations:
+
+1:  Cat   FamilyOne[500]
+2:  CAT * FamilyTwo[500];
+3:  CAT * FamilyThree = new CAT[500];
+
+FamilyOne is an array of 500 CATs. FamilyTwo is an array of 500 pointers to CATs. FamilyThree is a pointer to an array of 500 CATs.
+
+The differences among these three code lines dramatically affect how these arrays operate. What is perhaps even more surprising is that FamilyThree is a variant of FamilyOne, but is very different from FamilyTwo.
+
+This raises the thorny issue of how pointers relate to arrays. In the third case, FamilyThree is a pointer to an array. That is, the address in FamilyThree is the address of the first item in that array. This is exactly the case for FamilyOne.
+Pointers and Array Names
+
+In C++ an array name is a constant pointer to the first element of the array. Therefore, in the declaration
+
+CAT Family[50];
+
+Family is a pointer to &Family[0], which is the address of the first element of the array Family.
+
+It is legal to use array names as constant pointers, and vice versa. Therefore, Family + 4 is a legitimate way of accessing the data at Family[4].
+
+The compiler does all the arithmetic when you add to, increment, and decrement pointers. The address accessed when you write Family + 4 isn't 4 bytes past the address of Family--it is four objects. If each object is 4 bytes long, Family + 4 is 16 bytes. If each object is a CAT that has four long member variables of 4 bytes each and two short member variables of 2 bytes each, each CAT is 20 bytes, and Family + 4 is 80 bytes past the start of the array.
+
+Listing 11.7 illustrates declaring and using an array on the free store.
+
+Listing 11.7. Creating an array by using new.
+
+
+1:     // Listing 11.7 - An array on the free store
+2:
+3:     #include <iostream.h>
+4:
+5:     class CAT
+6:     {
+7:        public:
+8:           CAT() { itsAge = 1; itsWeight=5; } 
+9:           ~CAT();         
+10:          int GetAge() const { return itsAge; }
+11:          int GetWeight() const { return itsWeight; }
+12:          void SetAge(int age) { itsAge = age; }
+13:
+14:       private:
+15:          int itsAge;
+16:          int itsWeight;
+17:    };
+18:
+19:    CAT :: ~CAT()
+20:    {
+21:      // cout << "Destructor called!\n";
+22:    }
+23:
+24:    int main()
+25:    {
+26:       CAT * Family = new CAT[500];
+27:       int i;
+28:       CAT * pCat;
+29:       for (i = 0; i < 500; i++)
+30:       {
+31:          pCat = new CAT;
+32:          pCat->SetAge(2*i +1);
+33:          Family[i] = *pCat;
+34:          delete pCat;
+35:       }
+36:
+37:       for (i = 0; i < 500; i++)
+38:       {
+38:          cout << "Cat #" << i+1 << ": ";
+39:          cout << Family[i].GetAge() << endl;
+40:       }
+41:
+42:       delete [] Family;
+43:
+44:     return 0;
+45: }
+
+Output: Cat #1: 1
+Cat #2: 3
+Cat #3: 5
+...
+Cat #499: 997
+Cat #500: 999
+
+Analysis: Line 26 declares the array Family, which holds 500 CAT objects. The entire array is created on the free store with the call to new CAT[500].
+
+Each CAT object added to the array also is created on the free store (line 31). Note, however, that the pointer isn't added to the array this time; the object itself is. This array isn't an array of pointers to CATs. It is an array of CATs.
+Deleting Arrays on the Free Store
+
+Family is a pointer, a pointer to the array on the free store. When, on line 33, the pointer pCat is dereferenced, the CAT object itself is stored in the array (why not? the array is on the free store). But pCat is used again in the next iteration of the loop. Isn't there a danger that there will now be no pointer to that CAT object, and a memory leak has been created?
+
+This would be a big problem, except that deleting Family returns all the memory set aside for the array. The compiler is smart enough to destroy each object in the array and to return its memory to the free store.
+
+To see this, change the size of the array from 500 to 10 in lines 26, 29, and 37. Then uncomment the cout statement in line 21. When line 40 is reached and the array is destroyed, each CAT object destructor is called.
+
+When you create an item on the heap by using new, you always delete that item and free its memory with delete. Similarly, when you create an array by using new <class>[size], you delete that array and free all its memory with delete[]. The brackets signal the compiler that this array is being deleted.
+
+If you leave the brackets off, only the first object in the array will be deleted. You can prove this to yourself by removing the bracket on line 40. If you edited line 21 so that the destructor prints, you should now see only one CAT object destroyed. Congratulations! You just created a memory leak.
+
+    DO remember that an array of n items is numbered from zero through n-1. DON'T write or read past the end of an array. DON'T confuse an array of pointers with a pointer to an array. DO use array indexing with pointers that point to arrays. 
+
+char Arrays
+
+A string is a series of characters. The only strings you've seen until now have been unnamed string constants used in cout statements, such as
+
+cout << "hello world.\n";
+
+In C++ a string is an array of chars ending with a null character. You can declare and initialize a string just as you would any other array. For example,
+
+char Greeting[] = 
+{ `H', `e', `l', `l', `o', ` `, `W','o','r','l','d', `\0' };
+
+The last character, `\0', is the null character, which many C++ functions recognize as the terminator for a string. Although this character-by-character approach works, it is difficult to type and admits too many opportunities for error. C++ enables you to use a shorthand form of the previous line of code. It is
+
+char Greeting[] = "Hello World";
+
+You should note two things about this syntax:
+
+    Instead of single quoted characters separated by commas and surrounded by braces, you have a double-quoted string, no commas, and no braces.
+
+    You don't need to add the null character because the compiler adds it for you. 
+
+The string Hello World is 12 bytes. Hello is 5 bytes, the space 1, World 5, and the null character 1.
+
+You can also create uninitialized character arrays. As with all arrays, it is important to ensure that you don't put more into the buffer than there is room for.
+
+Listing 11.8 demonstrates the use of an uninitialized buffer.
+
+Listing 11.8. Filling an array.
+
+1:     //Listing 11.8 char array buffers
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        char buffer[80];
+8:        cout << "Enter the string: ";
+9:        cin >> buffer;
+10:       cout << "Here's the buffer:  " << buffer << endl;
+11:     return 0;
+12: }
+
+Output: Enter the string: Hello World
+Here's the buffer:  Hello
+
+Analysis: On line 7, a buffer is declared to hold 80 characters. This is large enough to hold a 79-character string and a terminating null character.
+On line 8, the user is prompted to enter a string, which is entered into buffer on line 9. It is the syntax of cin to write a terminating null to buffer after it writes the string.
+
+There are two problems with the program in Listing 11.8. First, if the user enters more than 79 characters, cin writes past the end of the buffer. Second, if the user enters a space, cin thinks that it is the end of the string, and it stops writing to the buffer.
+
+To solve theseproblems, you must call a special method on cin: get(). cin.get() takes three parameters:
+
+    The buffer to fill
+
+    The maximum number of characters to get
+
+    The delimiter that terminates input 
+
+
+The default delimiter is newline. Listing 11.9 illustrates its use.
+
+Listing 11.9. Filling an array.
+
+
+1:     //Listing 11.9 using cin.get()
+2:
+3:     #include <iostream.h>
+4:
+5:     int main()
+6:     {
+7:        char buffer[80];
+8:        cout << "Enter the string: ";
+9:        cin.get(buffer, 79);       // get up to 79 or newline
+10:       cout << "Here's the buffer:  " << buffer << endl;
+11:     return 0;
+12: }
+
+Output: Enter the string: Hello World
+Here's the buffer:  Hello World
+
+Analysis: Line 9 calls the method get() of cin. The buffer declared in line 7 is passed in as the first argument. The second argument is the maximum number of characters to get. In this case, it must be 79 to allow for the terminating null. There is no need to provide a terminating character because the default value of newline is sufficient.
+
+cin and all its variations are covered on Day 17, "The Preprocessor," when streams are discussed in depth.
+strcpy() and strncpy()
+
+C++ inherits from C a library of functions for dealing with strings. Among the many functions provided are two for copying one string into another: strcpy() and strncpy(). strcpy() copies the entire contents of one string into a designated buffer. Listing 11.10 demonstrates the use of strcpy().
+
+Listing 11.10. Using strcpy().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:     int main()
+4:     {
+5:        char String1[] = "No man is an island";
+6:        char String2[80];
+7:
+8:        strcpy(String2,String1);
+9:
+10:       cout << "String1: " << String1 << endl;
+11:       cout << "String2: " << String2 << endl;
+12:     return 0;
+13: }
+
+Output: String1: No man is an island
+String2: No man is an island
+
+Analysis: The header file string.h is included in line 2. This file contains the prototype of the strcpy() function. strcpy() takes two character arrays--a destination followed by a source. If the source were larger than the destination, strcpy() would overwrite past the end of the buffer.
+
+To protect against this, the standard library also includes strncpy(). This variation takes a maximum number of characters to copy. strncpy() copies up to the first null character or the maximum number of characters specified into the destination buffer.
+
+Listing 11.11 illustrates the use of strncpy().
+
+Listing 11.11. Using strncpy().
+
+1:     #include <iostream.h>
+2:     #include <string.h>
+3:     int main()
+4:     {
+5:        const int MaxLength = 80;
+6:        char String1[] = "No man is an island";
+7:        char String2[MaxLength+1];
+8:
+9:
+10:       strncpy(String2,String1,MaxLength);
+11:
+12:       cout << "String1: " << String1 << endl;
+13:       cout << "String2: " << String2 << endl;
+14:     return 0;
+15: }
+
+Output: String1: No man is an island
+String2: No man is an island
+
+Analysis: In line 10, the call to strcpy() has been changed to a call to strncpy(), which takes a third parameter: the maximum number of characters to copy. The buffer String2 is declared to take MaxLength+1 characters. The extra character is for the null, which both strcpy() and strncpy() automatically add to the end of the string.
+String Classes
+
+Most C++ compilers come with a class library that includes a large set of classes for data manipulation. A standard component of a class library is a String class.
+
+C++ inherited the null-terminated string and the library of functions that includes strcpy() from C, but these functions aren't integrated into an object-oriented framework. A String class provides an encapsulated set of data and functions for manipulating that data, as well as accessor functions so that the data itself is hidden from the clients of the String class.
+
+If your compiler doesn't already provide a String class--and perhaps even if it does--you might want to write your own. The remainder of this chapter discusses the design and partial implementation of String classes.
+
+At a minimum, a String class should overcome the basic limitations of character arrays. Like all arrays, character arrays are static. You define how large they are. They always take up that much room in memory even if you don't need it all. Writing past the end of the array is disastrous.
+
+A good String class allocates only as much memory as it needs, and always enough to hold whatever it is given. If it can't allocate enough memory, it should fail gracefully.
+
+Listing 11.12 provides a first approximation of a String class.
+
+Listing 11.12. Using a String class.
+
+1:     //Listing 11.12
+2:
+3:     #include <iostream.h>
+4:     #include <string.h>
+5:
+6:     // Rudimentary string class
+7:     class String
+8:     {
+9:        public:
+10:          // constructors
+11:          String();
+12:          String(const char *const);
+13:          String(const String &);
+14:          ~String();
+15:
+16:          // overloaded operators
+17:          char & operator[](unsigned short offset);
+18:          char operator[](unsigned short offset) const;
+19:          String operator+(const String&);
+20:          void operator+=(const String&);
+21:          String & operator= (const String &);
+22:
+23:          // General accessors
+24:          unsigned short GetLen()const { return itsLen; }
+25:          const char * GetString() const { return itsString; }
+26:
+27:       private:
+28:          String (unsigned short);         // private constructor
+29:          char * itsString;
+30:          unsigned short itsLen;
+31:    };
+32:
+33:    // default constructor creates string of 0 bytes
+34:    String::String()
+35:    {
+36:       itsString = new char[1];
+37:       itsString[0] = `\0';
+38:       itsLen=0;
+39:    }
+40:
+41:    // private (helper) constructor, used only by
+42:    // class methods for creating a new string of
+43:    // required size. Null filled.
+44:    String::String(unsigned short len)
+45:    {
+46:       itsString = new char[len+1];
+47:       for (unsigned short i = 0; i<=len; i++)
+48:          itsString[i] = `\0';
+49:       itsLen=len;
+50:    }
+51:
+52:    // Converts a character array to a String
+53:    String::String(const char * const cString)
+54:    {
+55:       itsLen = strlen(cString);
+56:       itsString = new char[itsLen+1];
+57:       for (unsigned short i = 0; i<itsLen; i++)
+58:          itsString[i] = cString[i];
+59:       itsString[itsLen]='\0';
+60:    }
+61:
+62:    // copy constructor
+63:    String::String (const String & rhs)
+64:    {
+65:       itsLen=rhs.GetLen();
+66:       itsString = new char[itsLen+1];
+67:       for (unsigned short i = 0; i<itsLen;i++)
+68:          itsString[i] = rhs[i];
+69:       itsString[itsLen] = `\0';
+70:    }
+71:
+72:    // destructor, frees allocated memory
+73:    String::~String ()
+74:    {
+75:       delete [] itsString;
+76:       itsLen = 0;
+77:    }
+78:
+79:    // operator equals, frees existing memory
+80:    // then copies string and size
+81:    String& String::operator=(const String & rhs)
+82:    {
+83:       if (this == &rhs)
+84:          return *this;
+85:       delete [] itsString;
+86:       itsLen=rhs.GetLen();
+87:       itsString = new char[itsLen+1];
+88:       for (unsigned short i = 0; i<itsLen;i++)
+89:          itsString[i] = rhs[i];
+90:       itsString[itsLen] = `\0';
+91:       return *this;
+92:    }
+93:
+94:    //nonconstant offset operator, returns
+95:    // reference to character so it can be
+96:    // changed!
+97:    char & String::operator[](unsigned short offset)
+98:    {
+99:       if (offset > itsLen)
+100:         return itsString[itsLen-1];
+101:      else
+102:         return itsString[offset];
+103:   }
+104:
+105:   // constant offset operator for use
+106:   // on const objects (see copy constructor!)
+107:   char String::operator[](unsigned short offset) const
+108:   {
+109:      if (offset > itsLen)
+110:         return itsString[itsLen-1];
+111:      else
+112:         return itsString[offset];
+113:   }
+114:
+115:   // creates a new string by adding current
+116:   // string to rhs
+117:   String String::operator+(const String& rhs)
+118:   {
+119:      unsigned short  totalLen = itsLen + rhs.GetLen();
+120:      String temp(totalLen);
+121:      for (unsigned short i = 0; i<itsLen; i++)
+122:         temp[i] = itsString[i];
+123:      for (unsigned short j = 0; j<rhs.GetLen(); j++, i++)
+124:         temp[i] = rhs[j];
+125:      temp[totalLen]='\0';
+126:      return temp;
+127:   }
+128:
+129:   // changes current string, returns nothing
+130:   void String::operator+=(const String& rhs)
+131:   {
+132:      unsigned short rhsLen = rhs.GetLen();
+133:      unsigned short totalLen = itsLen + rhsLen;
+134:      String  temp(totalLen);
+135:      for (unsigned short i = 0; i<itsLen; i++)
+136:         temp[i] = itsString[i];
+137:      for (unsigned short j = 0; j<rhs.GetLen(); j++, i++)
+138:         temp[i] = rhs[i-itsLen];
+139:      temp[totalLen]='\0';
+140:      *this = temp;
+141:   }
+142:
+143:   int main()
+144:   {
+145:      String s1("initial test");
+146:      cout << "S1:\t" << s1.GetString() << endl;
+147:
+148:      char * temp = "Hello World";
+149:      s1 = temp;
+150:      cout << "S1:\t" << s1.GetString() << endl;
+151:
+152:      char tempTwo[20];
+153:      strcpy(tempTwo,"; nice to be here!");
+154:      s1 += tempTwo;
+155:      cout << "tempTwo:\t" << tempTwo << endl;
+156:      cout << "S1:\t" << s1.GetString() << endl;
+157:
+158:      cout << "S1[4]:\t" << s1[4] << endl;
+159:      s1[4]='x';
+160:      cout << "S1:\t" << s1.GetString() << endl;
+161:
+162:      cout << "S1[999]:\t" << s1[999] << endl;
+163:
+164:      String s2(" Another string");
+165:      String s3;
+166:      s3 = s1+s2;
+167:      cout << "S3:\t" << s3.GetString() << endl;
+168:
+169:      String s4;
+170:      s4 = "Why does this work?";
+171:      cout << "S4:\t" << s4.GetString() << endl;
+172:     return 0;
+173: }
+
+Output: S1:        initial test
+S1:        Hello world
+tempTwo:           ; nice to be here!
+S1:        Hello world; nice to be here!
+S1[4]:     o
+S1:        Hellx World; nice to be here!
+S1[999]:           !
+S3:        Hellx World; nice to be here! Another string
+S4:        Why does this work?
+
+
+Analysis: Lines 7-31 are the declaration of a simple String class. Lines 11-13 contain three constructors: the default constructor, the copy constructor, and a constructor that takes an existing null-terminated (C-style) string.
+This String class overloads the offset operator ([ ]), operator plus (+), and operator plus-equals (+=). The offset operator is overloaded twice: once as a constant function returning a char and again as a nonconstant function returning a reference to a char.
+
+The nonconstant version is used in statements such as
+
+SomeString[4]='x';
+
+as seen in line 159. This enables direct access to each of the characters in the string. A reference to the character is returned so that the calling function can manipulate it.
+
+The constant version is used when a constant String object is being accessed, such as in the implementation of the copy constructor, (line 63). Note that rhs[i] is accessed, yet rhs is declared as a const String &. It isn't legal to access this object by using a nonconstant member function. Therefore, the reference operator must be overloaded with a constant accessor.
+
+If the object being returned were large, you might want to declare the return value to be a constant reference. However, because a char is only one byte, there would be no point in doing that.
+
+The default constructor is implemented in lines 33-39. It creates a string whose length is 0. It is the convention of this String class to report its length not counting the terminating null. This default string contains only a terminating null.
+
+The copy constructor is implemented in lines 63-70. It sets the new string's length to that of the existing string--plus 1 for the terminating null. It copies each character from the existing string to the new string, and it null-terminates the new string.
+
+Lines 53-60 implement the constructor that takes an existing C-style string. This constructor is similar to the copy constructor. The length of the existing string is established by a call to the standard String library function strlen().
+
+On line 28, another constructor, String(unsigned short), is declared to be a private member function. It is the intent of the designer of this class that no client class ever create a String of arbitrary length. This constructor exists only to help in the internal creation of Strings as required, for example, by operator+=, on line 130. This will be discussed in depth when operator+= is described, below.
+
+The String(unsigned short) constructor fills every member of its array with NULL. Therefore, the for loop checks for i<=len rather than i<len.
+
+The destructor, implemented in lines 73-77, deletes the character string maintained by the class. Be sure to include the brackets in the call to the delete operator, so that every member of the array is deleted, instead of only the first.
+
+The assignment operator first checks whether the right-hand side of the assignment is the same as the left-hand side. If it isn't, the current string is deleted, and the new string is created and copied into place. A reference is returned to facilitate assignments lik
+
+String1 = String2 = String3;
+
+The offset operator is overloaded twice. Rudimentary bounds checking is performed both times. If the user attempts to access a character at a location beyond the end of the array, the last character--that is, len-1--is returned.
+
+Lines 117-127 implement operator plus (+) as a concatenation operator. It is convenient to be able to write
+
+String3 = String1 + String2;
+
+and have String3 be the concatenation of the other two strings. To accomplish this, the operator plus function computes the combined length of the two strings and creates a temporary string temp. This invokes the private constructor, which takes an integer, and creates a string filled with nulls. The nulls are then replaced by the contents of the two strings. The left-hand side string (*this) is copied first, followed by the right-hand side string (rhs).
+
+The first for loop counts through the string on the left-hand side and adds each character to the new string. The second for loop counts through the right-hand side. Note that i continues to count the place for the new string, even as j counts into the rhs string.
+
+Operator plus returns the temp string by value, which is assigned to the string on the left-hand side of the assignment (string1). Operator += operates on the existing string--that is, the left-hand side of the statement string1 += string2. It works just like operator plus, except that the temp value is assigned to the current string (*this = temp) in line 140.
+
+The main()function (lines 143-173) acts as a test driver program for this class. Line 145 creates a String object by using the constructor that takes a null-terminated C-style string. Line 146 prints its contents by using the accessor function GetString(). Line 148 creates another C-style string. Line 149 tests the assignment operator, and line 150 prints the results.
+
+Line 152 creates a third C-style string, tempTwo. Line 153 invokes strcpy to fill the buffer with the characters ; nice to be here! Line 154 invokes operator += and concatenates tempTwo onto the existing string s1. Line 156 prints the results.
+
+In line 158, the fifth character in s1 is accessed and printed. It is assigned a new value in line 159. This invokes the nonconstant offset operator ([ ]). Line 160 prints the result, which shows that the actual value has, in fact, been changed.
+
+Line 162 attempts to access a character beyond the end of the array. The last character of the array is returned, as designed.
+
+Lines 164-165 create two more String objects, and line 166 calls the addition operator. Line 167 prints the results.
+
+Line 169 creates a new String object, s4. Line 170 invokes the assignment operator. Line 171 prints the results. You might be thinking, "The assignment operator is defined to take a constant String reference in line 21, but here the program passes in a C-style string. Why is this legal?"
+
+The answer is that the compiler expects a String, but it is given a character array. Therefore, it checks whether it can create a String from what it is given. In line 12, you declared a constructor that creates Strings from character arrays. The compiler creates a temporary String from the character array and passes it to the assignment operator. This is known as implicit casting, or promotion. If you had not declared--and provided the implementation for--the constructor that takes a character array, this assignment would have generated a compiler error.
+Linked Lists and Other Structures
+
+Arrays are much like Tupperware. They are great containers, but they are of a fixed size. If you pick a container that is too large, you waste space in your storage area. If you pick one that is too small, its contents spill all over and you have a big mess.
+
+One way to solve this problem is with a linked list. A linked list is a data structure that consists of small containers that are designed to fit and that are linked together as needed. The idea is to write a class that holds one object of your data--such as one CAT or one Rectangle--and that can point at the next container. You create one container for each object that you need to store, and you chain them together as needed.
+
+The containers are called nodes. The first node in the list is called the head, and the last node in the list is called the tail.
+
+Lists come in three fundamental forms. From simplest to most complex, they are
+
+    Singly linked
+
+    Doubly linked
+
+    Trees 
+
+In a singly linked list, each node points forward to the next one, but not backward. To find a particular node, start at the top and go from node to node, as in a treasure hunt ("The next node is under the sofa"). A doubly linked list enables you to move backward and forward in the chain. A tree is a complex structure built from nodes, each of which can point in two or three directions. Figure 11.5 shows these three fundamental structures.
+
+Computer scientists have created even more complex and clever data structures, nearly all of which rely on interconnecting nodes. Listing 11.13 shows how to create and use a simple linked list.
+
+Figure 11.5 Linked lists.
+
+Listing 11.13. Implementing a linked list.
+
+1:       // Listing 11.13
+2:       // Linked list simple implementation
+3:
+4:       #include <iostream.h>
+5:
+6:       // object to add to list
+7:       class CAT
+8:       {
+9:       public:
+10:         CAT() { itsAge = 1;}
+11:         CAT(int age):itsAge(age){}
+12:         ~CAT(){};
+13:         int GetAge() const { return itsAge; }
+14:      private:
+15:         int itsAge;
+16:      };
+17:
+18:      // manages list, orders by cat's age!
+19:      class Node
+20:      {
+21:      public:
+22:         Node (CAT*);
+23:         ~Node();
+24:         void SetNext(Node * node) { itsNext = node; }
+25:         Node * GetNext() const { return itsNext; }
+26:         CAT * GetCat() const { return itsCat; }
+27:         void Insert(Node *);
+28:         void Display();
+29:      private:
+30:         CAT *itsCat;
+31:         Node * itsNext;
+32:      };
+33:
+34:
+35:      Node::Node(CAT* pCat):
+36:      itsCat(pCat),
+37:      itsNext(0)
+38:      {}
+39:
+40:      Node::~Node()
+41:      {
+42:         cout << "Deleting node...\n";
+43:         delete itsCat;
+44:         itsCat = 0;
+45:         delete itsNext;
+46:         itsNext = 0;
+47:      }
+48:
+49:      // ************************************
+50:      // Insert
+51:      // Orders cats based on their ages
+52:      // Algorithim: If you are last in line, add the cat
+53:      // Otherwise, if the new cat is older than you
+54:      // and also younger than next in line, insert it after
+55:      // this one. Otherwise call insert on the next in line
+56:      // ************************************
+57:      void Node::Insert(Node* newNode)
+58:      {
+59:         if (!itsNext)
+60:            itsNext = newNode;
+61:         else
+62:         {
+63:            int NextCatsAge = itsNext->GetCat()->GetAge();
+64:            int NewAge =  newNode->GetCat()->GetAge();
+65:            int ThisNodeAge = itsCat->GetAge();
+66:
+67:            if (  NewAge >= ThisNodeAge && NewAge < NextCatsAge  )
+68:            {
+69:               newNode->SetNext(itsNext);
+70:               itsNext = newNode;
+71:            }
+72:            else
+73:               itsNext->Insert(newNode);
+74:         }
+75:      }
+76:
+77:      void Node::Display()
+78:      {
+79:         if (itsCat->GetAge() > 0)
+80:         {
+81:            cout << "My cat is ";
+82:            cout << itsCat->GetAge() << " years old\n";
+83:         }
+84:         if (itsNext)
+85:            itsNext->Display();
+86:      }
+87:
+88:      int main()
+89:      {
+90:
+91:         Node *pNode = 0;
+92:         CAT * pCat = new CAT(0);
+93:         int age;
+94:
+95:         Node *pHead = new Node(pCat);
+96:
+97:         while (1)
+98:         {
+99:            cout << "New Cat's age? (0 to quit): ";
+100:            cin >>  age;
+101:            if (!age)
+102:               break;
+103:           pCat = new CAT(age);
+104:           pNode = new Node(pCat);
+105:           pHead->Insert(pNode);
+106:        }
+107:        pHead->Display();
+108:        delete pHead;
+109:        cout << "Exiting...\n\n";
+110:     return 0;
+111: }
+
+Output: New Cat's age? (0 to quit): 1
+New Cat's age? (0 to quit): 9
+New Cat's age? (0 to quit): 3
+New Cat's age? (0 to quit): 7
+New Cat's age? (0 to quit): 2
+New Cat's age? (0 to quit): 5
+New Cat's age? (0 to quit): 0
+My cat is 1 years old
+My cat is 2 years old
+My cat is 3 years old
+My cat is 5 years old
+My cat is 7 years old
+My cat is 9 years old
+Deleting node...
+Deleting node...
+Deleting node...
+Deleting node...
+Deleting node...
+Deleting node...
+Deleting node...
+Exiting...
+
+
+Analysis: Lines 7-16 declare a simplified CAT class. It has two constructors, a default constructor that initializes the member variable itsAge to 1, and a constructor that takes an integer and initializes itsAge to that value.
+
+Lines 19-32 declare the class Node. Node is designed specifically to hold a CAT object in a list. Normally, you would hide Node inside a CatList class. It is exposed here to illustrate how linked lists work.
+
+It is possible to make a more generic Node that would hold any kind of object in a list. You'll learn about doing that on Day 14, "Special Classes and Functions," when templates are discussed.
+
+Node's constructor takes a pointer to a CAT object. The copy constructor and assignment operator have been left out to save space. In a real-world application, they would be included.
+
+Three accessor functions are defined. SetNext() sets the member variable itsNext to point to the Node object supplied as its parameter. GetNext() and GetCat() return the appropriate member variables. GetNext() and GetCat() are declared const because they don't change the Node object.
+
+Insert() is the most powerful member function in the class. Insert() maintains the linked list and adds Nodes to the list based on the age of the CAT that they point to.
+
+The program begins at line 88. The pointer pNode is created and initialized to 0. A dummy CAT object is created, and its age is initialized to 0, to ensure that the pointer to the head of the list (pHead) is always first.
+
+Beginning on line 99, the user is prompted for an age. If the user presses 0, this is taken as a signal that no more CAT objects are to be created. For all other values, a CAT object is created on line 103, and the member variable itsAge is set to the supplied value. The CAT objects are created on the free store. For each CAT created, a Node object is created on line 104.
+
+After the CAT and Node objects are created, the first Node in the list is told to insert the newly created node, on line 105.
+
+Note that the program doesn't know--or care--how Node is inserted or how the list is maintained. That is entirely up to the Node object itself.
+
+The call to Insert() causes program execution to jump to line 57. Insert() is always called on pHead first.
+
+The test in line 59 fails the first time a new Node is added. Therefore, pHead is pointed at the first new Node. In the output, this is the node with a CAT whose itsAge value was set to 1.
+
+When the second CAT object's itsAge variable is set to 9, pHead is called again. This time, its member variable itsNext isn't null, and the else statement in lines 61 to 74 is invoked.
+
+Three local variables--NextCatsAge, NewAge, and ThisNodeAge--are filled with the values of The current Node's age--the age of pHead's CAT is 0
+
+The age of the CAT held by the new Node--in this case, 9
+
+The age of the CAT object held by the next node in line--in this case, 1
+
+The test in line 67 could have been written as
+
+if (  newNode->GetCat()->GetAge() > itsCat->GetAge() && \\
+newNode->GetCat()->GetAge()< itsNext->GetCat()->GetAge())
+
+which would have eliminated the three temporary variables while creating code that is more confusing and harder to read. Some C++ programmers see this as macho--until they have a bug and can't figure out which one of the values is wrong.
+
+If the new CAT's age is greater than the current CAT's age and less than the next CAT's age, the proper place to insert the new CAT's age is immediately after the current Node. In this case, the if statement is true. The new Node is set to point to what the current Node points to, and the current Node is set to point to the new Node. Figure 11.6 illustrates this.
+
+Figure 11.6. Inserting a Node.
+
+If the test fails, this isn't the proper place to insert the Node, and Insert() is called on the next Node in the list. Note that the current call to Insert() doesn't return until after the recursive call to Insert() returns. Therefore, these calls pile up on the stack. If the list gets too long, it will blow the stack and crash the program. There are other ways to do this that aren't so stack-intensive, but they are beyond the scope of this book.
+
+Once the user is finished adding CAT objects, display is called on the first Node: pHead. The CAT object's age is displayed if the current Node points to a CAT (pHead does not). Then, if the current Node points to another Node, display() is called on that Node.
+
+Finally, delete is called on pHead. Because the destructor deletes the pointer to the next Node, delete is called on that Node as well. It walks the entire list, eliminating each Node and freeing the memory of itsCat. Note that the last Node has its member variable itsNext set to zero, and delete is called on that pointer as well. It is always safe to call delete on zero, for it has no effect.
+Array Classes
+
+Writing your own Array class has many advantages over using the built-in arrays. For starters, you can prevent array overruns. You might also consider making your array class dynamically sized: At creation it might have only one member, growing as needed during the course of the program.
+
+You might want to sort or otherwise order the members of the array. There are a number of powerful Array variants you might consider. Among the most popular are:
+
+    Ordered collection: Each member is in sorted order.
+
+    Set: No member appears more than once.
+
+    Dictionary: This uses matched pairs in which one value acts as a key to retrieve the other value.
+
+    Sparse array: Indices are permitted for a large set, but only those values actually added to the array consume memory. Thus, you can ask for SparseArray[5] or SparseArray[200], but it is possible that memory is allocated only for a small number of entries.
+
+    Bag: An unordered collection that is added to and retrieved in random order. 
+
+By overloading the index operator ([ ]), you can turn a linked list into an ordered collection. By excluding duplicates, you can turn a collection into a set. If each object in the list has a pair of matched values, you can use a linked list to build a dictionary or a sparse array.
+Summary
+
+Today you learned how to create arrays in C++. An array is a fixed-size collection of objects that are all of the same type.
+
+Arrays don't do bounds checking. Therefore it is legal--even if disastrous--to read or write past the end of an array. Arrays count from 0. A common mistake is to write to offset n of an array of n members.
+
+Arrays can be one dimensional or multidimensional. In either case, the members of the array can be initialized, as long as the array contains either built-in types, such as int, or objects of a class that has a default constructor.
+
+Arrays and their contents can be on the free store or on the stack. If you delete an array on the free store, remember to use the brackets in the call to delete.
+
+Array names are constant pointers to the first elements of the array. Pointers and arrays use pointer arithmetic to find the next element of an array.
+
+You can create linked lists to manage collections whose size you won't know at compile time. From linked lists, you can create any number of more complex data structures.
+
+Strings are arrays of characters, or chars. C++ provides special features for managing char arrays, including the ability to initialize them with quoted strings.
+Q&A
+
+    Q. What happens if I write to element 25 in a 24-member array?
+
+    A. You will write to other memory, with potentially disastrous effects on your program.
+
+    Q. What is in an uninitialized array element?
+
+    A. Whatever happens to be in memory at a given time. The results of using this member without assigning a value are unpredictable.
+
+    Q. Can I combine arrays?
+
+    A. Yes. With simple arrays you can use pointers to combine them into a new, larger array. With strings you can use some of the built-in functions, such as strcat, to combine strings.
+
+    Q. Why should I create a linked list if an array will work?
+
+    A. An array must have a fixed size, whereas a linked list can be sized dynamically at runtime.
+
+    Q. Why would I ever use built-in arrays if I can make a better array class?
+
+    A. Built-in arrays are quick and easy to use.
+
+    Q. Must a string class use a char * to hold the contents of the string?
+
+    A. No. It can use any memory storage the designer thinks is best. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What are the first and last elements in SomeArray[25]?
+
+    2. How do you declare a multidimensional array?
+
+    3. Initialize the members of the array in Question 2.
+
+    4. How many elements are in the array SomeArray[10][5][20]?
+
+    5. What is the maximum number of elements that you can add to a linked list?
+
+    6. Can you use subscript notation on a linked list?
+
+    7. What is the last character in the string "Brad is a nice guy"? 
+
+Exercises
+
+    1. Declare a two-dimensional array that represents a tic-tac-toe game board.
+
+    2. Write the code that initializes all the elements in the array you created in Exercise 1 to the value 0.
+
+    3. Write the declaration for a Node class that holds unsigned short integers.
+
+    4. BUG BUSTERS: What is wrong with this code fragment? 
+
+unsigned short SomeArray[5][4];
+for (int i = 0; i<4; i++)
+     for (int j = 0; j<5; j++)
+          SomeArray[i][j] = i+j;
+
+    5. BUG BUSTERS: What is wrong with this code fragment? 
+
+        unsigned short SomeArray[5][4];
+for (int i = 0; i<=5; i++)
+     for (int j = 0; j<=4; j++)
+          SomeArray[i][j] = 0;
+
+

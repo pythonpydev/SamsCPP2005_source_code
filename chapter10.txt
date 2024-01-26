@@ -1,0 +1,1439 @@
+    Day 10
+        Advanced Functions
+            Overloaded Member Functions
+            Listing 10.1. Overloading member functions.
+            Using Default Values
+            Listing 10.2. Using default values.
+            Choosing Between Default Values and Overloaded Functions
+            The Default Constructor
+            Overloading Constructors
+            Listing 10.3. Overloading the constructor.
+            Initializing Objects
+            Listing 10.4. A code snippet showing initialization of member variables.
+            The Copy Constructor
+                Figure 10.1.
+                Figure 10.2. 
+            Listing 10.5. Copy constructors.
+                Figure 10.3. 
+            Operator Overloading
+            Listing 10.6. The Counter class.
+                Writing an Increment Function 
+            Listing 10.7. Adding an increment operator.
+                Overloading the Prefix Operator 
+            Listing 10.8. Overloading operator++.
+                Returning Types in Overloaded Operator Functions 
+            Listing 10.9. Returning a temporary object.
+                Returning Nameless Temporaries 
+            Listing 10.10. Returning a nameless temporary object.
+                Using the this Pointer 
+            Listing 10.11. Returning the this pointer.
+                Overloading the Postfix Operator
+                Difference Between Prefix and Postfix 
+            Listing 10.12. Prefix and postfix operators.
+            Operator Overloading Unary Operators
+                The Addition Operator 
+            Listing 10.13. The Add() function.
+                Overloading operator+ 
+            Listing 10.14. operator+.
+            Operator Overloading: Binary Operators
+                Issues in Operator Overloading
+                Limitations on Operator Overloading
+                What to Overload
+                The Assignment Operator 
+            Listing 10.15. An assignment operator.
+            Conversion Operators
+            Listing 10.16. Attempting to assign a Counter to a USHORT.
+            Listing 10.17. Converting USHORT to Counter.
+                Conversion Operators 
+            Listing 10.18. Converting from Counter to unsigned short().
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 10
+Advanced Functions
+
+On Day 5, "Functions," you learned the fundamentals of working with functions. Now that you know how pointers and references work, there is more you can do with functions. Today you learn
+
+    How to overload member functions.
+
+    How to overload operators.
+
+    How to write functions to support classes with dynamically allocated variables. 
+
+Overloaded Member Functions
+
+On Day 5, you learned how to implement function polymorphism, or function overloading, by writing two or more functions with the same name but with different parameters. Class member functions can be overloaded as well, in much the same way.
+
+The Rectangle class, demonstrated in Listing 10.1, has two DrawShape() functions. One, which takes no parameters, draws the Rectangle based on the class's current values. The other takes two values, width and length, and draws the rectangle based on those values, ignoring the current class values.
+
+Listing 10.1. Overloading member functions.
+
+
+1:     //Listing 10.1 Overloading class member functions
+2:     #include <iostream.h>
+3:
+4:     typedef unsigned short int USHORT;
+5:     enum BOOL { FALSE, TRUE};
+6:
+7:     // Rectangle class declaration
+8:     class Rectangle
+9:     {
+10:    public:
+11:       // constructors
+12:       Rectangle(USHORT width, USHORT height);
+13:       ~Rectangle(){}
+14:
+15:       // overloaded class function DrawShape
+16:       void DrawShape() const;
+17:       void DrawShape(USHORT aWidth, USHORT aHeight) const;
+18:
+19:    private:
+20:       USHORT itsWidth;
+21:       USHORT itsHeight;
+22:    };
+23:
+24:    //Constructor implementation
+25:    Rectangle::Rectangle(USHORT width, USHORT height)
+26:    {
+27:       itsWidth = width;
+28:       itsHeight = height;
+29:    }
+30:
+31:
+32:    // Overloaded DrawShape - takes no values
+33:    // Draws based on current class member values
+34:    void Rectangle::DrawShape() const
+35:    {
+36:        DrawShape( itsWidth, itsHeight);
+37:    }
+38:
+39:
+40:    // overloaded DrawShape - takes two values
+41:    // draws shape based on the parameters
+42:    void Rectangle::DrawShape(USHORT width, USHORT height) const
+43:    {
+44:       for (USHORT i = 0; i<height; i++)
+45:       {
+46:          for (USHORT j = 0; j< width; j++)
+47:          {
+48:             cout << "*";
+49:          }
+50:          cout << "\n";
+51:       }
+52:    }
+53:
+54:    // Driver program to demonstrate overloaded functions
+55:    int main()
+56:    {
+57:       // initialize a rectangle to 30,5
+58:       Rectangle theRect(30,5);
+59:       cout << "DrawShape(): \n";
+60:       theRect.DrawShape();
+61:       cout << "\nDrawShape(40,2): \n";
+62:       theRect.DrawShape(40,2);
+63:     return 0;
+64: }
+
+    NOTE: This listing passes width and height values to several functions. You should note that sometimes width is passed first and at other times height is passed first. 
+
+Output: DrawShape():
+******************************
+******************************
+******************************
+******************************
+******************************
+
+DrawShape(40,2):
+************************************************************
+************************************************************
+
+Analysis: Listing 10.1 represents a stripped-down version of the Week in Review project from Week 1. The test for illegal values has been taken out to save room, as have some of the accessor functions. The main program has been stripped down to a simple driver program, rather than a menu.
+
+The important code, however, is on lines 16 and 17, where DrawShape() is overloaded. The implementation for these overloaded class methods is on lines 32-52. Note that the version of DrawShape() that takes no parameters simply calls the version that takes two parameters, passing in the current member variables. Try very hard to avoid duplicating code in two functions. Otherwise, keeping them in sync when changes are made to one or the other will be difficult and error-prone.
+
+The driver program, on lines 54-64, creates a rectangle object and then calls DrawShape(), first passing in no parameters, and then passing in two unsigned short integers.
+
+The compiler decides which method to call based on the number and type of parameters entered. One can imagine a third overloaded function named DrawShape() that takes one dimension and an enumeration for whether it is the width or height, at the user's choice.
+Using Default Values
+
+Just as non-class functions can have one or more default values, so can each member function of a class. The same rules apply for declaring the default values, as illustrated in Listing 10.2.
+
+Listing 10.2. Using default values.
+
+
+1:     //Listing 10.2 Default values in member functions
+2:     #include <iostream.h>
+3:
+4:     typedef unsigned short int USHORT;
+5:     enum BOOL { FALSE, TRUE};
+6:
+7:     // Rectangle class declaration
+8:     class Rectangle
+9:     {
+10:    public:
+11:       // constructors
+12:       Rectangle(USHORT width, USHORT height);
+13:       ~Rectangle(){}
+14:       void DrawShape(USHORT aWidth, USHORT aHeight, BOOL UseCurrentVals =  Â                  FALSE) const;
+15:
+16:    private:
+17:       USHORT itsWidth;
+18:       USHORT itsHeight;
+19:    };
+20:
+21:    //Constructor implementation
+22:    Rectangle::Rectangle(USHORT width, USHORT height):
+23:    itsWidth(width),       // initializations
+24:    itsHeight(height)
+25:    {}                     // empty body
+26:
+27:
+28:    // default values used for third parameter
+29:    void Rectangle::DrawShape(
+30:       USHORT width,
+31:       USHORT height,
+32:       BOOL UseCurrentValue
+33:       ) const
+34:    {
+35:       int printWidth;
+36:       int printHeight;
+37:
+38:       if (UseCurrentValue == TRUE)
+39:       {
+40:          printWidth = itsWidth;       // use current class values
+41:          printHeight = itsHeight;
+42:       }
+43:       else
+44:       {
+45:          printWidth = width;         // use parameter values
+46:          printHeight = height;
+47:       }
+48:
+49:
+50:       for (int i = 0; i<printHeight; i++)
+51:       {
+52:          for (int j = 0; j< printWidth; j++)
+53:          {
+54:             cout << "*";
+55:          }
+56:          cout << "\n";
+57:       }
+58:    }
+59:
+60:    // Driver program to demonstrate overloaded functions
+61:    int main()
+62:    {
+63:       // initialize a rectangle to 10,20
+64:       Rectangle theRect(30,5);
+65:       cout << "DrawShape(0,0,TRUE)...\n";
+66:       theRect.DrawShape(0,0,TRUE);
+67:       cout <<"DrawShape(40,2)...\n";
+68:       theRect.DrawShape(40,2);
+69:     return 0;
+70: }
+
+Output: DrawShape(0,0,TRUE)...
+******************************
+******************************
+******************************
+******************************
+******************************
+DrawShape(40,2)...
+************************************************************
+************************************************************
+
+Analysis: Listing 10.2 replaces the overloaded DrawShape() function with a single function with default parameters. The function is declared on line 14 to take three parameters. The first two, aWidth and aHeight, are USHORTs, and the third, UseCurrentVals, is a BOOL (true or false) that defaults to FALSE.
+
+    NOTE: Boolean values are those that evaluate to TRUE or FALSE. C++ considers 0 to be false and all other values to be true. 
+
+The implementation for this somewhat awkward function begins on line 29. The third parameter, UseCurrentValue, is evaluated. If it is TRUE, the member variables itsWidth and itsHeight are used to set the local variables printWidth and printHeight, respectively.
+
+If UseCurrentValue is FALSE, either because it has defaulted FALSE or was set by the user, the first two parameters are used for setting printWidth and printHeight.
+
+Note that if UseCurrentValue is TRUE, the values of the other two parameters are completely ignored.
+Choosing Between Default Values and Overloaded Functions
+
+Listings 10.1 and 10.2 accomplish the same thing, but the overloaded functions in Listing 10.1 are easier to understand and more natural to use. Also, if a third variation is needed--perhaps the user wants to supply either the width or the height, but not both--it is easy to extend the overloaded functions. The default value, however, will quickly become unusably complex as new variations are added.
+
+How do you decide whether to use function overloading or default values? Here's a rule of thumb:
+
+Use function overloading when
+
+    There is no reasonable default value.
+
+    You need different algorithms.
+
+    You need to support variant types in your parameter list. 
+
+The Default Constructor
+
+As discussed on Day 6, "Basic Classes," if you do not explicitly declare a constructor for your class, a default constructor is created that takes no parameters and does nothing. You are free to make your own default constructor, however, that takes no arguments but that "sets up" your object as required.
+
+The constructor provided for you is called the "default" constructor, but by convention so is any constructor that takes no parameters. This can be a bit confusing, but it is usually clear from context which is meant.
+
+Take note that if you make any constructors at all, the default constructor is not made by the compiler. So if you want a constructor that takes no parameters and you've created any other constructors, you must make the default constructor yourself!
+Overloading Constructors
+
+The point of a constructor is to establish the object; for example, the point of a Rectangle constructor is to make a rectangle. Before the constructor runs, there is no rectangle, just an area of memory. After the constructor finishes, there is a complete, ready-to-use rectangle object.
+
+Constructors, like all member functions, can be overloaded. The ability to overload constructors is very powerful and very flexible.
+
+For example, you might have a rectangle object that has two constructors: The first takes a length and a width and makes a rectangle of that size. The second takes no values and makes a default-sized rectangle. Listing 10.3 implements this idea.
+
+Listing 10.3. Overloading the constructor.
+
+
+1:     // Listing 10.3
+2:      // Overloading constructors
+3:
+4:      #include <iostream.h>
+5:
+6:      class Rectangle
+7:      {
+8:      public:
+9:           Rectangle();
+10:           Rectangle(int width, int length);
+11:           ~Rectangle() {}
+12:           int GetWidth() const { return itsWidth; }
+13:           int GetLength() const { return itsLength; }
+14:      private:
+15:           int itsWidth;
+16:           int itsLength;
+17:      };
+18:
+19:      Rectangle::Rectangle()
+20:      {
+21:           itsWidth = 5;
+22:           itsLength = 10;
+23:      }
+24:
+25:      Rectangle::Rectangle (int width, int length)
+26:      {
+27:           itsWidth = width;
+28:           itsLength = length;
+29:      }
+30:
+31:      int main()
+32:      {
+33:           Rectangle Rect1;
+34:           cout << "Rect1 width: " << Rect1.GetWidth() << endl;
+35:           cout << "Rect1 length: " << Rect1.GetLength() << endl;
+36:
+37:           int aWidth, aLength;
+38:           cout << "Enter a width: ";
+39:           cin >> aWidth;
+40:           cout << "\nEnter a length: ";
+41:           cin >> aLength;
+42:
+43:           Rectangle Rect2(aWidth, aLength);
+44:           cout << "\nRect2 width: " << Rect2.GetWidth() << endl;
+45:           cout << "Rect2 length: " << Rect2.GetLength() << endl;
+46:     return 0;
+47: }
+
+Output: Rect1 width: 5
+Rect1 length: 10
+Enter a width: 20
+
+Enter a length: 50
+
+Rect2 width: 20
+Rect2 length: 50
+
+Analysis: The Rectangle class is declared on lines 6-17. Two constructors are declared: the "default constructor" on line 9 and a constructor taking two integer variables.
+
+On line 33, a rectangle is created using the default constructor, and its values are printed on lines 34-35. On lines 37-41, the user is prompted for a width and length, and the constructor taking two parameters is called on line 43. Finally, the width and height for this rectangle are printed on lines 44-45.
+
+Just as it does any overloaded function, the compiler chooses the right constructor, based on the number and type of the parameters.
+Initializing Objects
+
+Up to now, you've been setting the member variables of objects in the body of the constructor. Constructors, however, are invoked in two stages: the initialization stage and the body.
+
+Most variables can be set in either stage, either by initializing in the initialization stage or by assigning in the body of the constructor. It is cleaner, and often more efficient, to initialize member variables at the initialization stage. The following example shows how to initialize member variables:
+
+CAT():        // constructor name and parameters
+itsAge(5),    // initialization list
+itsWeight(8)
+{ }                // body of constructor
+
+After the closing parentheses on the constructor's parameter list, write a colon. Then write the name of the member variable and a pair of parentheses. Inside the parentheses, write the expression to be used to initialize that member variable. If there is more than one initialization, separate each one with a comma. Listing 10.4 shows the definition of the constructors from Listing 10.3, with initialization of the member variables rather than assignment.
+
+Listing 10.4. A code snippet showing initialization of member variables.
+
+
+1:   Rectangle::Rectangle():
+2:       itsWidth(5),
+3:       itsLength(10)
+4:   {
+5:   };
+6:
+7:   Rectangle::Rectangle (int width, int length)
+8:       itsWidth(width),
+9:       itsLength(length)
+10:  
+11: }; 
+
+Output: No output.
+
+There are some variables that must be initialized and cannot be assigned to: references and constants. It is common to have other assignments or action statements in the body of the constructor; however, it is best to use initialization as much as possible.
+The Copy Constructor
+
+In addition to providing a default constructor and destructor, the compiler provides a default copy constructor. The copy constructor is called every time a copy of an object is made.
+
+When you pass an object by value, either into a function or as a function's return value, a temporary copy of that object is made. If the object is a user-defined object, the class's copy constructor is called, as you saw yesterday in Listing 9.6.
+
+All copy constructors take one parameter, a reference to an object of the same class. It is a good idea to make it a constant reference, because the constructor will not have to alter the object passed in. For example:
+
+CAT(const CAT & theCat);
+
+Here the CAT constructor takes a constant reference to an existing CAT object. The goal of the copy constructor is to make a copy of theCAT.
+
+The default copy constructor simply copies each member variable from the object passed as a parameter to the member variables of the new object. This is called a member-wise (or shallow) copy, and although this is fine for most member variables, it breaks pretty quickly for member variables that are pointers to objects on the free store.
+
+    New Term: A shallow or member-wise copy copies the exact values of one object's member variables into another object. Pointers in both objects end up pointing to the same memory. A deep copy copies the values allocated on the heap to newly allocated memory.
+
+    If the CAT class includes a member variable, itsAge, that points to an integer on the free store, the default copy constructor will copy the passed-in CAT's itsAge member variable to the new CAT's itsAge member variable. The two objects will now point to the same memory, as illustrated in Figure 10.1.
+
+Figure 10.1.Using the default copy constructor.
+
+This will lead to a disaster when either CAT goes out of scope. As mentioned on Day 8, "Pointers," the job of the destructor is to clean up this memory. If the original CAT's destructor frees this memory and the new CAT is still pointing to the memory, a stray pointer has been created, and the program is in mortal danger. Figure 10.2 illustrates this problem.
+
+Figure 10.2. Creating a stray pointer.
+
+The solution to this is to create your own copy constructor and to allocate the memory as required. Once the memory is allocated, the old values can be copied into the new memory. This is called a deep copy. Listing 10.5 illustrates how to do this.
+
+Listing 10.5. Copy constructors.
+
+
+1:   // Listing 10.5
+2:   // Copy constructors
+3:
+4:   #include <iostream.h>
+5:
+6:   class CAT
+7:   {
+8:       public:
+9:            CAT();                         // default constructor
+10:            CAT (const CAT &);     // copy constructor
+11:            ~CAT();                         // destructor
+12:            int GetAge() const { return *itsAge; }
+13:            int GetWeight() const { return *itsWeight; }
+14:            void SetAge(int age) { *itsAge = age; }
+15:
+16:       private:
+17:            int *itsAge;
+18:            int *itsWeight;
+19:  };
+20:
+21:  CAT::CAT()
+22:  {
+23:       itsAge = new int;
+24:       itsWeight = new int;
+25:       *itsAge = 5;
+26:       *itsWeight = 9;
+27:  }
+28:
+29:  CAT::CAT(const CAT & rhs)
+30:  {
+31:       itsAge = new int;
+32:       itsWeight = new int;
+33:       *itsAge = rhs.GetAge();
+34:       *itsWeight = rhs.GetWeight();
+35:  }
+36:
+37:  CAT::~CAT()
+38:  {
+39:       delete itsAge;
+40:       itsAge = 0;
+41:       delete itsWeight;
+42:       itsWeight = 0;
+43:  }
+44:
+45:  int main()
+46:  {
+47:       CAT frisky;
+48:       cout << "frisky's age: " << frisky.GetAge() << endl;
+49:       cout << "Setting frisky to 6...\n";
+50:       frisky.SetAge(6);
+51:       cout << "Creating boots from frisky\n";
+52:       CAT boots(frisky);
+53:       cout << "frisky's age: " <<     frisky.GetAge() << endl;
+54:       cout << "boots' age: " << boots.GetAge() << endl;
+55:       cout << "setting frisky to 7...\n";
+56:       frisky.SetAge(7);
+57:       cout << "frisky's age: " <<     frisky.GetAge() << endl;
+58:       cout << "boot's age: " << boots.GetAge() << endl;
+59:     return 0;
+60: }
+
+Output: frisky's age: 5
+Setting frisky to 6...
+Creating boots from frisky
+frisky's age: 6
+boots' age:  6
+setting frisky to 7...
+frisky's age: 7
+boots' age: 6
+
+Analysis: On lines 6-19, the CAT class is declared. Note that on line 9 a default constructor is declared, and on line 10 a copy constructor is declared.
+On lines 17 and 18, two member variables are declared, each as a pointer to an integer. Typically there'd be little reason for a class to store int member variables as pointers, but this was done to illustrate how to manage member variables on the free store.
+
+The default constructor, on lines 21-27, allocates room on the free store for two int variables and then assigns values to them.
+
+The copy constructor begins on line 29. Note that the parameter is rhs. It is common to refer to the parameter to a copy constructor as rhs, which stands for right-hand side. When you look at the assignments in lines 33 and 34, you'll see that the object passed in as a parameter is on the right-hand side of the equals sign. Here's how it works.
+
+On lines 31 and 32, memory is allocated on the free store. Then, on lines 33 and 34, the value at the new memory location is assigned the values from the existing CAT.
+
+The parameter rhs is a CAT that is passed into the copy constructor as a constant reference. The member function rhs.GetAge() returns the value stored in the memory pointed to by rhs's member variable itsAge. As a CAT object, rhs has all the member variables of any other CAT.
+
+When the copy constructor is called to create a new CAT, an existing CAT is passed in as a parameter. The new CAT can refer to its own member variables directly; however, it must access rhs's member variables using the public accessor methods.
+
+Figure 10.3 diagrams what is happening here. The values pointed to by the existing CAT are copied to the memory allocated for the new CAT
+
+Figure 10.3. Deep copy illustrated.
+
+On line 47, a CAT called frisky is created. frisky's age is printed, and then his age is set to 6 on line 50. On line 52, a new CAT boots is created, using the copy constructor and passing in frisky. Had frisky been passed as a parameter to a function, this same call to the copy constructor would have been made by the compiler.
+
+On lines 53 and 54, the ages of both CATs are printed. Sure enough, boots has frisky's age, 6, not the default age of 5. On line 56, frisky's age is set to 7, and then the ages are printed again. This time frisky's age is 7, but boots' age is still 6, demonstrating that they are stored in separate areas of memory.
+
+When the CATs fall out of scope, their destructors are automatically invoked. The implementation of the CAT destructor is shown on lines 37-43. delete is called on both pointers, itsAge and itsWeight, returning the allocated memory to the free store. Also, for safety, the pointers are reassigned to NULL.
+Operator Overloading
+
+C++ has a number of built-in types, including int, real, char, and so forth. Each of these has a number of built-in operators, such as addition (+) and multiplication (*). C++ enables you to add these operators to your own classes as well.
+
+In order to explore operator overloading fully, Listing 10.6 creates a new class, Counter. A Counter object will be used in counting (surprise!) in loops and other applications where a number must be incremented, decremented, or otherwise tracked.
+
+Listing 10.6. The Counter class.
+
+
+1:     // Listing 10.6
+2:     // The Counter class
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          ~Counter(){}
+12:          USHORT GetItsVal()const { return itsVal; }
+13:          void SetItsVal(USHORT x) {itsVal = x; }
+14:
+15:       private:
+16:          USHORT itsVal;
+17:
+18:    };
+19:
+20:    Counter::Counter():
+21:    itsVal(0)
+22:    {};
+23:
+24:    int main()
+25:    {
+26:       Counter i;
+27:       cout << "The value of i is " << i.GetItsVal() << endl;
+28:     return 0;
+29: }
+Output: The value of i is 0
+
+Analysis: As it stands, this is a pretty useless class. It is defined on lines 7-18. Its only member variable is a USHORT. The default constructor, which is declared on line 10 and whose implementation is on line 20, initializes the one member variable, itsVal, to zero.
+
+Unlike an honest, red-blooded USHORT, the Counter object cannot be incremented, decremented, added, assigned, or otherwise manipulated. In exchange for this, it makes printing its value far more difficult!
+Writing an Increment Function
+
+Operator overloading restores much of the functionality that has been stripped out of this class. For example, there are two ways to add the ability to increment a Counter object. The first is to write an increment method, as shown in Listing 10.7.
+
+Listing 10.7. Adding an increment operator.
+
+
+1:     // Listing 10.7
+2:     // The Counter class
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          ~Counter(){}
+12:          USHORT GetItsVal()const { return itsVal; }
+13:          void SetItsVal(USHORT x) {itsVal = x; }
+14:          void Increment() { ++itsVal; }
+15:
+16:       private:
+17:          USHORT itsVal;
+18:
+19:    };
+20:
+21:    Counter::Counter():
+22:    itsVal(0)
+23:    {};
+24:
+25:    int main()
+26:    {
+27:       Counter i;
+28:       cout << "The value of i is " << i.GetItsVal() << endl;
+29:       i.Increment();
+30:       cout << "The value of i is " << i.GetItsVal() << endl;
+31:     return 0;
+32: }
+
+
+Output: The value of i is 0
+The value of i is 1
+
+Analysis: Listing 10.7 adds an Increment function, defined on line 14. Although this works, it is cumbersome to use. The program cries out for the ability to add a ++ operator, and of course this can be done.
+Overloading the Prefix Operator
+
+Prefix operators can be overloaded by declaring functions with the form:
+
+returnType Operator op (parameters)
+
+Here, op is the operator to overload. Thus, the ++ operator can be overloaded with the following syntax:
+
+void operator++ ()
+
+Listing 10.8 demonstrates this alternative.
+
+Listing 10.8. Overloading operator++.
+
+1:     // Listing 10.8
+2:     // The Counter class
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          ~Counter(){}
+12:          USHORT GetItsVal()const { return itsVal; }
+13:          void SetItsVal(USHORT x) {itsVal = x; }
+14:          void Increment() { ++itsVal; }
+15:          void operator++ () { ++itsVal; }
+16:
+17:       private:
+18:          USHORT itsVal;
+19:
+20:    };
+21:
+22:    Counter::Counter():
+23:    itsVal(0)
+24:    {};
+25:
+26:    int main()
+27:    {
+28:       Counter i;
+29:       cout << "The value of i is " << i.GetItsVal() << endl;
+30:       i.Increment();
+31:       cout << "The value of i is " << i.GetItsVal() << endl;
+32:       ++i;
+33:       cout << "The value of i is " << i.GetItsVal() << endl;
+34:     return 0;
+35: }
+Output: The value of i is 0
+The value of i is 1
+The value of i is 2
+
+Analysis: On line 15, operator++ is overloaded, and it's used on line 32. This is far closer to the syntax one would expect with the Counter object. At this point, you might consider putting in the extra abilities for which Counter was created in the first place, such as detecting when the Counter overruns its maximum size.
+There is a significant defect in the way the increment operator was written, however. If you want to put the Counter on the right side of an assignment, it will fail. For example:
+
+Counter a = ++i;
+
+This code intends to create a new Counter, a, and then assign to it the value in i after i is incremented. The built-in copy constructor will handle the assignment, but the current increment operator does not return a Counter object. It returns void. You can't assign a void object to a Counter object. (You can't make something from nothing!)
+Returning Types in Overloaded Operator Functions
+
+Clearly, what you want is to return a Counter object so that it can be assigned to another Counter object. Which object should be returned? One approach would be to create a temporary object and return that. Listing 10.9 illustrates this approach.
+
+Listing 10.9. Returning a temporary object.
+
+
+1:     // Listing 10.9
+2:     // operator++ returns a temporary object
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          ~Counter(){}
+12:          USHORT GetItsVal()const { return itsVal; }
+13:          void SetItsVal(USHORT x) {itsVal = x; }
+14:          void Increment() { ++itsVal; }
+15:          Counter operator++ ();
+16:
+17:       private:
+18:          USHORT itsVal;
+19:
+20:    };
+21:
+22:    Counter::Counter():
+23:    itsVal(0)
+24:    {};
+25:
+26:    Counter Counter::operator++()
+27:    {
+28:        ++itsVal;
+29:        Counter temp;
+30:        temp.SetItsVal(itsVal);
+31:        return temp;
+32:    }
+33:
+34:    int main()
+35:    {
+36:       Counter i;
+37:       cout << "The value of i is " << i.GetItsVal() << endl;
+38:       i.Increment();
+39:       cout << "The value of i is " << i.GetItsVal() << endl;
+40:       ++i;
+41:       cout << "The value of i is " << i.GetItsVal() << endl;
+42:       Counter a = ++i;
+43:       cout << "The value of a: " << a.GetItsVal();
+44:       cout << " and i: " << i.GetItsVal() << endl;
+45:     return 0;
+46: }
+
+Output: The value of i is 0
+The value of i is 1
+The value of i is 2
+The value of a: 3 and i: 3
+
+Analysis: In this version, operator++ has been declared on line 15 to return a Counter object. On line 29, a temporary variable, temp, is created and its value is set to match that in the current object. That temporary variable is returned and immediately assigned to a on line 42.
+Returning Nameless Temporaries
+
+There is really no need to name the temporary object created on line 29. If Counter had a constructor that took a value, you could simply return the result of that constructor as the return value of the increment operator. Listing 10.10 illustrates this idea.
+
+Listing 10.10. Returning a nameless temporary object.
+
+
+1:     // Listing 10.10
+2:     // operator++ returns a nameless temporary object
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          Counter(USHORT val);
+12:          ~Counter(){}
+13:          USHORT GetItsVal()const { return itsVal; }
+14:          void SetItsVal(USHORT x) {itsVal = x; }
+15:          void Increment() { ++itsVal; }
+16:          Counter operator++ ();
+17:
+18:       private:
+19:          USHORT itsVal;
+20:
+21:    };
+22:
+23:    Counter::Counter():
+24:    itsVal(0)
+25:    {}
+26:
+27:    Counter::Counter(USHORT val):
+28:    itsVal(val)
+29:    {}
+30:
+31:    Counter Counter::operator++()
+32:    {
+33:       ++itsVal;
+34:       return Counter (itsVal);
+35:    }
+36:
+37:    int main()
+38:    {
+39:       Counter i;
+40:       cout << "The value of i is " << i.GetItsVal() << endl;
+41:       i.Increment();
+42:       cout << "The value of i is " << i.GetItsVal() << endl;
+43:       ++i;
+44:       cout << "The value of i is " << i.GetItsVal() << endl;
+45:       Counter a = ++i;
+46:       cout << "The value of a: " << a.GetItsVal();
+47:       cout << " and i: " << i.GetItsVal() << endl;
+48:     return 0;
+49: }
+
+Output: The value of i is 0
+The value of i is 1
+The value of i is 2
+The value of a: 3 and i: 3
+
+Analysis: On line 11, a new constructor is declared that takes a USHORT. The implementation is on lines 27-29. It initializes itsVal with the passed-in value.
+The implementation of operator++ is now simplified. On line 33, itsVal is incremented. Then on line 34, a temporary Counter object is created, initialized to the value in itsVal, and then returned as the result of the operator++.
+
+This is more elegant, but begs the question, "Why create a temporary object at all?" Remember that each temporary object must be constructed and later destroyed--each one potentially an expensive operation. Also, the object i already exists and already has the right value, so why not return it? We'll solve this problem by using the this pointer.
+Using the this Pointer
+
+The this pointer, as discussed yesterday, was passed to the operator++ member function as to all member functions. The this pointer points to i, and if it's dereferenced it will return the object i, which already has the right value in its member variable itsVal. Listing 10.11 illustrates returning the dereferenced this pointer and avoiding the creation of an unneeded temporary object.
+
+Listing 10.11. Returning the this pointer.
+
+
+1:     // Listing 10.11
+2:     // Returning the dereferenced this pointer
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:        public:
+10:          Counter();
+11:          ~Counter(){}
+12:          USHORT GetItsVal()const { return itsVal; }
+13:          void SetItsVal(USHORT x) {itsVal = x; }
+14:          void Increment() { ++itsVal; }
+15:          const Counter& operator++ ();
+16:
+17:       private:
+18:          USHORT itsVal;
+19:
+20:    };
+21:
+22:    Counter::Counter():
+23:    itsVal(0)
+24:    {};
+25:
+26:    const Counter& Counter::operator++()
+27:    {
+28:       ++itsVal;
+29:       return *this;
+30:    }
+31:
+32:    int main()
+33:    {
+34:       Counter i;
+35:       cout << "The value of i is " << i.GetItsVal() << endl;
+36:       i.Increment();
+37:       cout << "The value of i is " << i.GetItsVal() << endl;
+38:       ++i;
+39:       cout << "The value of i is " << i.GetItsVal() << endl;
+40:       Counter a = ++i;
+41:       cout << "The value of a: " << a.GetItsVal();
+42:       cout << " and i: " << i.GetItsVal() << endl;
+48:     return 0;
+49: }
+
+Output: The value of i is 0
+The value of i is 1
+The value of i is 2
+The value of a: 3 and i: 3
+
+Analysis: The implementation of operator++, on lines 26-30, has been changed to dereference the this pointer and to return the current object. This provides a Counter object to be assigned to a. As discussed above, if the Counter object allocated memory, it would be important to override the copy constructor. In this case, the default copy constructor works fine.
+
+Note that the value returned is a Counter reference, thereby avoiding the creation of an extra temporary object. It is a const reference because the value should not be changed by the function using this Counter.
+Overloading the Postfix Operator
+
+So far you've overloaded the prefix operator. What if you want to overload the postfix increment operator? Here the compiler has a problem: How is it to differentiate between prefix and postfix? By convention, an integer variable is supplied as a parameter to the operator declaration. The parameter's value is ignored; it is just a signal that this is the postfix operator.
+Difference Between Prefix and Postfix
+
+Before we can write the postfix operator, we must understand how it is different from the prefix operator. We reviewed this in detail on Day 4, "Expressions and Statements" (see Listing 4.3).
+
+To review, prefix says "increment, and then fetch," while postfix says "fetch, and then increment."
+
+Thus, while the prefix operator can simply increment the value and then return the object itself, the postfix must return the value that existed before it was incremented. To do this, we must create a temporary object that will hold the original value, then increment the value of the original object, and then return the temporary.
+
+Let's go over that again. Consider the following line of code:
+
+a = x++;
+
+If x was 5, after this statement a is 5, but x is 6. Thus, we returned the value in x and assigned it to a, and then we increased the value of x. If x is an object, its postfix increment operator must stash away the original value (5) in a temporary object, increment x's value to 6, and then return that temporary to assign its value to a.
+
+Note that since we are returning the temporary, we must return it by value and not by reference, as the temporary will go out of scope as soon as the function returns.
+
+Listing 10.12 demonstrates the use of both the prefix and the postfix operators.
+
+Listing 10.12. Prefix and postfix operators.
+
+
+1:     // Listing 10.12
+2:     // Returning the dereferenced this pointer
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:     public:
+10:       Counter();
+11:       ~Counter(){}
+12:       USHORT GetItsVal()const { return itsVal; }
+13:       void SetItsVal(USHORT x) {itsVal = x; }
+14:       const Counter& operator++ ();      // prefix
+15:       const Counter operator++ (int); // postfix
+16:
+17:    private:
+18:       USHORT itsVal;
+19:    };
+20:
+21:    Counter::Counter():
+22:    itsVal(0)
+23:    {}
+24:
+25:    const Counter& Counter::operator++()
+26:    {
+27:       ++itsVal;
+28:       return *this;
+29:    }
+30:
+31:    const Counter Counter::operator++(int)
+32:    {
+33:       Counter temp(*this);
+34:       ++itsVal;
+35:       return temp;
+36:    }
+37:
+38:    int main()
+39:    {
+40:       Counter i;
+41:       cout << "The value of i is " << i.GetItsVal() << endl;
+42:       i++;
+43:       cout << "The value of i is " << i.GetItsVal() << endl;
+44:       ++i;
+45:       cout << "The value of i is " << i.GetItsVal() << endl;
+46:       Counter a = ++i;
+47:       cout << "The value of a: " << a.GetItsVal();
+48:       cout << " and i: " << i.GetItsVal() << endl;
+49:       a = i++;
+50:       cout << "The value of a: " << a.GetItsVal();
+51:       cout << " and i: " << i.GetItsVal() << endl;
+52:     return 0;
+53: }
+
+Output: The value of i is 0
+The value of i is 1
+The value of i is 2
+The value of a: 3 and i: 3
+The value of a: 3 and i: 4
+
+Analysis: The postfix operator is declared on line 15 and implemented on lines 31-36. Note that the call to the prefix operator on line 14 does not include the flag integer (x), but is used with its normal syntax. The postfix operator uses a flag value (x) to signal that it is the postfix and not the prefix. The flag value (x) is never used, however.
+Operator Overloading Unary Operators
+
+Declare an overloaded operator as you would a function. Use the keyword operator, followed by the operator to overload. Unary operator functions do not take parameters, with the exception of the postfix increment and decrement, which take an integer as a flag. Example 1
+
+const Counter& Counter::operator++ ();
+
+Example 2
+
+Counter Counter::operator-(int);
+
+    DO use a parameter to operator++ if you want the postfix operator. DO return a const reference to the object from operator++. DON'T create temporary objects as return values from operator++. 
+
+The Addition Operator
+
+The increment operator is a unary operator. It operates on only one object. The addition operator (+) is a binary operator, where two objects are involved. How do you implement overloading the + operator for Count?
+
+The goal is to be able to declare two Counter variables and then add them, as in this example:
+
+Counter varOne, varTwo, varThree;
+VarThree = VarOne + VarTwo;
+
+Once again, you could start by writing a function, Add(), which would take a Counter as its argument, add the values, and then return a Counter with the result. Listing 10.13 illustrates this approach.
+
+Listing 10.13. The Add() function.
+
+
+1:     // Listing 10.13
+2:     // Add function
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:     public:
+10:       Counter();
+11:       Counter(USHORT initialValue);
+12:       ~Counter(){}
+13:       USHORT GetItsVal()const { return itsVal; }
+14:       void SetItsVal(USHORT x) {itsVal = x; }
+15:       Counter Add(const Counter &);
+16:
+17:    private:
+18:       USHORT itsVal;
+19:
+20:    };
+21:
+22:    Counter::Counter(USHORT initialValue):
+23:    itsVal(initialValue)
+24:    {}
+25:
+26:    Counter::Counter():
+27:    itsVal(0)
+28:    {}
+29:
+30:    Counter Counter::Add(const Counter & rhs)
+31:    {
+32:       return Counter(itsVal+ rhs.GetItsVal());
+33:    }
+34:
+35:    int main()
+36:    {
+37:       Counter varOne(2), varTwo(4), varThree;
+38:       varThree = varOne.Add(varTwo);
+39:       cout << "varOne: " << varOne.GetItsVal()<< endl;
+40:       cout << "varTwo: " << varTwo.GetItsVal() << endl;
+41:       cout << "varThree: " << varThree.GetItsVal() << endl;
+42:
+43:     return 0;
+44: }
+Output: varOne: 2
+varTwo: 4
+varThree: 6
+
+
+Analysis: The Add()function is declared on line 15. It takes a constant Counter reference, which is the number to add to the current object. It returns a Counter object, which is the result to be assigned to the left side of the assignment statement, as shown on line 38. That is, VarOne is the object, varTwo is the parameter to the Add() function, and the result is assigned to VarThree.
+
+In order to create varThree without having to initialize a value for it, a default constructor is required. The default constructor initializes itsVal to 0, as shown on lines 26-28. Since varOne and varTwo need to be initialized to a non-zero value, another constructor was created, as shown on lines 22-24. Another solution to this problem is to provide the default value 0 to the constructor declared on line 11.
+Overloading operator+
+
+The Add() function itself is shown on lines 30-33. It works, but its use is unnatural. Overloading the + operator would make for a more natural use of the Counter class. Listing 10.14 illustrates this.
+
+Listing 10.14. operator+.
+
+
+1:     // Listing 10.14
+2:     //Overload operator plus (+)
+3:
+4:     typedef unsigned short  USHORT;
+5:     #include <iostream.h>
+6:
+7:     class Counter
+8:     {
+9:     public:
+10:       Counter();
+11:       Counter(USHORT initialValue);
+12:       ~Counter(){}
+13:       USHORT GetItsVal()const { return itsVal; }
+14:       void SetItsVal(USHORT x) {itsVal = x; }
+15:       Counter operator+ (const Counter &);
+16:    private:
+17:       USHORT itsVal;
+18:    };
+19:
+20:    Counter::Counter(USHORT initialValue):
+21:    itsVal(initialValue)
+22:    {}
+23:
+24:    Counter::Counter():
+25:    itsVal(0)
+26:    {}
+27:
+28:    Counter Counter::operator+ (const Counter & rhs)
+29:    {
+30:       return Counter(itsVal + rhs.GetItsVal());
+31:    }
+32:
+33:    int main()
+34:    {
+35:       Counter varOne(2), varTwo(4), varThree;
+36:       varThree = varOne + varTwo;
+37:       cout << "varOne: " << varOne.GetItsVal()<< endl;
+38:       cout << "varTwo: " << varTwo.GetItsVal() << endl;
+39:       cout << "varThree: " << varThree.GetItsVal() << endl;
+40:
+41:     return 0;
+42: }
+
+Output: varOne: 2
+varTwo: 4
+varThree: 6
+
+Analysis: operator+ is declared on line 15 and defined on lines 28-31. Compare these with the declaration and definition of the Add() function in the previous listing; they are nearly identical. The syntax of their use, however, is quite different. It is more natural to say this:
+
+varThree = varOne + varTwo;
+
+than to say:
+
+varThree = varOne.Add(varTwo);
+
+Not a big change, but enough to make the program easier to use and understand.
+
+    NOTE: The techniques used for overloading operator++ can be applied to the other unary operators, such as operator-. 
+
+Operator Overloading: Binary Operators
+
+Binary operators are created like unary operators, except that they do take a parameter. The parameter is a constant reference to an object of the same type. Example 1
+
+Counter Counter::operator+ (const Counter & rhs);
+
+Example 2
+
+Counter Counter::operator-(const Counter & rhs);
+
+Issues in Operator Overloading
+
+Overloaded operators can be member functions, as described in this chapter, or non-member functions. The latter will be described on Day 14, "Special Classes and Functions," when we discuss friend functions.
+
+The only operators that must be class members are the assignment (=), subscript([]), function call (()), and indirection (->) operators.
+
+operator[] will be discussed tomorrow, when arrays are covered. Overloading operator-> will be discussed on Day 14, when smart pointers are discussed.
+Limitations on Operator Overloading
+
+Operators on built-in types (such as int) cannot be overloaded. The precedence order cannot be changed, and the arity of the operator, that is, whether it is unary or binary, cannot be changed. You cannot make up new operators, so you cannot declare ** to be the "power of" operator.
+
+    New Term: Arity refers to how many terms are used in the operator. Some C++ operators are unary and use only one term (myValue++). Some operators are binary and use two terms (a+b). Only one operator is ternary and uses three terms. The ? operator is often called the ternary operator, as it is the only ternary operator in C++ (a > b ? x : y). 
+
+What to Overload
+
+Operator overloading is one of the aspects of C++ most overused and abused by new programmers. It is tempting to create new and interesting uses for some of the more obscure operators, but these invariably lead to code that is confusing and difficult to read.
+
+Of course, making the + operator subtract and the * operator add can be fun, but no professional programmer would do that. The greater danger lies in the well-intentioned but idiosyncratic use of an operator--using + to mean concatenate a series of letters, or / to mean split a string. There is good reason to consider these uses, but there is even better reason to proceed with caution. Remember, the goal of overloading operators is to increase usability and understanding.
+
+    DO use operator overloading when it will clarify the program. DON'T create counter-intuitive operators. DO return an object of the class from overloaded operators. 
+
+The Assignment Operator
+
+The fourth and final function that is supplied by the compiler, if you don't specify one, is the assignment operator (operator=()). This operator is called whenever you assign to an object. For example:
+
+CAT catOne(5,7);
+CAT catTwo(3,4);
+// ... other code here
+catTwo = catOne;
+
+Here, catOne is created and initialized with itsAge equal to 5 and itsWeight equal to 7. catTwo is then created and assigned the values 3 and 4.
+
+After a while, catTwo is assigned the values in catOne. Two issues are raised here: What happens if itsAge is a pointer, and what happens to the original values in catTwo?
+
+Handling member variables that store their values on the free store was discussed earlier during the examination of the copy constructor. The same issues arise here, as you saw illustrated in Figures 10.1 and 10.2.
+
+C++ programmers differentiate between a shallow or member-wise copy on the one hand, and a deep copy on the other. A shallow copy just copies the members, and both objects end up pointing to the same area on the free store. A deep copy allocates the necessary memory. This is illustrated in Figure 10.3.
+
+There is an added wrinkle with the assignment operator, however. The object catTwo already exists and has memory already allocated. That memory must be deleted if there is to be no memory leak. But what happens if you assign catTwo to itself?
+
+catTwo = catTwo;
+
+No one is likely to do this on purpose, but the program must be able to handle it. More important, it is possible for this to happen by accident when references and dereferenced pointers hide the fact that the assignment is to itself.
+
+If you did not handle this problem carefully, catTwo would delete its memory allocation. Then, when it was ready to copy in the memory from the right-hand side of the assignment, it would have a very big problem: The memory would be gone.
+
+To protect against this, your assignment operator must check to see if the right-hand side of the assignment operator is the object itself. It does this by examining the this pointer. Listing 10.15 shows a class with an assignment operator.
+
+Listing 10.15. An assignment operator.
+
+
+1:      // Listing 10.15
+2:      // Copy constructors
+3:
+4:      #include <iostream.h>
+5:
+6:      class CAT
+7:      {
+8:          public:
+9:               CAT();                         // default constructor
+10:    // copy constructor and destructor elided!
+11:               int GetAge() const { return *itsAge; }
+12:               int GetWeight() const { return *itsWeight; }
+13:               void SetAge(int age) { *itsAge = age; }
+14:               CAT operator=(const CAT &);
+15:
+16:          private:
+17:               int *itsAge;
+18:               int *itsWeight;
+19:     };
+20:
+21:     CAT::CAT()
+22:     {
+23:          itsAge = new int;
+24:       itsWeight = new int;
+25:       *itsAge = 5;
+26:       *itsWeight = 9;
+27:  }
+28:
+29:
+30: CAT CAT::operator=(const CAT & rhs)
+31: {
+32:    if (this == &rhs)
+33:       return *this;
+34:    delete itsAge;
+35:    delete itsWeight;
+36:    itsAge = new int;
+37:    itsWeight = new int;
+38:    *itsAge = rhs.GetAge();
+39:    *itsWeight = rhs.GetWeight();
+40:    return *this;
+41: }
+42:
+43:
+44:     int main()
+45:     {
+46:          CAT frisky;
+47:          cout << "frisky's age: " << frisky.GetAge() << endl;
+48:          cout << "Setting frisky to 6...\n";
+49:          frisky.SetAge(6);
+50:          CAT whiskers;
+51:          cout << "whiskers' age: " << whiskers.GetAge() << endl;
+52:          cout << "copying frisky to whiskers...\n";
+53:          whiskers = frisky;
+54:          cout << "whiskers' age: " << whiskers.GetAge() << endl;
+55:     return 0;
+56: }
+
+frisky's age: 5
+Setting frisky to 6...
+whiskers' age: 5
+copying frisky to whiskers...
+whiskers' age: 6
+
+Output: Listing 10.15 brings back the CAT class, and leaves out the copy constructor and destructor to save room. On line 14, the assignment operator is declared, and on lines 30-41 it is defined.
+
+Analysis: On line 32, the current object (the CAT being assigned to) is tested to see whether it is the same as the CAT being assigned. This is done by checking whether or not the address of rhs is the same as the address stored in the this pointer.
+
+This works fine for single inheritance, but if you are using multiple inheritance, as discussed on Day 13, "Polymorphism," this test will fail. An alternative test is to dereference the this pointer and see if the two objects are the same:
+
+if (*this == rhs)
+
+Of course, the equality operator (==) can be overloaded as well, allowing you to determine for yourself what it means for your objects to be equal.
+Conversion Operators
+
+What happens when you try to assign a variable of a built-in type, such as int or unsigned short, to an object of a user-defined class? Listing 10.16 brings back the Counter class, and attempts to assign a variable of type USHORT to a Counter object.
+
+    WARNING: Listing 10.16 will not compile! 
+
+Listing 10.16. Attempting to assign a Counter to a USHORT
+
+
+1:        // Listing 10.16
+2:        // This code won't compile!
+3:
+4:        typedef unsigned short  USHORT;
+5:        #include <iostream.h>
+6:
+7:        class Counter
+8:        {
+9:           public:
+10:             Counter();
+11:             ~Counter(){}
+12:             USHORT GetItsVal()const { return itsVal; }
+13:             void SetItsVal(USHORT x) {itsVal = x; }
+14:          private:
+15:             USHORT itsVal;
+16:
+17:       };
+18:
+19:       Counter::Counter():
+20:       itsVal(0)
+21:       {}
+22:
+23:    int main()
+24:    {
+25:       USHORT theShort = 5;
+26:       Counter theCtr = theShort;
+27:       cout << "theCtr: " << theCtr.GetItsVal() << endl;
+28:     return ;0
+29: }
+Output: Compiler error! Unable to convert USHORT to Counter
+
+Analysis: The Counter class declared on lines 7-17 has only a default constructor. It declares no particular method for turning a USHORT into a Counter object, and so line 26 causes a compile error. The compiler cannot figure out, unless you tell it, that, given a USHORT, it should assign that value to the member variable itsVal.
+
+Listing 10.17 corrects this by creating a conversion operator: a constructor that takes a USHORT and produces a Counter object.
+
+Listing 10.17. Converting USHORT to Counter.
+
+
+1:        // Listing 10.17
+2:        // Constructor as conversion operator
+3:
+4:        typedef unsigned short  USHORT;
+5:        #include <iostream.h>
+6:
+7:        class Counter
+8:        {
+9:           public:
+10:             Counter();
+11:             Counter(USHORT val);
+12:             ~Counter(){}
+13:             USHORT GetItsVal()const { return itsVal; }
+14:             void SetItsVal(USHORT x) {itsVal = x; }
+15:          private:
+16:             USHORT itsVal;
+17:
+18:       };
+19:
+20:       Counter::Counter():
+21:       itsVal(0)
+22:       {}
+23:
+24:    Counter::Counter(USHORT val):
+25:    itsVal(val)
+26:    {}
+27:
+28:
+29:    int main()
+30:    {
+31:       USHORT theShort = 5;
+32:       Counter theCtr = theShort;
+33:       cout << "theCtr: " << theCtr.GetItsVal() << endl;
+34:     return 0;
+35: 
+Output: theCtr: 5
+
+Analysis: The important change is on line 11, where the constructor is overloaded to take a USHORT, and on lines 24-26, where the constructor is implemented. The effect of this constructor is to create a Counter out of a USHORT.
+Given this, the compiler is able to call the constructor that takes a USHORT as its argument. What happens, however, if you try to reverse the assignment with the following?
+
+1:  Counter theCtr(5);
+2:  USHORT theShort = theCtr;
+3:  cout << "theShort : " << theShort  << endl;
+
+Once again, this will generate a compile error. Although the compiler now knows how to create a Counter out of a USHORT, it does not know how to reverse the process.
+Conversion Operators
+
+To solve this and similar problems, C++ provides conversion operators that can be added to your class. This allows your class to specify how to do implicit conversions to built-in types. Listing 10.18 illustrates this. One note, however: Conversion operators do not specify a return value, even though they do, in effect, return a converted value.
+
+Listing 10.18. Converting from Counter to unsigned short().
+
+
+1:  // Listing 10.18
+2:  // conversion operator
+3:
+4:  typedef unsigned short  USHORT;
+5:  #include <iostream.h>
+6:
+7:  class Counter
+8:  {
+9:    public:
+10:      Counter();
+11:      Counter(USHORT val);
+12:      ~Counter(){}
+13:      USHORT GetItsVal()const { return itsVal; }
+14:      void SetItsVal(USHORT x) {itsVal = x; }
+15:      operator unsigned short();
+16:   private:
+17:      USHORT itsVal;
+18:
+19:  };
+20:
+21:  Counter::Counter():
+22:  itsVal(0)
+23:  {}
+24:
+25: Counter::Counter(USHORT val):
+26: itsVal(val)
+27: {}
+28:
+29: Counter::operator unsigned short ()
+30: {
+31:    return ( USHORT (itsVal) );
+32: }
+33:
+34: int main()
+35: {
+36:    Counter ctr(5);
+37:    USHORT theShort = ctr;
+38:    cout << "theShort: " << theShort << endl;
+39:     return 0;
+40: 
+Output: theShort: 5
+
+Analysis: On line 15, the conversion operator is declared. Note that it has no return value. The implementation of this function is on lines 29-32. Line 31 returns the value of itsVal, converted to a USHORT.
+
+Now the compiler knows how to turn USHORTs into Counter objects and vice versa, and they can be assigned to one another freely.
+Summary
+
+Today you learned how to overload member functions of your classes. You also learned how to supply default values to functions, and how to decide when to use default values and when to overload.
+
+Overloading class constructors allows you to create flexible classes that can be created from other objects. Initialization of objects happens at the initialization stage of construction, and is more efficient than assigning values in the body of the constructor.
+
+The copy constructor and the assignment operator are supplied by the compiler if you don't create your own, but they do a member-wise copy of the class. In classes in which member data includes pointers to the free store, these methods must be overridden so that you allocate memory for the target object.
+
+Almost all C++ operators can be overloaded, though you want to be cautious not to create operators whose use is counter-intuitive. You cannot change the arity of operators, nor can you invent new operators.
+
+The this pointer refers to the current object and is an invisible parameter to all member functions. The dereferenced this pointer is often returned by overloaded operators.
+
+Conversion operators allow you to create classes that can be used in expressions that expect a different type of object. They are exceptions to the rule that all functions return an explicit value; like constructors and destructors, they have no return type.
+Q&A
+
+    Q. Why would you ever use default values when you can overload a function?
+
+    A. It is easier to maintain one function than two, and often easier to understand a function with default parameters than to study the bodies of two functions. Furthermore, updating one of the functions and neglecting to update the second is a common source of bugs.
+
+    Q. Given the problems with overloaded functions, why not always use default values instead?
+
+    A. Overloaded functions supply capabilities not available with default variables, such as varying the list of parameters by type rather than just by number.
+
+    Q. When writing a class constructor, how do you decide what to put in the initialization and what to put in the body of the constructor?
+
+    A. A simple rule of thumb is to do as much as possible in the initialization phase--that is, initialize all member variables there. Some things, like computations and print statements, must be in the body of the constructor.
+
+    Q. Can an overloaded function have a default parameter?
+
+    A. Yes. There is no reason not to combine these powerful features. One or more of the overloaded functions can have their own default values, following the normal rules for default variables in any function.
+
+    Q. Why are some member functions defined within the class declaration and others are not?
+
+    A. Defining the implementation of a member function within the declaration makes it inline. Generally, this is done only if the function is extremely simple. Note that you can also make a member function inline by using the keyword inline, even if the function is declared outside the class declaration. 
+
+Workshop
+
+The Workshop provides quiz questions to help solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before going to the next chapter.
+Quiz
+
+    1. When you overload member functions, in what ways must they differ?
+
+    2. What is the difference between a declaration and a definition?
+
+    3. When is the copy constructor called?
+
+    4. When is the destructor called?
+
+    5. How does the copy constructor differ from the assignment operator (=)?
+
+    6. What is the this pointer?
+
+    7. How do you differentiate between overloading the prefix and postfix increment operators?
+
+    8. Can you overload the operator+ for short integers?
+
+    9. Is it legal in C++ to overload the operator++ so that it decrements a value in your class?
+
+    10. What return value must conversion operators have in their declarations? 
+
+Exercises
+
+    1. Write a SimpleCircle class declaration (only) with one member variable: itsRadius. Include a default constructor, a destructor, and accessor methods for radius.
+
+    2. Using the class you created in Exercise 1, write the implementation of the default constructor, initializing itsRadius with the value 5.
+
+    3. Using the same class, add a second constructor that takes a value as its parameter and assigns that value to itsRadius.
+
+    4. Create a prefix and postfix increment operator for your SimpleCircle class that increments itsRadius.
+
+    5. Change SimpleCircle to store itsRadius on the free store, and fix the existing methods.
+
+    6. Provide a copy constructor for SimpleCircle.
+
+    7. Provide an assignment operator for SimpleCircle.
+
+    8. Write a program that creates two SimpleCircle objects. Use the default constructor on one and instantiate the other with the value 9. Call the increment operator on each and then print their values. Finally, assign the second to the first and print its values.
+
+    9. BUG BUSTERS: What is wrong with this implementation of the assignment operator? 
+
+
+SQUARE SQUARE ::operator=(const SQUARE & rhs)
+{
+      itsSide = new int;
+      *itsSide = rhs.GetSide();
+      return *this;
+}
+
+    10. BUG BUSTERS: What is wrong with this implementation of the addition operator? 
+
+
+VeryShort  VeryShort::operator+ (const VeryShort& rhs)
+{
+   itsVal += rhs.GetItsVal();
+   return *this;
+}
+
+

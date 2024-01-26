@@ -1,0 +1,1072 @@
+    Day 17
+        The Preprocessor
+            The Preprocessor and the Compiler
+            Seeing the Intermediate Form
+            Using #define
+                Using #define for Constants
+                Using #define for Tests
+                The #else Precompiler Command 
+            Listing 17.1. Using #define.
+            Inclusion and Inclusion Guards
+                Defining on the Command Line
+                Undefining 
+            Listing 17.2. Using #undef.
+                Conditional Compilation 
+            Macro Functions
+                Why All the Parentheses? 
+            Listing 17.3. Using parentheses in macros.
+                Macros Versus Functions and Templates 
+            Inline Functions
+            Listing 17.4. Using
+            inline rather than a macro.
+            String Manipulation
+                Stringizing
+                Concatenation 
+            Predefined Macros
+            assert()
+            Listing 17.5. A simple assert() macro.
+                Debugging with assert()
+                assert() Versus Exceptions
+                Side Effects
+                Class Invariants 
+            Listing 17.6. Using Invariants().
+                Printing Interim Values 
+            Listing 17.7. Printing values in DEBUG mode.
+                Debugging Levels 
+            Listing 17.8. Levels of debugging.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 17
+The Preprocessor
+
+Most of what you write in your source code files is C++. These are interpreted by the compiler and turned into your program. Before the compiler runs, however, the preprocessor runs, and this provides an opportunity for conditional compilation. Today you will learn
+
+    What conditional compilation is and how to manage it.
+
+    How to write macros using the preprocessor.
+
+    How to use the preprocessor in finding bugs. 
+
+The Preprocessor and the Compiler
+
+Every time you run your compiler, your preprocessor runs first. The preprocessor looks for preprocessor instructions, each of which begins with a pound symbol (#). The effect of each of these instructions is a change to the text of the source code. The result is a new source code file, a temporary file that you normally don't see, but that you can instruct the compiler to save so that you can examine it if you want to.
+
+The compiler does not read your original source code file; it reads the output of the preprocessor and compiles that file. You've seen the effect of this already with the #include directive. This instructs the preprocessor to find the file whose name follows the #include directive, and to write it into the intermediate file at that location. It is as if you had typed that entire file right into your source code, and by the time the compiler sees the source code, the included file is there.
+Seeing the Intermediate Form
+
+Just about every compiler has a switch that you can set either in the integrated development environment (IDE) or at the command line, and that instructs the compiler to save the intermediate file. Check your compiler manual for the right switches to set for your compiler, if you'd like to examine this file.
+Using #define
+
+The #define command defines a string substitution. If you write
+
+#define BIG 512
+
+you have instructed the precompiler to substitute the string 512 wherever it sees the string BIG. This is not a string in the C++ sense. The characters 512 are substituted in your source code wherever the token BIG is seen. A token is a string of characters that can be used wherever a string or constant or other set of letters might be used. Thus, if you write
+
+#define BIG 512
+int myArray[BIG];
+
+The intermediate file produced by the precompiler will look like this:
+
+int myArray[512];
+
+Note that the #define statement is gone. Precompiler statements are all removed from the intermediate file; they do not appear in the final source code at all.
+Using #define for Constants
+
+One way to use #define is as a substitute for constants. This is almost never a good idea, however, as #define merely makes a string substitution and does no type checking. As explained in the section on constants, there are tremendous advantages to using the const keyword rather than #define.
+Using #define for Tests
+
+A second way to use #define, however, is simply to declare that a particular character string is defined. Therefore, you could write
+
+#define BIG
+
+Later, you can test whether BIG has been defined and take action accordingly. The precompiler commands to test whether a string has been defined are #ifdef and #ifndef. Both of these must be followed by the command #endif before the block ends (before the next closing brace).
+
+#ifdef evaluates to TRUE if the string it tests has been defined already. So, you can write
+
+#ifdef DEBUG
+cout << "Debug defined";
+#endif
+
+When the precompiler reads the #ifdef, it checks a table it has built to see if you've defined DEBUG. If you have, the #ifdef evaluates to TRUE, and everything to the next #else or #endif is written into the intermediate file for compiling. If it evaluates to FALSE, nothing between #ifdef DEBUG and #endif will be written into the intermediate file; it will be as if it were never in the source code in the first place.
+
+Note that #ifndef is the logical reverse of #ifdef. #ifndef evaluates to TRUE if the string has not been defined up to that point in the file.
+The #else Precompiler Command
+
+As you might imagine, the term #else can be inserted between either #ifdef or #ifndef and the closing #endif. Listing 17.1 illustrates how these terms are used.
+
+Listing 17.1. Using #define.
+
+1:     #define DemoVersion
+2:     #define DOS_VERSION 5
+3:     #include <iostream.h>
+4:
+5:
+6:     int main()
+7:     {
+8:
+9:     cout << "Checking on the definitions of DemoVersion, DOS_VERSION  Â                _and WINDOWS_VERSION...\n";
+10:
+11:    #ifdef DemoVersion
+12:       cout << "DemoVersion defined.\n";
+13:    #else
+14:       cout << "DemoVersion not defined.\n";
+15:    #endif
+16:
+17:    #ifndef DOS_VERSION
+18:       cout << "DOS_VERSION not defined!\n";
+19:    #else
+20:       cout << "DOS_VERSION defined as: " << DOS_VERSION << endl;
+21:    #endif
+22:
+23:    #ifdef WINDOWS_VERSION
+24:       cout << "WINDOWS_VERSION defined!\n";
+25:    #else
+26:       cout << "WINDOWS_VERSION was not defined.\n";
+27:    #endif
+28:
+29:     cout << "Done.\n";
+30:     return 0;
+31: }
+
+Output: Checking on the definitions of DemoVersion, DOS_VERSION 
+Â                _and WINDOWS_VERSION...\n";
+DemoVersion defined.
+DOS_VERSION defined as: 5
+WINDOWS_VERSION was not defined.
+Done.
+
+Analysis: On lines 1 and 2, DemoVersion and DOS_VERSION are defined, with DOS_VERSION defined with the string 5. On line 11, the definition of DemoVersion is tested, and because DemoVersion is defined (albeit with no value), the test is true and the string on line 12 is printed.
+On line 17 is the test that DOS_VERSION is not defined. Because DOS_VERSION is defined, this test fails and execution jumps to line 20. Here the string 5 is substituted for the word DOS_VERSION; this is seen by the compiler as
+
+cout << "DOS_VERSION defined as: " << 5 << endl;
+
+Note that the first word DOS_VERSION is not substituted because it is in a quoted string. The second DOS_VERSION is substituted, however, and thus the compiler sees 5 as if you had typed 5 there.
+
+Finally, on line 23, the program tests for WINDOWS_VERSION. Because you did not define WINDOWS_VERSION, the test fails and the message on line 24 is printed.
+Inclusion and Inclusion Guards
+
+You will create projects with many different files. You will probably organize your directories so that each class has its own header file (HPP) with the class declaration, and its own implementation file (CPP) with the source code for the class methods.
+
+Your main() function will be in its own CPP file, and all the CPP files will be compiled into OBJ files, which will then be linked together into a single program by the linker.
+
+Because your programs will use methods from many classes, many header files will be included in each file. Also, header files often need to include one another. For example, the header file for a derived class's declaration must include the header file for its base class.
+
+Imagine that the Animal class is declared in the file ANIMAL.HPP. The Dog class (which derives from Animal) must include the file ANIMAL.HPP in DOG.HPP, or Dog will not be able to derive from Animal. The Cat header also includes ANIMAL.HPP for the same reason.
+
+If you create a method that uses both a Cat and a Dog, you will be in danger of including ANIMAL.HPP twice. This will generate a compile-time error, because it is not legal to declare a class (Animal) twice, even though the declarations are identical. You can solve this problem with inclusion guards. At the top of your ANIMAL header file, you write these lines:
+
+#ifndef ANIMAL_HPP
+#define ANIMAL_HPP
+...                     // the whole file goes here
+#endif
+
+This says, if you haven't defined the term ANIMAL_HPP, go ahead and define it now. Between the #define statement and the closing #endif are the entire contents of the file.
+
+The first time your program includes this file, it reads the first line and the test evaluates to TRUE; that is, you have not yet defined ANIMAL_HPP. So, it goes ahead and defines it and then includes the entire file.
+
+The second time your program includes the ANIMAL.HPP file, it reads the first line and the test evaluates to FALSE; ANIMAL.HPP has been defined. It therefore skips to the next #else (there isn't one) or the next #endif (at the end of the file). Thus, it skips the entire contents of the file, and the class is not declared twice.
+
+The actual name of the defined symbol (ANIMAL_HPP) is not important, although it is customary to use the filename in all uppercase with the dot (.) changed to an underscore. This is purely convention, however.
+
+    NOTE: It never hurts to use inclusion guards. Often they will save you hours of debugging time. 
+
+Defining on the Command Line
+
+Almost all C++ compilers will let you #define values either from the command line or from the integrated development environment (and usually both). Thus you can leave out lines 1 and 2 from Listing 17.1, and define DemoVersion and BetaTestVersion from the command line for some compilations, and not for others.
+
+It is common to put in special debugging code surrounded by #ifdef DEBUG and #endif. This allows all the debugging code to be easily removed from the source code when you compile the final version; just don't define the term DEBUG.
+Undefining
+
+If you have a name defined and you'd like to turn it off from within your code, you can use #undef. This works as the antidote to #define. Listing 17.2 provides an illustration of its use.
+
+Listing 17.2. Using #undef.
+
+1:     #define DemoVersion
+2:     #define DOS_VERSION 5
+3:     #include <iostream.h>
+4:
+5:
+6:     int main()
+7:     {
+8:
+9:     cout << "Checking on the definitions of DemoVersion, DOS_VERSION  Â                _and WINDOWS_VERSION...\n";
+10:
+11:    #ifdef DemoVersion
+12:       cout << "DemoVersion defined.\n";
+13:    #else
+14:       cout << "DemoVersion not defined.\n";
+15:    #endif
+16:
+17:    #ifndef DOS_VERSION
+18:       cout << "DOS_VERSION not defined!\n";
+19:    #else
+20:       cout << "DOS_VERSION defined as: " << DOS_VERSION << endl;
+21:    #endif
+22:
+23:    #ifdef WINDOWS_VERSION
+24:       cout << "WINDOWS_VERSION defined!\n";
+25:    #else
+26:       cout << "WINDOWS_VERSION was not defined.\n";
+27:    #endif
+28:
+29:    #undef DOS_VERSION
+30:
+31:     #ifdef DemoVersion
+32:       cout << "DemoVersion defined.\n";
+33:    #else
+34:       cout << "DemoVersion not defined.\n";
+35:    #endif
+36:
+37:    #ifndef DOS_VERSION
+38:       cout << "DOS_VERSION not defined!\n";
+39:    #else
+40:       cout << "DOS_VERSION defined as: " << DOS_VERSION << endl;
+41:    #endif
+42:
+43:    #if_Tz'WINDOWS_VERSION
+44:       cout << "WINDOWS_VERSION defined!\n";
+45:    #else
+46:       cout << "WINDOWS_VERSION was not defined.\n";
+47:    #endif
+48:
+49:     cout << "Done.\n";
+50:     return 0;
+51: }
+
+Output: Checking on the definitions of DemoVersion, DOS_VERSION 
+Â                _and WINDOWS_VERSION...\n";
+DemoVersion defined.
+DOS_VERSION defined as: 5
+WINDOWS_VERSION was not defined.
+DemoVersion defined.
+DOS_VERSION not defined!
+WINDOWS_VERSION was not defined.
+Done.
+
+Analysis: Listing 17.2 is the same as Listing 17.1 until line 29, when #undef DOS_VERSION is called. This removes the definition of the term DOS_VERSION without changing the other defined terms (in this case, DemoVersion). The rest of the listing just repeats the printouts. The tests for DemoVersion and WINDOWS_VERSION act as they did the first time, but the test for DOS_VERSION now evaluates TRUE. In this second case DOS_VERSION does not exist as a defined term.
+Conditional Compilation
+
+By combining #define or command-line definitions with #ifdef, #else, and #ifndef, you can write one program that compiles different code, depending on what is already #defined. This can be used to create one set of source code to compile on two different platforms, such as DOS and Windows.
+
+Another common use of this technique is to conditionally compile in some code based on whether debug has been defined, as you'll see in a few moments.
+
+    DO use conditional compilation when you need to create more than one version of your code at the same time. DON'T let your conditions get too complex to manage. DO use #undef as often as possible to avoid leaving stray definitions in your code. DO use inclusion guards! 
+
+Macro Functions
+
+The #define directive can also be used to create macro functions. A macro function is a symbol created using #define and that takes an argument, much like a function does. The preprocessor will substitute the substitution string for whatever argument it is given. For example, you can define the macro TWICE as
+
+#define TWICE(x) ( (x) * 2 )
+
+and then in your code you write
+
+TWICE(4)
+
+The entire string TWICE(4) will be removed, and the value 8 will be substituted! When the precompiler sees the 4, it will substitute ( (4) * 2 ), which will then evaluate to 4 * 2 or 8.
+
+A macro can have more than one parameter, and each parameter can be used repeatedly in the replacement text. Two common macros are MAX and MIN:
+
+#define MAX(x,y) ( (x) > (y) ? (x) : (y) )
+#define MIN(x,y) ( (x) < (y) ? (x) : (y) )
+
+Note that in a macro function definition, the opening parenthesis for the parameter list must immediately follow the macro name, with no spaces. The preprocessor is not as forgiving of white space as is the compiler.
+
+If you were to write
+
+#define MAX (x,y) ( (x) > (y) ? (x) : (y) )
+
+and then tried to use MAX like this,
+
+
+int x = 5, y = 7, z;
+z = MAX(x,y);
+
+the intermediate code would be
+
+int x = 5, y = 7, z;
+z = (x,y) ( (x) > (y) ? (x) : (y) ) (x,y)
+
+A simple text substitution would be done, rather than invoking the macro function. Thus the token MAX would have substituted for it (x,y) ( (x) > (y) ? (x) : (y) ), and then that would be followed by the (x,y) which followed Max.
+
+By removing the space between MAX and (x,y), however, the intermediate code becomes:
+
+int x = 5, y = 7, z;
+z =7;
+
+Why All the Parentheses?
+
+You may be wondering why there are so many parentheses in many of the macros presented so far. The preprocessor does not demand that parentheses be placed around the arguments in the substitution string, but the parentheses help you to avoid unwanted side effects when you pass complicated values to a macro. For example, if you define MAX as
+
+#define MAX(x,y) x > y ? x : y
+
+and pass in the values 5 and 7, the macro works as intended. But if you pass in a more complicated expression, you'll get unintended results, as shown in Listing 17.3.
+
+Listing 17.3. Using parentheses in macros.
+
+1:     // Listing 17.3 Macro Expansion
+2:     #include <iostream.h>
+3:
+4:     #define CUBE(a) ( (a) * (a) * (a) )
+5:     #define THREE(a) a * a * a
+6:
+7:     int main()
+8:     {
+9:        long x = 5;
+10:       long y = CUBE(x);
+11:       long z = THREE(x);
+12:
+13:       cout << "y: " << y << endl;
+14:       cout << "z: " << z << endl;
+15:
+16:       long a = 5, b = 7;
+17:       y = CUBE(a+b);
+18:       z = THREE(a+b);
+19:
+20:       cout << "y: " << y << endl;
+21:       cout << "z: " << z << endl;
+22:     return 0;
+23: }
+
+Output: y: 125
+z: 125
+y: 1728
+z: 82
+
+Analysis: On line 4, the macro CUBE is defined, with the argument x put into parentheses each time it is used. On line 5, the macro THREE is defined, without the parentheses.
+In the first use of these macros, the value 5 is given as the parameter, and both macros work fine. CUBE(5) expands to ( (5) * (5) * (5) ), which evaluates to 125, and THREE(5) expands to 5 * 5 * 5, which also evaluates to 125.
+
+In the second use, on lines 16-18, the parameter is 5 + 7. In this case, CUBE(5+7) evaluates to
+
+( (5+7) * (5+7) * (5+7) )
+
+which evaluates to
+
+( (12) * (12) * (12) )
+
+which in turn evaluates to 1728. THREE(5+7), however, evaluates to
+
+5 + 7 * 5 + 7 * 5 + 7
+
+Because multiplication has a higher precedence than addition, this becomes
+
+5 + (7 * 5) + (7 * 5) + 7
+
+which evaluates to
+
+5 + (35) + (35) + 7
+
+which finally evaluates to 82.
+Macros Versus Functions and Templates
+
+Macros suffer from four problems in C++. The first is that they can be confusing if they get large, because all macros must be defined on one line. You can extend that line by using the backslash character (\), but large macros quickly become difficult to manage.
+
+The second problem is that macros are expanded inline each time they are used. This means that if a macro is used a dozen times, the substitution will appear 12 times in your program, rather than appear once as a function call will. On the other hand, they are usually quicker than a function call because the overhead of a function call is avoided.
+
+The fact that they are expanded inline leads to the third problem, which is that the macro does not appear in the intermediate source code used by the compiler, and therefore is unavailable in most debuggers. This makes debugging macros tricky.
+
+The final problem, however, is the biggest: macros are not type-safe. While it is convenient that absolutely any argument may be used with a macro, this completely undermines the strong typing of C++ and so is anathema to C++ programmers. However, there is a way to overcome this problem, as you'll see on Day 19, "Templates."
+Inline Functions
+
+It is often possible to declare an inline function rather than a macro. For example, Listing 17.4 creates a CUBE function, which accomplishes the same thing as the CUBE macro in Listing 17.3, but does so in a type-safe way.
+
+Listing 17.4. Using inline rather than a macro.
+
+1:     #include <iostream.h>
+2:
+3:     inline unsigned long Square(unsigned long a) { return a * a; }
+4:     inline unsigned long Cube(unsigned long a) 
+5:         { return a * a * a; }
+6:     int main()
+7:     {
+8:        unsigned long x=1 ;
+9:        for (;;)
+10:       {
+11:          cout << "Enter a number (0 to quit): ";
+12:          cin >> x;
+13:          if (x == 0)
+14:             break;
+15:          cout << "You entered: " << x;
+16:          cout << ".  Square(" << x << "): ";
+17:          cout  << Square(x);
+18:          cout<< ". Cube(" _<< x << "): ";
+19:          cout << Cube(x) << "." << endl;
+20:       }
+21:     return 0;
+22: }
+
+Output: Enter a number (0 to quit): 1
+You entered: 1.  Square(1): 1. Cube(1): 1.
+Enter a number (0 to quit): 2
+You entered: 2.  Square(2): 4. Cube(2): 8.
+Enter a number (0 to quit): 3
+You entered: 3.  Square(3): 9. Cube(3): 27.
+Enter a number (0 to quit): 4
+You entered: 4.  Square(4): 16. Cube(4): 64.
+Enter a number (0 to quit): 5
+You entered: 5.  Square(5): 25. Cube(5): 125.
+Enter a number (0 to quit): 6
+You entered: 6.  Square(6): 36. Cube(6): 216.
+Enter a number (0 to quit): 0
+
+Analysis: On lines 3 and 4, two inline functions are declared: Square() and Cube(). Each is declared to be inline, so like a macro function these will be expanded in place for each call, and there will be no function call overhead.
+As a reminder, expanded inline means that the content of the function will be placed into the code wherever the function call is made (for example, on line 16). Because the function call is never made, there is no overhead of putting the return address and the parameters on the stack.
+
+On line 16, the function Square is called, as is the function Cube. Again, because these are inline functions, it is exactly as if this line had been written like this:
+
+16:          cout << ".  Square(" << x << "): "  << x * x << ". 
+	Cube(" << x << Â"): " << x * x * x <<
+"." << endl;
+
+String Manipulation
+
+The preprocessor provides two special operators for manipulating strings in macros. The stringizing operator (#) substitutes a quoted string for whatever follows the stringizing operator. The concatenation operator bonds two strings together into one.
+Stringizing
+
+The stringizing operator puts quotes around any characters following the operator, up to the next white space. Thus, if you write
+
+#define WRITESTRING(x) cout << #x
+
+and then call
+
+WRITESTRING(This is a string);
+
+the precompiler will turn it into
+
+cout << "This is a string";
+
+Note that the string This is a string is put into quotes, as required by cout.
+Concatenation
+
+The concatenation operator allows you to bond together more than one term into a new word. The new word is actually a token that can be used as a class name, a variable name, an offset into an array, or anywhere else a series of letters might appear.
+
+Assume for a moment that you have five functions, named fOnePrint, fTwoPrint, fThreePrint, fFourPrint, and fFivePrint. You can then declare:
+
+#define fPRINT(x) f ## x ## Print
+
+and then use it with fPRINT(Two) to generate fTwoPrint and with fPRINT(Three) to generate fThreePrint.
+
+At the conclusion of Week 2, a PartsList class was developed. This list could only handle objects of type List. Let's say that this list works well, and you'd like to be able to make lists of animals, cars, computers, and so forth.
+
+One approach would be to create AnimalList, CarList, ComputerList, and so on, cutting and pasting the code in place. This will quickly become a nightmare, as every change to one list must be written to all the others.
+
+An alternative is to use macros and the concatenation operator. For example, you could define
+
+#define Listof(Type)  class Type##List \
+{ \
+public: \
+Type##List(){} \
+private:          \
+int itsLength; \
+};
+
+This example is overly sparse, but the idea would be to put in all the necessary methods and data. When you were ready to create an AnimalList, you would write
+
+Listof(Animal)
+
+and this would be turned into the declaration of the AnimalList class. There are some problems with this approach, all of which are discussed in detail on Day 19, when templates are discussed.
+Predefined Macros
+
+Many compilers predefine a number of useful macros, including __DATE__, __TIME__, __LINE__, and __FILE__. Each of these names is surrounded by two underscore characters to reduce the likelihood that the names will conflict with names you've used in your program.
+
+When the precompiler sees one of these macros, it makes the appropriate substitutes. For __DATE__, the current date is substituted. For __TIME__, the current time is substituted. __LINE__ and __FILE__ are replaced with the source code line number and filename, respectively. You should note that this substitution is made when the source is precompiled, not when the program is run. If you ask the program to print __DATE__, you will not get the current date; instead, you will get the date the program was compiled. These defined macros are very useful in debugging.
+assert()
+
+Many compilers offer an assert() macro. The assert() macro returns TRUE if its parameter evaluates TRUE and takes some kind of action if it evaluates FALSE. Many compilers will abort the program on an assert() that fails; others will throw an exception (see Day 20, "Exceptions and Error Handling").
+
+One powerful feature of the assert() macro is that the preprocessor collapses it into no code at all if DEBUG is not defined. It is a great help during development, and when the final product ships there is no performance penalty nor increase in the size of the executable version of the program.
+
+Rather than depending on the compiler-provided assert(), you are free to write your own assert() macro. Listing 17.5 provides a simple assert() macro and shows its use.
+
+Listing 17.5. A simple assert() macro.
+
+1:     // Listing 17.5 ASSERTS
+2:     #define DEBUG
+3:     #include <iostream.h>
+4:
+5:     #ifndef DEBUG
+6:        #define ASSERT(x)
+7:     #else
+8:        #define ASSERT(x) \
+9:                 if (! (x)) \
+10:                { \
+11:                   cout << "ERROR!! Assert " << #x << " failed\n"; \
+12:                   cout << " on line " << __LINE__  << "\n"; \
+13:                   cout << " in file " << __FILE__ << "\n";  \
+14:                }
+15:    #endif
+16:
+17:
+18:    int main()
+19:    {
+20:       int x = 5;
+21:       cout << "First assert: \n";
+22:       ASSERT(x==5);
+23:       cout << "\nSecond assert: \n";
+24:       ASSERT(x != 5);
+25:       cout << "\nDone.\n";
+26:     return 0;
+27: }
+
+Output: First assert:
+
+Second assert:
+ERROR!! Assert x !=5 failed
+ on line 24
+ in file test1704.cpp
+Done.
+
+Analysis: On line 2, the term DEBUG is defined. Typically, this would be done from the command line (or the IDE) at compile time, so you can turn this on and off at will. On lines 8-14, the assert() macro is defined. Typically, this would be done in a header file, and that header (ASSERT.HPP) would be included in all your implementation files.
+
+On line 5, the term DEBUG is tested. If it is not defined, assert() is defined to create no code at all. If DEBUG is defined, the functionality defined on lines 8-14 is applied.
+
+The assert() itself is one long statement, split across seven source code lines, as far as the precompiler is concerned. On line 9, the value passed in as a parameter is tested; if it evaluates FALSE, the statements on lines 11-13 are invoked, printing an error message. If the value passed in evaluates TRUE, no action is taken.
+Debugging with assert()
+
+When writing your program, you will often know deep down in your soul that something is true: a function has a certain value, a pointer is valid, and so forth. It is the nature of bugs that what you know to be true might not be so under some conditions. For example, you know that a pointer is valid, yet the program crashes. assert() can help you find this type of bug, but only if you make it a regular practice to use assert() liberally in your code. Every time you assign or are passed a pointer as a parameter or function return value, be sure to assert that the pointer is valid. Any time your code depends on a particular value being in a variable, assert() that that is true.
+
+There is no penalty for frequent use of assert(); it is removed from the code when you undefine debugging. It also provides good internal documentation, reminding the reader of what you believe is true at any given moment in the flow of the code.
+assert() Versus Exceptions
+
+On Day 20, you will learn how to work with exceptions to handle error conditions. It is important to note that assert() is not intended to handle runtime error conditions such as bad data, out-of-memory conditions, unable to open file, and so forth. assert() is created to catch programming errors only. That is, if an assert() "fires," you know you have a bug in your code.
+
+This is critical, because when you ship your code to your customers, instances of assert() will be removed. You can't depend on an assert() to handle a runtime problem, because the assert() won't be there.
+
+It is a common mistake to use assert() to test the return value from a memory assignment:
+
+Animal *pCat = new Cat;
+Assert(pCat);   // bad use of assert
+pCat->SomeFunction();
+
+This is a classic programming error; every time the programmer runs the program, there is enough memory and the assert() never fires. After all, the programmer is running with lots of extra RAM to speed up the compiler, debugger, and so forth. The programmer then ships the executable, and the poor user, who has less memory, reaches this part of the program and the call to new fails and returns NULL. The assert(), however, is no longer in the code and there is nothing to indicate that the pointer points to NULL. As soon as the statement pCat->SomeFunction() is reached, the program crashes.
+
+Getting NULL back from a memory assignment is not a programming error, although it is an exceptional situation. Your program must be able to recover from this condition, if only by throwing an exception. Remember: The entire assert() statement is gone when DEBUG is undefined. Exceptions are covered in detail on Day 20.
+Side Effects
+
+It is not uncommon to find that a bug appears only after the instances of assert() are removed. This is almost always due to the program unintentionally depending on side effects of things done in assert() and other debug-only code. For example, if you write
+
+ASSERT (x = 5)
+
+when you mean to test whether x == 5, you will create a particularly nasty bug.
+
+Let's say that just prior to this assert() you called a function that set x equal to 0. With this assert() you think you are testing whether x is equal to 5; in fact, you are setting x equal to 5. The test returns TRUE, because x = 5 not only sets x to 5, but returns the value 5, and because 5 is non-zero it evaluates as TRUE.
+
+Once you pass the assert() statement, x really is equal to 5 (you just set it!). Your program runs just fine. You're ready to ship it, so you turn off debugging. Now the assert() disappears, and you are no longer setting x to 5. Because x was set to 0 just before this, it remains at 0 and your program breaks.
+
+In frustration, you turn debugging back on, but hey! Presto! The bug is gone. Once again, this is rather funny to watch, but not to live through, so be very careful about side effects in debugging code. If you see a bug that only appears when debugging is turned off, take a look at your debugging code with an eye out for nasty side effects.
+Class Invariants
+
+Most classes have some conditions that should always be true whenever you are finished with a class member function. These class invariants are the sine qua non of your class. For example, it may be true that your CIRCLE object should never have a radius of zero, or that your ANIMAL should always have an age greater than zero and less than 100.
+
+It can be very helpful to declare an Invariants() method that returns TRUE only if each of these conditions is still true. You can then ASSERT(Invariants()) at the start and completion of every class method. The exception would be that your Invariants() would not expect to return TRUE before your constructor runs or after your destructor ends. Listing 17.6 demonstrates the use of the Invariants() method in a trivial class.
+
+Listing 17.6. Using Invariants().
+
+0:    #define DEBUG
+1:    #define SHOW_INVARIANTS
+2:    #include <iostream.h>
+3:    #include <string.h>
+4:    
+5:    #ifndef DEBUG
+6:    #define ASSERT(x)
+7:    #else
+8:    #define ASSERT(x) \
+9:                if (! (x)) \
+10:                { \
+11:                   cout << "ERROR!! Assert " << #x << " failed\n"; \
+12:                   cout << " on line " << __LINE__  << "\n"; \
+13:                   cout << " in file " << __FILE__ << "\n";  \
+14:                }
+15:    #endif
+16:    
+17:    
+18:    const int FALSE = 0;
+19:    const int TRUE = 1;
+20:    typedef int BOOL;
+21: 
+22:    
+23:    class String
+24:    {
+25:       public:
+26:          // constructors
+27:          String();
+28:          String(const char *const);
+29:          String(const String &);
+30:          ~String();
+31:    
+32:          char & operator[](int offset);
+33:          char operator[](int offset) const;
+34:    
+35:          String & operator= (const String &);
+36:          int GetLen()const { return itsLen; }
+37:          const char * GetString() const { return itsString; }
+38:          BOOL Invariants() const;
+39:    
+40:       private:
+41:          String (int);         // private constructor
+42:          char * itsString;
+43:         // unsigned short itsLen;
+44:          int itsLen;
+45:    };
+46:    
+47:    // default constructor creates string of 0 bytes
+48:    String::String()
+49:    {
+50:       itsString = new char[1];
+51:       itsString[0] = `\0';
+52:       itsLen=0;
+53:       ASSERT(Invariants());
+54:    }
+55:    
+56:    // private (helper) constructor, used only by
+57:    // class methods for creating a new string of
+58:    // required size.  Null filled.
+59:    String::String(int len)
+60:    {
+61:       itsString = new char[len+1];
+62:       for (int i = 0; i<=len; i++)
+63:          itsString[i] = `\0';
+64:       itsLen=len;
+65:       ASSERT(Invariants());
+66:    }
+67:    
+68:    // Converts a character array to a String
+69:    String::String(const char * const cString)
+70:    {
+71:       itsLen = strlen(cString);
+72:       itsString = new char[itsLen+1];
+73:       for (int i = 0; i<itsLen; i++)
+74:          itsString[i] = cString[i];
+75:       itsString[itsLen]='\0';
+76:       ASSERT(Invariants());
+77:    }
+78:    
+79:    // copy constructor
+80:    String::String (const String & rhs)
+81:    {
+82:       itsLen=rhs.GetLen();
+83:       itsString = new char[itsLen+1];
+84:       for (int i = 0; i<itsLen;i++)
+85:          itsString[i] = rhs[i];
+86:       itsString[itsLen] = `\0';
+87:       ASSERT(Invariants());
+88:    }
+89:    
+90:    // destructor, frees allocated memory
+91:    String::~String ()
+92:    {
+93:       ASSERT(Invariants());
+94:       delete [] itsString;
+95:       itsLen = 0;
+96:    }
+97:    
+98:    // operator equals, frees existing memory
+99:    // then copies string and size
+100:    String& String::operator=(const String & rhs)
+101:    {
+102:       ASSERT(Invariants());
+103:       if (this == &rhs)
+104:          return *this;
+105:       delete [] itsString;
+106:       itsLen=rhs.GetLen();
+107:       itsString = new char[itsLen+1];
+108:       for (int i = 0; i<itsLen;i++)
+109:          itsString[i] = rhs[i];
+110:       itsString[itsLen] = `\0';
+111:       ASSERT(Invariants());
+112:       return *this;
+113:    }
+114:    
+115:    //non constant offset operator, returns
+116:    // reference to character so it can be
+117:    // changed!
+118:    char & String::operator[](int offset)
+119:    {
+120:       ASSERT(Invariants());
+121:       if (offset > itsLen)
+122:          return itsString[itsLen-1];
+123:       else
+124:          return itsString[offset];
+125:       ASSERT(Invariants());
+126:    }
+127:    
+128:    // constant offset operator for use
+129:    // on const objects (see copy constructor!)
+130:    char String::operator[](int offset) const
+131:    {
+132:       ASSERT(Invariants());
+133:       if (offset > itsLen)
+134:          return itsString[itsLen-1];
+135:       else
+136:          return itsString[offset];
+137:       ASSERT(Invariants());
+138:    }
+139:    
+140:    
+141:    BOOL String::Invariants() const
+142:    {
+143:    #ifdef SHOW_INVARIANTS
+144:       cout << " String OK ";
+145:    #endif
+146:        return ( (itsLen && itsString) || 
+147:          (!itsLen && !itsString) );
+148:     }
+149:    
+150:     class Animal
+151:     {
+152:     public:
+153:        Animal():itsAge(1),itsName("John Q. Animal")
+154:           {ASSERT(Invariants());}
+155:         Animal(int, const String&);
+156:        ~Animal(){}
+157:        int GetAge() {  ASSERT(Invariants()); return itsAge;}
+158:        void SetAge(int Age) 
+159:        { 
+160:             ASSERT(Invariants()); 
+161:             itsAge = Age;              
+162:             ASSERT(Invariants()); 
+163:        }
+164:         String& GetName() 
+165:         { 
+166:               ASSERT(Invariants()); 
+167:               return itsName;  
+168:         }
+169:         void SetName(const String& name)
+170:               { 
+171:               ASSERT(Invariants()); 
+172:               itsName = name; 
+173:               ASSERT(Invariants());
+174:         }
+175:         BOOL Invariants();
+176:      private:
+177:         int itsAge;
+178:         String itsName;
+179:      };
+180:    
+181:      Animal::Animal(int age, const String& name):
+182:      itsAge(age),
+183:      itsName(name)
+184:      {
+185:         ASSERT(Invariants());
+186:      }
+187:    
+188:      BOOL Animal::Invariants()
+189:      {
+190:      #ifdef SHOW_INVARIANTS
+191:         cout << " Animal OK ";
+192:      #endif
+193:         return (itsAge > 0 && itsName.GetLen());
+194:      }
+195:    
+196:      int main()
+197:      {
+198:         Animal sparky(5,"Sparky");
+199:         cout << "\n" << sparky.GetName().GetString() << " is ";
+200:         cout << sparky.GetAge() << " years old.";
+201:         sparky.SetAge(8);
+202:         cout << "\n" << sparky.GetName().GetString() << " is ";
+203:         cout << sparky.GetAge() << " years old.";
+204:         return 0;
+205: }
+
+Output: String OK  String OK  String OK  String OK  String OK  
+String OK  String OK  Animal OK  String OK  Animal OK
+Sparky is  Animal OK 5 years old. Animal OK  Animal OK  
+Animal OK  Sparky is  Animal OK 8 years old. String OK 
+
+Analysis: On lines 6-16, the assert() macro is defined. If DEBUG is defined, this will write out an error message when the assert() macro evaluates FALSE.
+On line 38, the String class member function Invariants() is declared; it is defined on lines 141-148. The constructor is declared on lines 48-54, and on line 53, after the object is fully constructed, Invariants() is called to confirm proper construction.
+
+This pattern is repeated for the other constructors, and the destructor calls Invariants() only before it sets out to destroy the object. The remaining class functions call Invariants() both before taking any action and then again before returning. This both affirms and validates a fundamental principal of C++: Member functions other than constructors and destructors should work on valid objects and should leave them in a valid state.
+
+On line 175, class Animal declares its own Invariants() method, implemented on lines 188-194. Note on lines 154, 157, 160, and 162 that inline functions can call the Invariants() method.
+Printing Interim Values
+
+In addition to asserting that something is true using the assert() macro, you may want to print the current value of pointers, variables, and strings. This can be very helpful in checking your assumptions about the progress of your program, and in locating off-by-one bugs in loops. Listing 17.7 illustrates this idea.
+
+Listing 17.7. Printing values in DEBUG mode.
+
+1:     // Listing 17.7 - Printing values in DEBUG mode
+2:     #include <iostream.h>
+3:     #define DEBUG
+4:
+5:     #ifndef DEBUG
+6:     #define PRINT(x)
+7:     #else
+8:     #define PRINT(x) \
+9:        cout << #x << ":\t" << x << endl;
+10:    #endif
+11:
+12:    enum BOOL { FALSE, TRUE } ;
+13:
+14:    int main()
+15:    {
+16:       int x = 5;
+17:       long y = 73898l;
+18:       PRINT(x);
+19:       for (int i = 0; i < x; i++)
+20:       {
+21:          PRINT(i);
+22:       }
+23:
+24:       PRINT (y);
+25:       PRINT("Hi.");
+26:       int *px = &x;
+27:       PRINT(px);
+28:       PRINT (*px);
+29:     return 0;
+30: }
+
+Output: x:      5
+i:      0
+i:      1
+i:      2
+i:      3
+i:      4
+y:      73898
+"Hi.":  Hi.
+px:       0x2100 (You may receive a value other than 0x2100)
+*px:    5
+
+Analysis: The macro on lines 5-10 provides printing of the current value of the supplied parameter. Note that the first thing fed to cout is the stringized version of the parameter; that is, if you pass in x, cout receives "x".
+
+Next, cout receives the quoted string ":\t", which prints a colon and then a tab. Third, cout receives the value of the parameter (x), and then finally, endl, which writes a new line and flushes the buffer.
+Debugging Levels
+
+In large, complex projects, you may want more control than simply turning DEBUG on and off. You can define debug levels and test for these levels when deciding which macros to use and which to strip out.
+
+To define a level, simply follow the #define DEBUG statement with a number. While you can have any number of levels, a common system is to have four levels: HIGH, MEDIUM, LOW, and NONE. Listing 17.8 illustrates how this might be done, using the String and Animal classes from Listing 17.6. The definitions of the class methods other than Invariants() have been left out to save space because they are unchanged from Listing 17.6.
+
+    NOTE: To compile this code, copy lines 43-136 of Listing 17.6 between lines 64 and 65 of this listing. 
+
+Listing 17.8. Levels of debugging.
+
+0:    enum LEVEL { NONE, LOW, MEDIUM, HIGH };
+1:    const int FALSE = 0;
+2:    const int TRUE = 1;
+3:    typedef int BOOL;
+4:    
+5:     #define DEBUGLEVEL HIGH
+6:    
+7:     #include <iostream.h>
+8:     #include <string.h>
+9:    
+10:     #if DEBUGLEVEL < LOW  // must be medium or high
+11:     #define ASSERT(x)
+12:     #else
+13:     #define ASSERT(x) \
+14:         if (! (x)) \
+15:         { \
+16:            cout << "ERROR!! Assert " << #x << " failed\n"; \
+17:            cout << " on line " << __LINE__  << "\n"; \
+18:            cout << " in file " << __FILE__ << "\n";  \
+19:         }
+20:     #endif
+21:    
+22:     #if DEBUGLEVEL < MEDIUM
+23:     #define EVAL(x)
+24:     #else
+25:     #define EVAL(x) \
+26:       cout << #x << ":\t" << x << endl;
+27:     #endif
+28:    
+29:    #if DEBUGLEVEL < HIGH
+30:     #define PRINT(x)
+31:     #else
+32:     #define PRINT(x) \
+33:       cout << x << endl;
+34:     #endif
+35:    
+36:    
+37:     class String
+38:     {
+39:        public:
+40:           // constructors
+41:           String();
+42:           String(const char *const);
+43:           String(const String &);
+44:           ~String();
+45:    
+46:           char & operator[](int offset);
+47:           char operator[](int offset) const;
+48:    
+49:           String & operator= (const String &);
+50:           int GetLen()const { return itsLen; }
+51:           const char * GetString() const 
+52:            { return itsString; }
+53:           BOOL Invariants() const;
+54: 
+55:        private:
+56:           String (int);         // private constructor
+57:           char * itsString;
+58:           unsigned short itsLen;
+59:     };
+60:    
+61:     BOOL String::Invariants() const
+62:     {
+63:         PRINT("(String Invariants Checked)");
+64:         return ( (BOOL) (itsLen && itsString) || 
+65:             (!itsLen && !itsString) );
+66:     }
+67:    
+68:     class Animal
+69:     {
+70:     public:
+71:        Animal():itsAge(1),itsName("John Q. Animal")
+72:            {ASSERT(Invariants());}
+73:    
+74:        Animal(int, const String&);
+75:        ~Animal(){}
+76:    
+77:        int GetAge() 
+78:            {  
+79:                ASSERT(Invariants()); 
+80:                return itsAge;
+81:            }
+82:    
+83:        void SetAge(int Age) 
+84:            { 
+85:                ASSERT(Invariants()); 
+86:                itsAge = Age; 
+87:                ASSERT(Invariants());
+88:            }
+89:        String& GetName() 
+90:            { 
+91:                ASSERT(Invariants()); 
+92:                return itsName;  
+93:            }
+94:    
+95:        void SetName(const String& name)
+96:            { 
+97:                ASSERT(Invariants()); 
+98:                itsName = name; 
+99:                ASSERT(Invariants());
+100:            }
+101:    
+102:        BOOL Invariants();
+103:     private:
+104:        int itsAge;
+105:        String itsName;
+106:     };
+107:    
+108:     BOOL Animal::Invariants()
+109:     {
+110:        PRINT("(Animal Invariants Checked)");
+111:        return (itsAge > 0 && itsName.GetLen());
+112:     }
+113:    
+114:     int main()
+115:     {
+116:        const int AGE = 5;
+117:        EVAL(AGE);
+118:        Animal sparky(AGE,"Sparky");
+119:        cout << "\n" << sparky.GetName().GetString();
+120:        cout << " is ";
+121:        cout << sparky.GetAge() << " years old.";
+122:        sparky.SetAge(8);
+123:        cout << "\n" << sparky.GetName().GetString();
+124:        cout << " is ";
+125:        cout << sparky.GetAge() << " years old.";
+126:        return 0;
+127: }
+
+Output: AGE:     5
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+ (String Invariants Checked)
+
+Sparky is (Animal Invariants Checked)
+5 Years old. (Animal Invariants Checked)
+ (Animal Invariants Checked)
+ (Animal Invariants Checked)
+
+Sparky is (Animal Invariants Checked)
+8 years old. (String Invariants Checked)
+ (String Invariants Checked)
+
+// run again with DEBUG = MEDIUM
+
+AGE:     5
+Sparky is 5 years old.
+Sparky is 8 years old.
+
+Analysis: On lines 10 to 20, the assert() macro is defined to be stripped if DEBUGLEVEL is less than LOW (that is, DEBUGLEVEL is NONE). If any debugging is enabled, the assert() macro will work. On line 23, EVAL is declared to be stripped if DEBUG is less than MEDIUM; if DEBUGLEVEL is NONE or LOW, EVAL is stripped.
+Finally, on lines 29-34, the PRINT macro is declared to be stripped if DEBUGLEVEL is less than HIGH. PRINT is used only when DEBUGLEVEL is HIGH; you can eliminate this macro by setting DEBUGLEVEL to MEDIUM and still maintain your use of EVAL and assert().
+
+PRINT is used within the Invariants() methods to print an informative message. EVAL is used on line 117 to evaluate the current value of the constant integer AGE.
+
+    DO use CAPITALS for your macro names. This is a pervasive convention, and other programmers will be confused if you don't. DON'T allow your macros to have side effects. Don't increment variables or assign values from within a macro. DO surround all arguments with parentheses in macro functions. 
+
+Summary
+
+Today you learned more details about working with the preprocessor. Each time you run the compiler, the preprocessor runs first and translates your preprocessor directives such as #define and #ifdef.
+
+The preprocessor does text substitution, although with the use of macros these can be somewhat complex. By using #ifdef, #else, and #ifndef, you can accomplish conditional compilation, compiling in some statements under one set of conditions and in another set of statements under other conditions. This can assist in writing programs for more than one platform and is often used to conditionally include debugging information.
+
+Macro functions provide complex text substitution based on arguments passed at compile time to the macro. It is important to put parentheses around every argument in the macro to ensure the correct substitution takes place.
+
+Macro functions, and the preprocessor in general, are less important in C++ than they were in C. C++ provides a number of language features, such as const variables and templates, that offer superior alternatives to use of the preprocessor.
+Q&A
+
+    Q. If C++ offers better alternatives than the preprocessor, why is this option still available?
+
+    A. First, C++ is backward-compatible with C, and all significant parts of C must be supported in C++. Second, there are some uses of the preprocessor that are still used frequently in C++, such as inclusion guards.
+
+    Q. Why use macro functions when you can use a regular function?
+
+    A. Macro functions are expanded inline and are used as a substitute for repeatedly typing the same commands with minor variations. Again, though, templates offer a better alternative.
+
+    Q. How do you know when to use a macro versus an inline function?
+
+    A. Often it doesn't matter much; use whichever is simpler. However, macros offer character substitution, stringizing, and concatenation. None of these is available with functions.
+
+    Q. What is the alternative to using the preprocessor to print interim values during debugging?
+
+    A. The best alternative is to use watch statements within a debugger. For information on watch statements, consult your compiler or debugger documentation.
+
+    Q. How do you decide when to use an assert() and when to throw an exception?
+
+    A. If the situation you're testing can be true without your having committed a programming error, use an exception. If the only reason for this situation to ever be true is a bug in your program, use an assert(). 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is an inclusion guard?
+
+    2. How do you instruct your compiler to print the contents of the intermediate file showing the effects of the preprocessor?
+
+    3. What is the difference between #define debug 0 and #undef debug?
+
+    4. Name four predefined macros.
+
+    5. Why can't you call Invariants() as the first line of your constructor? 
+
+Exercises
+
+    1. Write the inclusion guard statements for the header file STRING.H.
+
+    2. Write an assert() macro that prints an error message and the file and line number if debug level is 2, just a message (without file and line number) if the level is 1, and does nothing if the level is 0.
+
+    3. Write a macro DPrint that tests if DEBUG is defined and, if it is, prints the value passed in as a parameter.
+
+    4. Write a function that prints an error message. The function should print the line number and filename where the error occurred. Note that the line number and filename are passed in to this function.
+
+    5. How would you call the preceding error function?
+
+    6. Write an assert() macro that uses the error function from Exercise 4, and write a driver program that calls this assert() macro. 
+
+
+

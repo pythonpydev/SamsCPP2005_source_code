@@ -1,0 +1,992 @@
+    Day 4
+        Expressions and Statements
+            Statements
+                Whitespace
+                Blocks and Compound Statements 
+            Expressions
+            Listing 4.1. Evaluating complex expressions.
+            Operators
+                Assignment Operator
+                Mathematical Operators 
+            Listing 4.2. A demonstration of subtraction and integer overflow.
+                Integer Division and Modulus 
+            Combining the Assignment and Mathematical Operators
+            Increment and Decrement
+                Prefix and Postfix 
+            Listing 4.3. A demonstration of prefix and postfix operators.
+            Precedence
+            Nesting Parentheses
+            The Nature of Truth
+                Relational Operators 
+            The if Statement
+            Listing 4.4. A demonstration of branching based on relational operators.
+                Indentation Styles
+                else 
+            Listing 4.5. Demonstrating the else keyword.
+            The if Statement
+                Advanced if Statements 
+            Listing 4.6. A complex, nested if statement.
+            Using Braces in Nested if Statements
+            Listing 4.7. A demonstration of why
+            braces help clarify which else statement goes with which if statement.
+            Listing 4.8. A demonstration of the proper use of braces with an if statement.
+            Logical Operators
+                Logical AND
+                Logical OR
+                Logical NOT 
+            Relational Precedence
+            More About Truth and Falsehood
+            Conditional (Ternary) Operator
+            Listing 4.9. A demonstration of the conditional operator.
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+Day 4
+Expressions and Statements
+
+At its heart, a program is a set of commands executed in sequence. The power in a program comes from its capability to execute one or another set of commands, based on whether a particular condition is true or false. Today you will learn
+
+    What statements are.
+
+    What blocks are.
+
+    What expressions are.
+
+    How to branch your code based on conditions.
+
+    What truth is, and how to act on it. 
+
+Statements
+
+In C++ a statement controls the sequence of execution, evaluates an expression, or does nothing (the null statement). All C++ statements end with a semicolon, even the null statement, which is just the semicolon and nothing else. One of the most common statements is the following assignment statement:
+
+x = a + b;
+
+Unlike in algebra, this statement does not mean that x equals a+b. This is read, "Assign the value of the sum of a and b to x," or "Assign to x, a+b." Even though this statement is doing two things, it is one statement and thus has one semicolon. The assignment operator assigns whatever is on the right side of the equal sign to whatever is on the left side.
+
+    New Term: A null statement is a statement that does nothing. 
+
+Whitespace
+
+Whitespace (tabs, spaces, and newlines) is generally ignored in statements. The assignment statement previously discussed could be written as
+
+x=a+b;
+
+or as
+
+x                       =a
+
++           b          ;
+
+Although this last variation is perfectly legal, it is also perfectly foolish. Whitespace can be used to make your programs more readable and easier to maintain, or it can be used to create horrific and indecipherable code. In this, as in all things, C++ provides the power; you supply the judgment.
+
+    New Term: Whitespace characters (spaces, tabs, and newlines) cannot be seen. If these characters are printed, you see only the white of the paper. 
+
+Blocks and Compound Statements
+
+Any place you can put a single statement, you can put a compound statement, also called a block. A block begins with an opening brace ({) and ends with a closing brace (}). Although every statement in the block must end with a semicolon, the block itself does not end with a semicolon. For example
+
+{
+     temp = a;
+     a = b;
+     b = temp;
+}
+
+This block of code acts as one statement and swaps the values in the variables a and b.
+
+    DO use a closing brace any time you have an opening brace. DO end your statements with a semicolon. DO use whitespace judiciously to make your code clearer. 
+
+Expressions
+
+Anything that evaluates to a value is an expression in C++. An expression is said to return a value. Thus, 3+2; returns the value 5 and so is an expression. All expressions are statements.
+
+The myriad pieces of code that qualify as expressions might surprise you. Here are three examples:
+
+3.2                       // returns the value 3.2
+PI                        // float const that returns the value 3.14
+SecondsPerMinute          // int const that returns 60
+
+Assuming that PI is a constant equal to 3.14 and SecondsPerMinute is a constant equal to 60, all three of these statements are expressions.
+
+The complicated expression
+
+x = a + b;
+
+not only adds a and b and assigns the result to x, but returns the value of that assignment (the value of x) as well. Thus, this statement is also an expression. Because it is an expression, it can be on the right side of an assignment operator:
+
+y = x = a + b;
+
+This line is evaluated in the following order: Add a to b.
+
+Assign the result of the expression a + b to x.
+
+Assign the result of the assignment expression x = a + b to y.
+
+If a, b, x, and y are all integers, and if a has the value 2 and b has the value 5, both x and y will be assigned the value 7.
+
+Listing 4.1. Evaluating complex expressions.
+
+1:    #include <iostream.h>
+2:    int main()
+3:    {
+4:        int a=0, b=0, x=0, y=35;
+5:        cout << "a: " << a << " b: " << b;
+6:        cout << " x: " << x << " y: " << y << endl;
+7:        a = 9;
+8:        b = 7;
+9:        y = x = a+b;
+10:       cout << "a: " << a << " b: " << b;
+11:       cout << " x: " << x << " y: " << y << endl;
+12:          return 0;
+13: }
+Output: a: 0 b: 0 x: 0 y: 35
+a: 9 b: 7 x: 16 y: 16
+
+Analysis: On line 4, the four variables are declared and initialized. Their values are printed on lines 5 and 6. On line 7, a is assigned the value 9. One line 8, b is assigned the value 7. On line 9, the values of a and b are summed and the result is assigned to x. This expression (x = a+b) evaluates to a value (the sum of a + b), and that value is in turn assigned to y.
+Operators
+
+An operator is a symbol that causes the compiler to take an action. Operators act on operands, and in C++ all operands are expressions. In C++ there are several different categories of operators. Two of these categories are
+
+    Assignment operators.
+
+    Mathematical operators. 
+
+Assignment Operator
+
+The assignment operator (=) causes the operand on the left side of the assignment operator to have its value changed to the value on the right side of the assignment operator. The expression
+
+x = a + b;
+
+assigns the value that is the result of adding a and b to the operand x.
+
+An operand that legally can be on the left side of an assignment operator is called an lvalue. That which can be on the right side is called (you guessed it) an rvalue.
+
+Constants are r-values. They cannot be l-values. Thus, you can write
+
+x = 35;          // ok
+
+but you can't legally write
+
+35 = x;          // error, not an lvalue!
+
+    New Term: An lvalue is an operand that can be on the left side of an expression. An rvalue is an operand that can be on the right side of an expression. Note that all l-values are r-values, but not all r-values are l-values. An example of an rvalue that is not an lvalue is a literal. Thus, you can write x = 5;, but you cannot write 5 = x;. 
+
+Mathematical Operators
+
+There are five mathematical operators: addition (+), subtraction (-), multiplication (*), division (/), and modulus (%).
+
+Addition and subtraction work as you would expect, although subtraction with unsigned integers can lead to surprising results, if the result is a negative number. You saw something much like this yesterday, when variable overflow was described. Listing 4.2 shows what happens when you subtract a large unsigned number from a small unsigned number.
+
+Listing 4.2. A demonstration of subtraction and integer overflow.
+
+1: // Listing 4.2 - demonstrates subtraction and
+2: // integer overflow
+3: #include <iostream.h>
+4:
+5: int main()
+6: {
+7:    unsigned int difference;
+8:    unsigned int bigNumber = 100;
+9:    unsigned int smallNumber = 50;
+10:   difference = bigNumber - smallNumber;
+11:   cout << "Difference is: " << difference;
+12:   difference = smallNumber - bigNumber;
+13:   cout << "\nNow difference is: " << difference <<endl;
+14:       return 0;
+15: }
+Output: Difference is: 50
+Now difference is: 4294967246
+
+Analysis: The subtraction operator is invoked on line 10, and the result is printed on line 11, much as we might expect. The subtraction operator is called again on line 12, but this time a large unsigned number is subtracted from a small unsigned number. The result would be negative, but because it is evaluated (and printed) as an unsigned number, the result is an overflow, as described yesterday. This topic is reviewed in detail in Appendix A, "Operator Precedence."
+Integer Division and Modulus
+
+Integer division is somewhat different from everyday division. When you divide 21 by 4, the result is a real number (a number with a fraction). Integers don't have fractions, and so the "remainder" is lopped off. The answer is therefore 5. To get the remainder, you take 21 modulus 4 (21 % 4) and the result is 1. The modulus operator tells you the remainder after an integer division.
+
+Finding the modulus can be very useful. For example, you might want to print a statement on every 10th action. Any number whose value is 0 when you modulus 10 with that number is an exact multiple of 10. Thus 1 % 10 is 1, 2 % 10 is 2, and so forth, until 10 % 10, whose result is 0. 11 % 10 is back to 1, and this pattern continues until the next multiple of 10, which is 20. We'll use this technique when looping is discussed on Day 7, "More Program Flow."
+
+    WARNING: Many novice C++ programmers inadvertently put a semicolon after their if statements:
+
+    if(SomeValue < 10);
+    SomeValue = 10;
+
+
+    What was intended here was to test whether SomeValue is less than 10, and if so, to set it to 10, making 10 the minimum value for SomeValue. Running this code snippet will show that SomeValue is always set to 10! Why? The if statement terminates with the semicolon (the do-nothing operator). Remember that indentation has no meaning to the compiler. This snippet could more accurately have been written as:
+
+    if (SomeValue < 10)  // test
+    ;  // do nothing
+    SomeValue = 10;  // assign
+
+    Removing the semicolon will make the final line part of the if statement and will make this code do what was intended. 
+
+Combining the Assignment and Mathematical Operators
+
+It is not uncommon to want to add a value to a variable, and then to assign the result back into the variable. If you have a variable myAge and you want to increase the value by two, you can write
+
+int myAge = 5;
+int temp;
+temp = myAge + 2;  // add 5 + 2 and put it in temp
+myAge = temp;             // put it back in myAge
+
+This method, however, is terribly convoluted and wasteful. In C++, you can put the same variable on both sides of the assignment operator, and thus the preceding becomes
+
+myAge = myAge + 2;
+
+which is much better. In algebra this expression would be meaningless, but in C++ it is read as "add two to the value in myAge and assign the result to myAge."
+
+Even simpler to write, but perhaps a bit harder to read is
+
+myAge += 2;
+
+The self-assigned addition operator (+=) adds the rvalue to the lvalue and then reassigns the result into the lvalue. This operator is pronounced "plus-equals." The statement would be read "myAge plus-equals two." If myAge had the value 4 to start, it would have 6 after this statement.
+
+There are self-assigned subtraction (-=), division (/=), multiplication (*=), and modulus (%=) operators as well.
+Increment and Decrement
+
+The most common value to add (or subtract) and then reassign into a variable is 1. In C++, increasing a value by 1 is called incrementing, and decreasing by 1 is called decrementing. There are special operators to perform these actions.
+
+The increment operator (++) increases the value of the variable by 1, and the decrement operator (--) decreases it by 1. Thus, if you have a variable, C, and you want to increment it, you would use this statement:
+
+C++;               // Start with C and increment it.
+
+This statement is equivalent to the more verbose statement
+
+C = C + 1;
+
+which you learned is also equivalent to the moderately verbose statement
+
+C += 1;
+
+Prefix and Postfix
+
+Both the increment operator (++) and the decrement operator(--) come in two varieties: prefix and postfix. The prefix variety is written before the variable name (++myAge); the postfix variety is written after (myAge++).
+
+In a simple statement, it doesn't much matter which you use, but in a complex statement, when you are incrementing (or decrementing) a variable and then assigning the result to another variable, it matters very much. The prefix operator is evaluated before the assignment, the postfix is evaluated after.
+
+The semantics of prefix is this: Increment the value and then fetch it. The semantics of postfix is different: Fetch the value and then increment the original.
+
+This can be confusing at first, but if x is an integer whose value is 5 and you write
+
+int a = ++x;
+
+you have told the compiler to increment x (making it 6) and then fetch that value and assign it to a. Thus, a is now 6 and x is now 6.
+
+If, after doing this, you write
+
+int b = x++;
+
+you have now told the compiler to fetch the value in x (6) and assign it to b, and then go back and increment x. Thus, b is now 6, but x is now 7. Listing 4.3 shows the use and implications of both types.
+
+Listing 4.3. A demonstration of prefix and postfix operators.
+
+1:  // Listing 4.3 - demonstrates use of
+2:  // prefix and postfix increment and
+3:  // decrement operators
+4:  #include <iostream.h>
+5:  int main()
+6:  {
+7:      int myAge = 39;      // initialize two integers
+8:      int yourAge = 39;
+9:      cout << "I am: " << myAge << " years old.\n";
+10:     cout << "You are: " << yourAge << " years old\n";
+11:     myAge++;         // postfix increment
+12:     ++yourAge;       // prefix increment
+13:     cout << "One year passes...\n";
+14:     cout << "I am: " << myAge << " years old.\n";
+15:     cout << "You are: " << yourAge << " years old\n";
+16:     cout << "Another year passes\n";
+17:     cout << "I am: " << myAge++ << " years old.\n";
+18:     cout << "You are: " << ++yourAge << " years old\n";
+19:     cout << "Let's print it again.\n";
+20:     cout << "I am: " << myAge << " years old.\n";
+21:     cout << "You are: " << yourAge << " years old\n";
+22:       return 0;
+23: }
+Output: I am      39 years old
+You are   39 years old
+One year passes
+I am      40 years old
+You are   40 years old
+Another year passes
+I am      40 years old
+You are   41 years old
+Let's print it again
+I am      41 years old
+You are   41 years old
+
+Analysis: On lines 7 and 8, two integer variables are declared, and each is initialized with the value 39. Their values are printed on lines 9 and 10.
+On line 11, myAge is incremented using the postfix increment operator, and on line 12, yourAge is incremented using the prefix increment operator. The results are printed on lines 14 and 15, and they are identical (both 40).
+
+On line 17, myAge is incremented as part of the printing statement, using the postfix increment operator. Because it is postfix, the increment happens after the print, and so the value 40 is printed again. In contrast, on line 18, yourAge is incremented using the prefix increment operator. Thus, it is incremented before being printed, and the value displays as 41.
+
+Finally, on lines 20 and 21, the values are printed again. Because the increment statement has completed, the value in myAge is now 41, as is the value in yourAge.
+Precedence
+
+In the complex statement
+
+x = 5 + 3 * 8;
+
+which is performed first, the addition or the multiplication? If the addition is performed first, the answer is 8 * 8, or 64. If the multiplication is performed first, the answer is 5 + 24, or 29.
+
+Every operator has a precedence value, and the complete list is shown in Appendix A, "Operator Precedence." Multiplication has higher precedence than addition, and thus the value of the expression is 29.
+
+When two mathematical operators have the same precedence, they are performed in left-to-right order. Thus
+
+x = 5 + 3 + 8 * 9 + 6 * 4;
+
+is evaluated multiplication first, left to right. Thus, 8*9 = 72, and 6*4 = 24. Now the expression is essentially
+
+x = 5 + 3 + 72 + 24;
+
+Now the addition, left to right, is 5 + 3 = 8; 8 + 72 = 80; 80 + 24 = 104.
+
+Be careful with this. Some operators, such as assignment, are evaluated in right-to-left order! In any case, what if the precedence order doesn't meet your needs? Consider the expression
+
+TotalSeconds = NumMinutesToThink + NumMinutesToType * 60
+
+In this expression, you do not want to multiply the NumMinutesToType variable by 60 and then add it to NumMinutesToThink. You want to add the two variables to get the total number of minutes, and then you want to multiply that number by 60 to get the total seconds.
+
+In this case, you use parentheses to change the precedence order. Items in parentheses are evaluated at a higher precedence than any of the mathematical operators. Thus
+
+TotalSeconds = (NumMinutesToThink + NumMinutesToType) * 60
+
+will accomplish what you want.
+Nesting Parentheses
+
+For complex expressions, you might need to nest parentheses one within another. For example, you might need to compute the total seconds and then compute the total number of people who are involved before multiplying seconds times people:
+
+TotalPersonSeconds = ( ( (NumMinutesToThink + NumMinutesToType) * 60) *  Â(PeopleInTheOffice + PeopleOnVacation) )
+
+This complicated expression is read from the inside out. First, NumMinutesToThink is added to NumMinutesToType, because these are in the innermost parentheses. Then this sum is multiplied by 60. Next, PeopleInTheOffice is added to PeopleOnVacation. Finally, the total number of people found is multiplied by the total number of seconds.
+
+This example raises an important related issue. This expression is easy for a computer to understand, but very difficult for a human to read, understand, or modify. Here is the same expression rewritten, using some temporary integer variables:
+
+TotalMinutes = NumMinutesToThink + NumMinutesToType;
+TotalSeconds = TotalMinutes * 60;
+TotalPeople = PeopleInTheOffice + PeopleOnVacation;
+TotalPersonSeconds = TotalPeople * TotalSeconds;
+
+This example takes longer to write and uses more temporary variables than the preceding example, but it is far easier to understand. Add a comment at the top to explain what this code does, and change the 60 to a symbolic constant. You then will have code that is easy to understand and maintain.
+
+    DO remember that expressions have a value. DO use the prefix operator (++variable) to increment or decrement the variable before it is used in the expression. DO use the postfix operator (variable++) to increment or decrement the variable after it is used. DO use parentheses to change the order of precedence. DON'T nest too deeply, because the expression becomes hard to understand and maintain. 
+
+The Nature of Truth
+
+In C++, zero is considered false, and all other values are considered true, although true is usually represented by 1. Thus, if an expression is false, it is equal to zero, and if an expression is equal to zero, it is false. If a statement is true, all you know is that it is nonzero, and any nonzero statement is true.
+Relational Operators
+
+The relational operators are used to determine whether two numbers are equal, or if one is greater or less than the other. Every relational statement evaluates to either 1 (TRUE) or 0 (FALSE). The relational operators are presented later, in Table 4.1.
+
+If the integer variable myAge has the value 39, and the integer variable yourAge has the value 40, you can determine whether they are equal by using the relational "equals" operator:
+
+myAge == yourAge;  // is the value in myAge the same as in yourAge?
+
+This expression evaluates to 0, or false, because the variables are not equal. The expression
+
+myAge > yourAge;  // is myAge greater than yourAge?
+
+evaluates to 0 or false.
+
+    WARNING: Many novice C++ programmers confuse the assignment operator (=) with the equals operator (==). This can create a nasty bug in your program. 
+
+There are six relational operators: equals (==), less than (<), greater than (>), less than or equal to (<=), greater than or equal to (>=), and not equals (!=). Table 4.1 shows each relational operator, its use, and a sample code use.
+
+Table 4.1. The Relational Operators.
+Name 	Operator 	Sample 	Evaluates
+Equals 	== 	100 == 50; 	false
+		50 == 50; 	true
+Not Equals 	!= 	100 != 50; 	true
+		50 != 50; 	false
+Greater Than 	> 	100 > 50; 	true
+		50 > 50; 	false
+Greater Than 	>= 	100 >= 50; 	true
+or Equals 		50 >= 50; 	true
+Less Than 	< 	100 < 50; 	false
+		50 < 50; 	false
+Less Than 	<= 	100 <= 50; 	false
+or Equals 		50 <= 50; 	true
+
+    DO remember that relational operators return the value 1 (true) or 0 (false). DON'T confuse the assignment operator (=) with the equals relational operator (==). This is one of the most common C++ programming mistakes--be on guard for it. 
+
+The if Statement
+
+Normally, your program flows along line by line in the order in which it appears in your source code. The if statement enables you to test for a condition (such as whether two variables are equal) and branch to different parts of your code, depending on the result.
+
+The simplest form of an if statement is this:
+
+if (expression)
+     statement;
+
+The expression in the parentheses can be any expression at all, but it usually contains one of the relational expressions. If the expression has the value 0, it is considered false, and the statement is skipped. If it has any nonzero value, it is considered true, and the statement is executed. Consider the following example:
+
+if (bigNumber > smallNumber)
+     bigNumber = smallNumber;
+
+This code compares bigNumber and smallNumber. If bigNumber is larger, the second line sets its value to the value of smallNumber.
+
+Because a block of statements surrounded by braces is exactly equivalent to a single statement, the following type of branch can be quite large and powerful:
+
+if (expression)
+{
+     statement1;
+     statement2;
+     statement3;
+}
+
+Here's a simple example of this usage:
+
+if (bigNumber > smallNumber)
+{
+     bigNumber = smallNumber;
+     cout << "bigNumber: " << bigNumber << "\n";
+     cout << "smallNumber: " << smallNumber << "\n";
+}
+
+This time, if bigNumber is larger than smallNumber, not only is it set to the value of smallNumber, but an informational message is printed. Listing 4.4 shows a more detailed example of branching based on relational operators.
+
+Listing 4.4. A demonstration of branching based on relational operators.
+
+1:  // Listing 4.4 - demonstrates if statement
+2:  // used with relational operators
+3:  #include <iostream.h>
+4:  int main()
+5:  {
+6:        int RedSoxScore, YankeesScore;
+7:        cout << "Enter the score for the Red Sox: ";
+8:        cin >> RedSoxScore;
+9:
+10:       cout << "\nEnter the score for the Yankees: ";
+11:       cin >> YankeesScore;
+12:
+13:       cout << "\n";
+14:
+15:       if (RedSoxScore > YankeesScore)
+16:            cout << "Go Sox!\n";
+17:
+18:       if (RedSoxScore < YankeesScore)
+19:       {
+20:            cout << "Go Yankees!\n";
+21:            cout << "Happy days in New York!\n";
+22:       }
+23:
+24:       if (RedSoxScore == YankeesScore)
+25:       {
+26:            cout << "A tie? Naah, can't be.\n";
+27:            cout << "Give me the real score for the Yanks: ";
+28:            cin >> YankeesScore;
+29:
+30:            if (RedSoxScore > YankeesScore)
+31:                 cout << "Knew it! Go Sox!";
+32:
+33:            if (YankeesScore > RedSoxScore)
+34:                 cout << "Knew it! Go Yanks!";
+35:
+36:            if (YankeesScore == RedSoxScore)
+37:                 cout << "Wow, it really was a tie!";
+38:       }
+39:
+40:       cout << "\nThanks for telling me.\n";
+41:        return 0;
+42: }
+Output: Enter the score for the Red Sox: 10
+
+Enter the score for the Yankees: 10
+
+A tie? Naah, can't be
+Give me the real score for the Yanks: 8
+Knew it! Go Sox!
+Thanks for telling me.
+
+Analysis: This program asks for user input of scores for two baseball teams, which are stored in integer variables. The variables are compared in the if statement on lines 15, 18, and 24.
+If one score is higher than the other, an informational message is printed. If the scores are equal, the block of code that begins on line 24 and ends on line 38 is entered. The second score is requested again, and then the scores are compared again.
+
+Note that if the initial Yankees score was higher than the Red Sox score, the if statement on line 15 would evaluate as FALSE, and line 16 would not be invoked. The test on line 18 would evaluate as true, and the statements on lines 20 and 21 would be invoked. Then the if statement on line 24 would be tested, and this would be false (if line 18 was true). Thus, the program would skip the entire block, falling through to line 39.
+
+In this example, getting a true result in one if statement does not stop other if statements from being tested.
+Indentation Styles
+
+Listing 4.3 shows one style of indenting if statements. Nothing is more likely to create a religious war, however, than to ask a group of programmers what is the best style for brace alignment. Although there are dozens of variations, these appear to be the favorite three:
+
+    Putting the initial brace after the condition and aligning the closing brace under the if to close the statement block. 
+
+if (expression){
+     statements
+}
+
+    Aligning the braces under the if and indenting the statements. 
+
+if (expression)
+{
+    statements
+}
+
+    Indenting the braces and statements. 
+
+if (expression)
+   {
+   statements
+   }
+
+This book uses the middle alternative, because I find it easier to understand where blocks of statements begin and end if the braces line up with each other and with the condition being tested. Again, it doesn't matter much which style you choose, as long as you are consistent with it.
+else
+
+Often your program will want to take one branch if your condition is true, another if it is false. In Listing 4.3, you wanted to print one message (Go Sox!) if the first test (RedSoxScore > Yankees) evaluated TRUE, and another message (Go Yanks!) if it evaluated FALSE.
+
+The method shown so far, testing first one condition and then the other, works fine but is a bit cumbersome. The keyword else can make for far more readable code:
+
+if (expression)
+     statement;
+else
+     statement;
+
+Listing 4.5 demonstrates the use of the keyword else.
+
+Listing 4.5. Demonstrating the else keyword.
+
+1:   // Listing 4.5 - demonstrates if statement
+2:   // with else clause
+3:   #include <iostream.h>
+4:   int main()
+5:   {
+6:      int firstNumber, secondNumber;
+7:      cout << "Please enter a big number: ";
+8:      cin >> firstNumber;
+9:      cout << "\nPlease enter a smaller number: ";
+10:     cin >> secondNumber;
+11:     if (firstNumber > secondNumber)
+12:          cout << "\nThanks!\n";
+13:     else
+14:          cout << "\nOops. The second is bigger!";
+15:
+16:        return 0;
+17: }
+
+Output: Please enter a big number: 10
+
+Please enter a smaller number: 12
+
+Oops. The second is bigger!
+
+Analysis: The if statement on line 11 is evaluated. If the condition is true, the statement on line 12 is run; if it is false, the statement on line 14 is run. If the else clause on line 13 were removed, the statement on line 14 would run whether or not the if statement was true. Remember, the if statement ends after line 12. If the else was not there, line 14 would just be the next line in the program.
+Remember that either or both of these statements could be replaced with a block of code in braces.
+The if Statement
+
+The syntax for the if statement is as follows: Form 1
+
+if (expression)
+    statement;
+next statement;
+
+If the expression is evaluated as TRUE, the statement is executed and the program continues with the next statement. If the expression is not true, the statement is ignored and the program jumps to the next statement. Remember that the statement can be a single statement ending with a semicolon or a block enclosed in braces. Form 2
+
+if (expression)
+    statement1;
+else
+    statement2;
+next statement;
+
+If the expression evaluates TRUE, statement1 is executed; otherwise, statement2 is executed. Afterwards, the program continues with the next statement. Example 1
+
+Example
+if (SomeValue < 10)
+  cout << "SomeValue is less than 10");
+else
+  cout << "SomeValue is not less than 10!");
+cout << "Done." << endl;
+
+Advanced if Statements
+
+It is worth noting that any statement can be used in an if or else clause, even another if or else statement. Thus, you might see complex if statements in the following form:
+
+if (expression1)
+{
+    if (expression2)
+        statement1;
+    else
+    {
+        if (expression3)
+            statement2;
+        else
+            statement3;
+    }
+}
+else
+    statement4;
+
+This cumbersome if statement says, "If expression1 is true and expression2 is true, execute statement1. If expression1 is true but expression2 is not true, then if expression3 is true execute statement2. If expression1 is true but expression2 and expression3 are false, execute statement3. Finally, if expression1 is not true, execute statement4." As you can see, complex if statements can be confusing!
+
+Listing 4.6 gives an example of such a complex if statement.
+
+Listing 4.6. A complex, nested if statement.
+
+1:  // Listing 4.5 - a complex nested
+2:  // if statement
+3:  #include <iostream.h>
+4:  int main()
+5:  {
+6:      // Ask for two numbers
+7:      // Assign the numbers to bigNumber and littleNumber
+8:      // If bigNumber is bigger than littleNumber,
+9:      // see if they are evenly divisible
+10:     // If they are, see if they are the same number
+11:
+12:     int firstNumber, secondNumber;
+13:     cout << "Enter two numbers.\nFirst: ";
+14:     cin >> firstNumber;
+15:     cout << "\nSecond: ";
+16:     cin >> secondNumber;
+17:     cout << "\n\n";
+18:
+19:     if (firstNumber >= secondNumber)
+20:     {
+21:       if ( (firstNumber % secondNumber) == 0) // evenly divisible?
+22:       {
+23:            if (firstNumber == secondNumber)
+24:                 cout << "They are the same!\n";
+25:            else
+26:                 cout << "They are evenly divisible!\n";
+27:       }
+28:       else
+29:            cout << "They are not evenly divisible!\n";
+30:     }
+31:     else
+32:       cout << "Hey! The second one is larger!\n";
+33:        return 0;
+34: }
+
+Output: Enter two numbers.
+First: 10
+
+Second: 2
+
+They are evenly divisible!
+
+Analysis: Two numbers are prompted for one at a time, and then compared. The first if statement, on line 19, checks to ensure that the first number is greater than or equal to the second. If not, the else clause on line 31 is executed.
+If the first if is true, the block of code beginning on line 20 is executed, and the second if statement is tested, on line 21. This checks to see whether the first number modulo the second number yields no remainder. If so, the numbers are either evenly divisible or equal. The if statement on line 23 checks for equality and displays the appropriate message either way.
+
+If the if statement on line 21 fails, the else statement on line 28 is executed.
+Using Braces in Nested if Statements
+
+Although it is legal to leave out the braces on if statements that are only a single statement, and it is legal to nest if statements, such as
+
+if (x > y)              // if x is bigger than y
+    if (x < z)          // and if x is smaller than z
+        x = y;         // then set x to the value in z
+
+when writing large nested statements, this can cause enormous confusion. Remember, whitespace and indentation are a convenience for the programmer; they make no difference to the compiler. It is easy to confuse the logic and inadvertently assign an else statement to the wrong if statement. Listing 4.7 illustrates this problem.
+
+Listing 4.7. A demonstration of why braces help clarify which else statement goes with which if statement.
+
+1:   // Listing 4.7 - demonstrates why braces
+2:   // are important in nested if statements
+3:   #include <iostream.h>
+4:   int main()
+5:   {
+6:     int x;
+7:     cout << "Enter a number less than 10 or greater than 100: ";
+8:     cin >> x;
+9:     cout << "\n";
+10:
+11:     if (x > 10)
+12:        if (x > 100)
+13:             cout << "More than 100, Thanks!\n";
+14:     else                            // not the else intended!
+15:        cout << "Less than 10, Thanks!\n";
+16:
+17:         return 0; 
+18: }
+
+Output: Enter a number less than 10 or greater than 100: 20
+
+Less than 10, Thanks!
+
+Analysis: The programmer intended to ask for a number between 10 and 100, check for the correct value, and then print a thank-you note.
+If the if statement on line 11 evaluates TRUE, the following statement (line 12) is executed. In this case, line 12 executes when the number entered is greater than 10. Line 12 contains an if statement also. This if statement evaluates TRUE if the number entered is greater than 100. If the number is not greater than 100, the statement on line 13 is executed.
+
+If the number entered is less than or equal to 10, the if statement on line 10 evaluates to FALSE. Program control goes to the next line following the if statement, in this case line 16. If you enter a number less than 10, the output is as follows:
+
+Enter a number less than 10 or greater than 100: 9
+
+The else clause on line 14 was clearly intended to be attached to the if statement on line 11, and thus is indented accordingly. Unfortunately, the else statement is really attached to the if statement on line 12, and thus this program has a subtle bug.
+
+It is a subtle bug because the compiler will not complain. This is a legal C++ program, but it just doesn't do what was intended. Further, most of the times the programmer tests this program, it will appear to work. As long as a number that is greater than 100 is entered, the program will seem to work just fine.
+
+Listing 4.8 fixes the problem by putting in the necessary braces.
+
+Listing 4.8. A demonstration of the proper use of braces with an if statement
+
+1:    // Listing 4.8 - demonstrates proper use of braces
+2:    // in nested if statements
+3:    #include <iostream.h>
+4:    int main()
+5:    {
+6:      int x;
+7:      cout << "Enter a number less than 10 or greater than 100: ";
+8:      cin >> x;
+9:      cout << "\n";
+10:
+11:     if (x > 10)
+12:     {
+13:        if (x > 100)
+14:             cout << "More than 100, Thanks!\n";
+15:     }
+16:     else                            // not the else intended!
+17:        cout << "Less than 10, Thanks!\n";
+18:         return 0;
+19: }
+Output: Enter a number less than 10 or greater than 100: 20
+
+Analysis: The braces on lines 12 and 15 make everything between them into one statement, and now the else on line 16 applies to the if on line 11 as intended.
+The user typed 20, so the if statement on line 11 is true; however, the if statement on line 13 is false, so nothing is printed. It would be better if the programmer put another else clause after line 14 so that errors would be caught and a message printed.
+
+    NOTE: The programs shown in this book are written to demonstrate the particular issues being discussed. They are kept intentionally simple; there is no attempt to "bulletproof" the code to protect against user error. In professional-quality code, every possible user error is anticipated and handled gracefully. 
+
+Logical Operators
+
+Often you want to ask more than one relational question at a time. "Is it true that x is greater than y, and also true that y is greater than z?" A program might need to determine that both of these conditions are true, or that some other condition is true, in order to take an action.
+
+Imagine a sophisticated alarm system that has this logic: "If the door alarm sounds AND it is after six p.m. AND it is NOT a holiday, OR if it is a weekend, then call the police." C++'s three logical operators are used to make this kind of evaluation. These operators are listed in Table 4.2.
+
+Table 4.2. The Logical Operators.
+Operator 	Symbol 	Example
+AND 	&& 	expression1 && expression2
+OR 	|| 	expression1 || expression2
+NOT 	! 	!expression
+Logical AND
+
+A logical AND statement evaluates two expressions, and if both expressions are true, the logical AND statement is true as well. If it is true that you are hungry, AND it is true that you have money, THEN it is true that you can buy lunch. Thus,
+
+if ( (x == 5) && (y == 5) )
+
+would evaluate TRUE if both x and y are equal to 5, and it would evaluate FALSE if either one is not equal to 5. Note that both sides must be true for the entire expression to be true.
+
+Note that the logical AND is two && symbols. A single & symbol is a different operator, discussed on Day 21, "What's Next."
+Logical OR
+
+A logical OR statement evaluates two expressions. If either one is true, the expression is true. If you have money OR you have a credit card, you can pay the bill. You don't need both money and a credit card; you need only one, although having both would be fine as well. Thus,
+
+if ( (x == 5) || (y == 5) )
+
+evaluates TRUE if either x or y is equal to 5, or if both are.
+
+Note that the logical OR is two || symbols. A single | symbol is a different operator, discussed on Day 21.
+Logical NOT
+
+A logical NOT statement evaluates true if the expression being tested is false. Again, if the expression being tested is false, the value of the test is TRUE! Thus
+
+if ( !(x == 5) )
+
+is true only if x is not equal to 5. This is exactly the same as writing
+
+if (x != 5)
+
+Relational Precedence
+
+Relational operators and logical operators, being C++ expressions, each return a value: 1 (TRUE) or 0 (FALSE). Like all expressions, they have a precedence order (see Appendix A) that determines which relations are evaluated first. This fact is important when determining the value of the statement
+
+if ( x > 5 &&  y > 5  || z > 5)
+
+It might be that the programmer wanted this expression to evaluate TRUE if both x and y are greater than 5 or if z is greater than 5. On the other hand, the programmer might have wanted this expression to evaluate TRUE only if x is greater than 5 and if it is also true that either y is greater than 5 or z is greater than 5.
+
+If x is 3, and y and z are both 10, the first interpretation will be true (z is greater than 5, so ignore x and y), but the second will be false (it isn't true that both x and y are greater than 5 nor is it true that z is greater than 5).
+
+Although precedence will determine which relation is evaluated first, parentheses can both change the order and make the statement clearer:
+
+if (  (x > 5)  && (y > 5 ||  z > 5) )
+
+Using the values from earlier, this statement is false. Because it is not true that x is greater than 5, the left side of the AND statement fails, and thus the entire statement is false. Remember that an AND statement requires that both sides be true--something isn't both "good tasting" AND "good for you" if it isn't good tasting.
+
+    NOTE: It is often a good idea to use extra parentheses to clarify what you want to group. Remember, the goal is to write programs that work and that are easy to read and understand. 
+
+More About Truth and Falsehood
+
+In C++, zero is false, and any other value is true. Because an expression always has a value, many C++ programmers take advantage of this feature in their if statements. A statement such as
+
+if (x)           // if x is true (nonzero)
+    x = 0;
+
+can be read as "If x has a nonzero value, set it to 0." This is a bit of a cheat; it would be clearer if written
+
+if (x != 0)      // if x is nonzero
+    x = 0;
+
+Both statements are legal, but the latter is clearer. It is good programming practice to reserve the former method for true tests of logic, rather than for testing for nonzero values.
+
+These two statements also are equivalent:
+
+
+if (!x)           // if x is false (zero)
+if (x == 0)       // if x is zero
+
+The second statement, however, is somewhat easier to understand and is more explicit.
+
+    DO put parentheses around your logical tests to make them clearer and to make the precedence explicit. DO use braces in nested if statements to make the else statements clearer and to avoid bugs. DON'T use if(x) as a synonym for if(x != 0); the latter is clearer. DON'T use if(!x) as a synonym for if(x == 0); the latter is clearer.
+
+    NOTE: It is common to define your own enumerated Boolean (logical) type with enum Bool {FALSE, TRUE};. This serves to set FALSE to 0 and TRUE to 1. 
+
+Conditional (Ternary) Operator
+
+The conditional operator (?:) is C++'s only ternary operator; that is, it is the only operator to take three terms.
+
+The conditional operator takes three expressions and returns a value:
+
+(expression1) ? (expression2) : (expression3)
+
+This line is read as "If expression1 is true, return the value of expression2; otherwise, return the value of expression3." Typically, this value would be assigned to a variable.
+
+Listing 4.9 shows an if statement rewritten using the conditional operator.
+
+Listing 4.9. A demonstration of the conditional operator.
+
+1:   // Listing 4.9 - demonstrates the conditional operator
+2:   //
+3:   #include <iostream.h>
+4:   int main()
+5:   {
+6:      int x, y, z;
+7:      cout << "Enter two numbers.\n";
+8:      cout << "First: ";
+9:      cin >> x;
+10:     cout << "\nSecond: ";
+11:     cin >> y;
+12:     cout << "\n";
+13:
+14:     if (x > y)
+15:       z = x;
+16:     else
+17:       z = y;
+18:
+19:     cout << "z: " << z;
+20:     cout << "\n";
+21:
+22:     z =  (x > y) ? x : y;
+23:
+24:     cout << "z: " << z;
+25:     cout << "\n";
+26:        return 0;
+27: }
+Output: Enter two numbers.
+First: 5
+
+Second: 8
+
+z: 8
+z: 8
+
+Analysis: Three integer variables are created: x, y, and z. The first two are given values by the user. The if statement on line 14 tests to see which is larger and assigns the larger value to z. This value is printed on line 19.
+The conditional operator on line 22 makes the same test and assigns z the larger value. It is read like this: "If x is greater than y, return the value of x; otherwise, return the value of y." The value returned is assigned to z. That value is printed on line 24. As you can see, the conditional statement is a shorter equivalent to the if...else statement.
+Summary
+
+This chapter has covered a lot of material. You have learned what C++ statements and expressions are, what C++ operators do, and how C++ if statements work.
+
+You have seen that a block of statements enclosed by a pair of braces can be used anywhere a single statement can be used.
+
+You have learned that every expression evaluates to a value, and that value can be tested in an if statement or by using the conditional operator. You've also seen how to evaluate multiple statements using the logical operator, how to compare values using the relational operators, and how to assign values using the assignment operator.
+
+You have explored operator precedence. And you have seen how parentheses can be used to change the precedence and to make precedence explicit and thus easier to manage.
+Q&A
+
+    Q. Why use unnecessary parentheses when precedence will determine which operators are acted on first?
+
+    A. Although it is true that the compiler will know the precedence and that a programmer can look up the precedence order, code that is easy to understand is easier to maintain.
+
+    Q. If the relational operators always return 1 or 0, why are other values considered true?
+
+    A. The relational operators return 1 or 0, but every expression returns a value, and those values can also be evaluated in an if statement. Here's an example: 
+
+if ( (x = a + b) == 35 )
+
+    This is a perfectly legal C++ statement. It evaluates to a value even if the sum of a and b is not equal to 35. Also note that x is assigned the value that is the sum of a and b in any case.
+
+    Q. What effect do tabs, spaces, and new lines have on the program?
+
+    A. Tabs, spaces, and new lines (known as whitespace) have no effect on the program, although judicious use of whitespace can make the program easier to read.
+
+    Q. Are negative numbers true or false?
+
+    A. All nonzero numbers, positive and negative, are true. 
+
+Workshop
+
+The Workshop provides quiz questions to help you solidify your understanding of the material covered, and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure that you understand the answers before continuing to the next chapter.
+Quiz
+
+    1. What is an expression?
+
+    2. Is x = 5 + 7 an expression? What is its value?
+
+    3. What is the value of 201 / 4?
+
+    4. What is the value of 201 % 4?
+
+    5. If myAge, a, and b are all int variables, what are their values after: 
+
+myAge = 39;
+a = myAge++;
+b = ++myAge;
+
+    6. What is the value of 8+2*3?
+
+    7. What is the difference between x = 3 and x == 3?
+
+    8. Do the following values evaluate to TRUE or FALSE?
+
+
+        a. 0
+
+        b. 1 
+
+        c. -1 
+
+        d. x = 0 
+
+        e. x == 0 // assume that x has the value of 0 
+
+Exercises
+
+    1. Write a single if statement that examines two integer variables and changes the larger to the smaller, using only one else clause.
+
+    2. Examine the following program. Imagine entering three numbers, and write what output you expect. 
+
+1: #include <iostream.h>
+2: int main()
+3: { 4: int a, b, c;
+5: cout << "Please enter three numbers\n";
+6: cout << "a: ";
+7: cin >> a;
+8: cout << "\nb: ";
+9: cin >> b;
+10: cout << "\nc: ";
+11: cin >> c;
+12:
+13: if (c = (a-b))
+14: {cout << "a: ";
+15: cout << a;
+16: cout << "minus b: ";
+17: cout << b;
+18: cout << "equals c: ";
+19: cout << c << endl;}
+20: else
+21: cout << "a-b does not equal c: " << endl;
+22: return 0;
+23: }
+
+    3. Enter the program from Exercise 2; compile, link, and run it. Enter the numbers 20, 10, and 50. Did you get the output you expected? Why not?
+
+    4. Examine this program and anticipate the output: 
+
+1: #include <iostream.h>
+2: int main()
+3: {
+4: int a = 1, b = 1, c;
+5: if (c = (a-b))
+6: cout << "The value of c is: " << c;
+7: return 0;
+8: }
+
+    5. Enter, compile, link, and run the program from Exercise 4. What was the output? Why?
+
+
+

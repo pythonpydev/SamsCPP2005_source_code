@@ -1,0 +1,1135 @@
+    Day 9
+        References
+            What Is a Reference?
+            Listing 9.1. Creating and using references.
+            Using the Address of Operator & on References
+            Listing 9.2. Taking the address of a reference
+            Listing 9.3. Assigning to a reference
+            What Can Be Referenced?
+            Listing 9.4. References to objects
+            References
+            Null Pointers and Null References
+            Passing Function Arguments by Reference
+            Listing 9.5. Demonstrating passing by value
+                Making swap() Work with Pointers 
+            Listing 9.6. Passing by reference using pointers
+                Implementing swap() with References 
+            Listing 9.7. swap() rewritten with references
+            Understanding Function Headers and Prototypes
+            Returning Multiple Values
+            Listing 9.8. Returning values with pointers
+                Returning Values by Reference 
+            Listing 9.9.
+            Listing 9.8 rewritten using references.
+            Passing by Reference for Efficiency
+            Listing 9.10. Passing objects by reference
+                Passing a const Pointer 
+            Listing 9.11. Passing const pointers
+                References as an Alternative 
+            Listing 9.12. Passing references to objects
+            const References
+            When to Use References and When to Use Pointers
+            Mixing References and Pointers
+            Dont Return a Reference to an Object that Isnt in Scope!
+            Listing 9.13. Returning a reference to a non-existent object
+            Returning a Reference to an Object on the Hea
+            Listing 9.14. Memory leaks
+            Pointer, Pointer, Who Has the Pointer?
+            Summary
+            Q&A
+            Workshop
+                Quiz
+                Exercises 
+
+
+Day 9
+References
+
+Yesterday you learned how to use pointers to manipulate objects on the free store and how to refer to those objects indirectly. References, the topic of today's chapter, give you almost all the power of pointers but with a much easier syntax. Today you learn the following
+
+    What references are.
+
+    How references differ from pointers.
+
+    How to create references and use them.
+
+    What the limitations of references are.
+
+    How to pass values and objects into and out of functions by reference. 
+
+What Is a Reference?
+
+A reference is an alias; when you create a reference, you initialize it with the name of another object, the target. From that moment on, the reference acts as an alternative name for the target, and anything you do to the reference is really done to the target.
+
+You create a reference by writing the type of the target object, followed by the reference operator (&), followed by the name of the reference. References can use any legal variable name, but for this book we'll prefix all reference names with "r." Thus, if you have an integer variable named someInt, you can make a reference to that variable by writing the following:
+
+int &rSomeRef = someInt;
+
+This is read as "rSomeRef is a reference to an integer that is initialized to refer to someInt." Listing 9.1 shows how references are created and used.
+
+    NOTE: Note that the reference operator (&) is the same symbol as the one used for the address of the operator. These are not the same operators, however, though clearly they are related. 
+
+Listing 9.1. Creating and using references.
+
+
+1:    //Listing 9.1
+2:    // Demonstrating the use of References
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:         int  intOne;
+9:         int &rSomeRef = intOne;
+10:
+11:        intOne = 5;
+12:        cout << "intOne: " << intOne << endl;
+13:        cout << "rSomeRef: " << rSomeRef << endl;
+14:
+15:        rSomeRef = 7;
+16:        cout << "intOne: " << intOne << endl;
+17:        cout << "rSomeRef: " << rSomeRef << endl;
+18:   return 0;
+19: }
+
+Output: intOne: 5
+rSomeRef: 5
+intOne: 7
+rSomeRef: 7
+
+Anaylsis: On line 8, a local int variable, intOne, is declared. On line 9, a reference to an int, rSomeRef, is declared and initialized to refer to intOne. If you declare a reference, but don't initialize it, you will get a compile-time error. References must be initialized.
+On line 11, intOne is assigned the value 5. On lines 12 and 13, the values in intOne and rSomeRef are printed, and are, of course, the same.
+
+On line 15, 7 is assigned to rSomeRef. Since this is a reference, it is an alias for intOne, and thus the 7 is really assigned to intOne, as is shown by the printouts on lines 16 and 17.
+Using the Address of Operator & on References
+
+If you ask a reference for its address, it returns the address of its target. That is the nature of references. They are aliases for the target. Listing 9.2 demonstrates this.
+
+Listing 9.2. Taking the address of a reference.
+
+
+1:    //Listing 9.2
+2:    // Demonstrating the use of References
+3:
+4:    #include <iostream.h>
+5:
+6:    int main()
+7:    {
+8:        int  intOne;
+9:        int &rSomeRef = intOne;
+10:
+11:       intOne = 5;
+12:       cout << "intOne: " << intOne << endl;
+13:       cout << "rSomeRef: " << rSomeRef << endl;
+14:
+15:       cout << "&intOne: "  << &intOne << endl;
+16:       cout << "&rSomeRef: " << &rSomeRef << endl;
+17:
+18:   return 0;
+19: }
+
+Output: intOne: 5
+rSomeRef: 5
+&intOne:  0x3500
+&rSomeRef: 0x3500
+
+    NOTE: Your output may differ on the last two lines. 
+
+Anaylsis: Once again rSomeRef is initialized as a reference to intOne. This time the addresses of the two variables are printed, and they are identical. C++ gives you no way to access the address of the reference itself because it is not meaningful, as it would be if you were using a pointer or other variable. References are initialized when created, and always act as a synonym for their target, even when the address of operator is applied.
+For example, if you have a class called President, you might declare an instance of that class as follows:
+
+President  William_Jefferson_Clinton;
+
+You might then declare a reference to President and initialize it with this object:
+
+President &Bill_Clinton = William_Jefferson_Clinton;
+
+There is only one President; both identifiers refer to the same object of the same class. Any action you take on Bill_Clinton will be taken on William_Jefferson_Clinton as well.
+
+Be careful to distinguish between the & symbol on line 9 of Listing 9.2, which declares a reference to int named rSomeRef, and the & symbols on lines 15 and 16, which return the addresses of the integer variable intOne and the reference rSomeRef.
+
+Normally, when you use a reference, you do not use the address of operator. You simply use the reference as you would use the target variable. This is shown on line 13.
+
+Even experienced C++ programmers, who know the rule that references cannot be reassigned and are always aliases for their target, can be confused by what happens when you try to reassign a reference. What appears to be a reassignment turns out to be the assignment of a new value to the target. Listing 9.3 illustrates this fact.
+
+Listing 9.3. Assigning to a reference.
+
+
+1:     //Listing 9.3
+2:      //Reassigning a reference
+3:
+4:      #include <iostream.h>
+5:
+6:      int main()
+7:      {
+8:           int  intOne;
+9:           int &rSomeRef = intOne;
+10:
+11:           intOne = 5;
+12:           cout << "intOne:\t" << intOne << endl;
+13:           cout << "rSomeRef:\t" << rSomeRef << endl;
+14:           cout << "&intOne:\t"  << &intOne << endl;
+15:           cout << "&rSomeRef:\t" << &rSomeRef << endl;
+16:
+17:           int intTwo = 8;
+18:           rSomeRef = intTwo;  // not what you think!
+19:           cout << "\nintOne:\t" << intOne << endl;
+20:           cout << "intTwo:\t" << intTwo << endl;
+21:           cout << "rSomeRef:\t" << rSomeRef << endl;
+22:           cout << "&intOne:\t"  << &intOne << endl;
+23:           cout << "&intTwo:\t"  << &intTwo << endl;
+24:           cout << "&rSomeRef:\t" << &rSomeRef << endl;
+25:      return 0;
+26: }
+
+Output: intOne:                 5
+rSomeRef:         5
+&intOne:              0x213e
+&rSomeRef:      0x213e
+
+intOne:                 8
+intTwo:                8
+rSomeRef:         8
+&intOne:              0x213e
+&intTwo:              0x2130
+&rSomeRef:      0x213e
+
+Anaylsis: Once again, an integer variable and a reference to an integer are declared, on lines 8 and 9. The integer is assigned the value 5 on line 11, and the values and their addresses are printed on lines 12-15.
+On line 17, a new variable, intTwo, is created and initialized with the value 8. On line 18, the programmer tries to reassign rSomeRef to now be an alias to the variable intTwo, but that is not what happens. What actually happens is that rSomeRef continues to act as an alias for intOne, so this assignment is exactly equivalent to the following:
+
+intOne = intTwo;
+
+Sure enough, when the values of intOne and rSomeRef are printed (lines 19-21) they are the same as intTwo. In fact, when the addresses are printed on lines 22-24, you see that rSomeRef continues to refer to intOne and not intTwo.
+
+    DO use references to create an alias to an object. DO initialize all references. DON'T try to reassign a reference. DON'T confuse the address of operator with the reference operator. 
+
+What Can Be Referenced?
+
+Any object can be referenced, including user-defined objects. Note that you create a reference to an object, but not to a class. You do not write this:
+
+int & rIntRef = int;    // wrong
+
+You must initialize rIntRef to a particular integer, such as this:
+
+int howBig = 200;
+int & rIntRef = howBig;
+
+In the same way, you don't initialize a reference to a CAT:
+
+CAT & rCatRef = CAT;   // wrong
+
+You must initialize rCatRef to a particular CAT object:
+
+CAT frisky;
+CAT & rCatRef = frisky;
+
+References to objects are used just like the object itself. Member data and methods are accessed using the normal class member access operator (.), and just as with the built-in types, the reference acts as an alias to the object. Listing 9.4 illustrates this.
+
+Listing 9.4. References to objects.
+
+
+1:    // Listing 9.4
+2:    // References to class objects
+3:
+4:    #include <iostream.h>
+5:
+6:    class SimpleCat
+7:    {
+8:       public:
+9:          SimpleCat (int age, int weight);
+10:         ~SimpleCat() {}
+11:         int GetAge() { return itsAge; }
+12:         int GetWeight() { return itsWeight; }
+13:      private:
+14:         int itsAge;
+15:         int itsWeight;
+16:   };
+17:
+18:   SimpleCat::SimpleCat(int age, int weight)
+19:   {
+20:        itsAge = age;
+21:        itsWeight = weight;
+22:   }
+23:
+24:   int main()
+25:   {
+26:        SimpleCat Frisky(5,8);
+27:        SimpleCat & rCat = Frisky;
+28:
+29:        cout << "Frisky is: ";
+30:        cout << Frisky.GetAge() << " years old. \n";
+31:        cout << "And Frisky weighs: ";
+32:        cout << rCat.GetWeight() << " pounds. \n";
+33:   return 0;
+34: }
+
+Output: Frisky is: 5 years old.
+And Frisky weighs 8 pounds.
+
+Anaylsis: On line 26, Frisky is declared to be a SimpleCat object. On line 27, a SimpleCat reference, rCat, is declared and initialized to refer to Frisky. On lines 30 and 32, the SimpleCat accessor methods are accessed by using first the SimpleCat object and then the SimpleCat reference. Note that the access is identical. Again, the reference is an alias for the actual object.
+References
+
+Declare a reference by writing the type, followed by the reference operator (&), followed by the reference name. References must be initialized at the time of creation. Example 1
+
+int hisAge;
+int &rAge = hisAge;
+
+Example 2
+
+CAT boots;
+CAT &rCatRef = boots;
+
+Null Pointers and Null References
+
+When pointers are not initialized, or when they are deleted, they ought to be assigned to null (0). This is not true for references. In fact, a reference cannot be null, and a program with a reference to a null object is considered an invalid program. When a program is invalid, just about anything can happen. It can appear to work, or it can erase all the files on your disk. Both are possible outcomes of an invalid program.
+
+Most compilers will support a null object without much complaint, crashing only if you try to use the object in some way. Taking advantage of this, however, is still not a good idea. When you move your program to another machine or compiler, mysterious bugs may develop if you have null objects.
+Passing Function Arguments by Reference
+
+On Day 5, "Functions," you learned that functions have two limitations: Arguments are passed by value, and the return statement can return only one value.
+
+Passing values to a function by reference can overcome both of these limitations. In C++, passing by reference is accomplished in two ways: using pointers and using references. The syntax is different, but the net effect is the same. Rather than a copy being created within the scope of the function, the actual original object is passed into the function.
+
+    NOTE: If you read the extra credit section after Day 5, you learned that functions are passed their parameters on the stack. When a function is passed a value by reference (either using pointers or references), the address of the object is put on the stack, not the entire object. In fact, on some computers the address is actually held in a register and nothing is put on the stack. In either case, the compiler now knows how to get to the original object, and changes are made there and not in a copy. 
+
+Passing an object by reference allows the function to change the object being referred to.
+
+Recall that Listing 5.5 in Day 5 demonstrated that a call to the swap() function did not affect the values in the calling function. Listing 5.5 is reproduced here as Listing 9.5, for your convenience.
+Listing 9.5. Demonstrating passing by value.
+
+1:     //Listing 9.5 Demonstrates passing by value
+2:
+3:      #include <iostream.h>
+4:
+5:      void swap(int x, int y);
+6:
+7:      int main()
+8:      {
+9:        int x = 5, y = 10;
+10:
+11:        cout << "Main. Before swap, x: " << x << " y: " << y << "\n";
+12:        swap(x,y);
+13:        cout << "Main. After swap, x: " << x << " y: " << y << "\n";
+14:     return 0;
+15:     }
+16:
+17:      void swap (int x, int y)
+18:      {
+19:        int temp;
+20:
+21:        cout << "Swap. Before swap, x: " << x << " y: " << y << "\n";
+22:
+23:        temp = x;
+24:        x = y;
+25:        y = temp;
+26:
+27:        cout << "Swap. After swap, x: " << x << " y: " << y << "\n";
+28:
+29: }
+
+Output: Main. Before swap, x: 5 y: 10
+Swap. Before swap, x: 5 y: 10
+Swap. After swap, x: 10 y: 5
+Main. After swap, x: 5 y: 10
+
+Anaylsis: This program initializes two variables in main() and then passes them to the swap() function, which appears to swap them. When they are examined again in main(), they are unchanged!
+The problem here is that x and y are being passed to swap() by value. That is, local copies were made in the function. What you want is to pass x and y by reference.
+
+There are two ways to solve this problem in C++: You can make the parameters of swap() pointers to the original values, or you can pass in references to the original values.
+Making swap() Work with Pointers
+
+When you pass in a pointer, you pass in the address of the object, and thus the function can manipulate the value at that address. To make swap() change the actual values using pointers, the function, swap(), should be declared to accept two int pointers. Then, by dereferencing the pointers, the values of x and y will, in fact, be swapped. Listing 9.6 demonstrates this idea.
+
+Listing 9.6. Passing by reference using pointers.
+
+
+1:     //Listing 9.6 Demonstrates passing by reference
+2:
+3:      #include <iostream.h>
+4:
+5:      void swap(int *x, int *y);
+6:
+7:      int main()
+8:      {
+9:        int x = 5, y = 10;
+10:
+11:        cout << "Main. Before swap, x: " << x << " y: " << y << "\n";
+12:        swap(&x,&y);
+13:        cout << "Main. After swap, x: " << x << " y: " << y << "\n";
+14:     return 0;
+15:      }
+16
+17:      void swap (int *px, int *py)
+18:      {
+19:        int temp;
+20:
+21:        cout << "Swap. Before swap, *px: " << *px << " *py: " << *py << "\n";
+22:
+23:        temp = *px;
+24:        *px = *py;
+25:        *py = temp;
+26:
+27:        cout << "Swap. After swap, *px: " << *px << " *py: " << *py << "\n";
+28:
+29: }
+
+Output: Main. Before swap, x: 5 y: 10
+Swap. Before swap, *px: 5 *py: 10
+Swap. After swap, *px: 10 *py: 5
+Main. After swap, x: 10 y: 5
+
+Anaylsis: Success! On line 5, the prototype of swap() is changed to indicate that its two parameters will be pointers to int rather than int variables. When swap() is called on line 12, the addresses of x and y are passed as the arguments.
+On line 19, a local variable, temp, is declared in the swap() function. Temp need not be a pointer; it will just hold the value of *px (that is, the value of x in the calling function) for the life of the function. After the function returns, temp will no longer be needed.
+
+On line 23, temp is assigned the value at px. On line 24, the value at px is assigned to the value at py. On line 25, the value stashed in temp (that is, the original value at px) is put into py.
+
+The net effect of this is that the values in the calling function, whose address was passed to swap(), are, in fact, swapped.
+Implementing swap() with References
+
+The preceding program works, but the syntax of the swap() function is cumbersome in two ways. First, the repeated need to dereference the pointers within the swap() function makes it error-prone and hard to read. Second, the need to pass the address of the variables in the calling function makes the inner workings of swap() overly apparent to its users.
+
+It is a goal of C++ to prevent the user of a function from worrying about how it works. Passing by pointers takes the burden off of the called function, and puts it where it belongs--on the calling function. Listing 9.7 rewrites the swap() function, using references.
+
+Listing 9.7. swap() rewritten with references.
+
+
+1:     //Listing 9.7 Demonstrates passing by reference
+2:      // using references!
+3:
+4:        #include <iostream.h>
+5:
+6:        void swap(int &x, int &y);
+7:
+8:        int main()
+9:        {
+10:            int x = 5, y = 10;
+11:
+12:            cout << "Main. Before swap, x: " << x << " y: " << y << "\n";
+13:             swap(x,y);
+14:             cout << "Main. After swap, x: " << x << " y: " << y << "\n";
+15:     return 0;
+16:           }
+17:
+18:           void swap (int &rx, int &ry)
+19:           {
+20:             int temp;
+21:
+22:                cout << "Swap. Before swap, rx: " << rx << " ry: " << ry << "\n";
+23:
+24:                temp = rx;
+25:                rx = ry;
+26:                ry = temp;
+27:
+28:                cout << "Swap. After swap, rx: " << rx << " ry: " << ry << "\n";
+29:
+30: }
+Output: Main. Before swap, x:5 y: 10
+Swap. Before swap, rx:5 ry:10
+Swap. After swap, rx:10 ry:5
+Main. After swap, x:10, y:5
+
+Anaylsis:Just as in the example with pointers, two variables are declared on line 10 and their values are printed on line 12. On line 13, the function swap() is called, but note that x and y, not their addresses, are passed. The calling function simply passes the variables.
+When swap() is called, program execution jumps to line 18, where the variables are identified as references. Their values are printed on line 22, but note that no special operators are required. These are aliases for the original values, and can be used as such.
+
+On lines 24-26, the values are swapped, and then they're printed on line 28. Program execution jumps back to the calling function, and on line 14, the values are printed in main(). Because the parameters to swap() are declared to be references, the values from main() are passed by reference, and thus are changed in main() as well.
+
+References provide the convenience and ease of use of normal variables, with the power and pass-by-reference capability of pointers!
+Understanding Function Headers and Prototypes
+
+Listing 9.6 shows swap() using pointers, and Listing 9.7 shows it using references. Using the function that takes references is easier, and the code is easier to read, but how does the calling function know if the values are passed by reference or by value? As a client (or user) of swap(), the programmer must ensure that swap() will, in fact, change the parameters.
+
+This is another use for the function prototype. By examining the parameters declared in the prototype, which is typically in a header file along with all the other prototypes, the programmer knows that the values passed into swap() are passed by reference, and thus will be swapped properly.
+
+If swap() had been a member function of a class, the class declaration, also available in a header file, would have supplied this information.
+
+In C++, clients of classes and functions rely on the header file to tell all that is needed; it acts as the interface to the class or function. The actual implementation is hidden from the client. This allows the programmer to focus on the problem at hand and to use the class or function without concern for how it works.
+
+When Colonel John Roebling designed the Brooklyn Bridge, he worried in detail about how the concrete was poured and how the wire for the bridge was manufactured. He was intimately involved in the mechanical and chemical processes required to create his materials. Today, however, engineers make more efficient use of their time by using well-understood building materials, without regard to how their manufacturer produced them.
+
+It is the goal of C++ to allow programmers to rely on well-understood classes and functions without regard to their internal workings. These "component parts" can be assembled to produce a program, much the same way wires, pipes, clamps, and other parts are assembled to produce buildings and bridges.
+
+In much the same way that an engineer examines the spec sheet for a pipe to determine its load-bearing capacity, volume, fitting size, and so forth, a C++ programmer reads the interface of a function or class to determine what services it provides, what parameters it takes, and what values it returns.
+Returning Multiple Values
+
+As discussed, functions can only return one value. What if you need to get two values back from a function? One way to solve this problem is to pass two objects into the function, by reference. The function can then fill the objects with the correct values. Since passing by reference allows a function to change the original objects, this effectively lets the function return two pieces of information. This approach bypasses the return value of the function, which can then be reserved for reporting errors.
+
+Once again, this can be done with references or pointers. Listing 9.8 demonstrates a function that returns three values: two as pointer parameters and one as the return value of the function.
+
+Listing 9.8. Returning values with pointers.
+
+
+1:     //Listing 9.8
+2:     // Returning multiple values from a function
+3:
+4:     #include <iostream.h>
+5:
+6:     typedef unsigned short USHORT;
+7:
+8:     short Factor(USHORT, USHORT*, USHORT*);
+9:
+10:    int main()
+11:    {
+12:       USHORT number, squared, cubed;
+13:       short error;
+14:
+15:       cout << "Enter a number (0 - 20): ";
+16:       cin >> number;
+17:
+18:       error = Factor(number, &squared, &cubed);
+19:
+20:       if (!error)
+21:       {
+22:           cout << "number: " << number << "\n";
+23:           cout << "square: " << squared << "\n";
+24:           cout << "cubed: "  << cubed   << "\n";
+25:       }
+26:       else
+27:       cout << "Error encountered!!\n";
+28:     return 0;
+29:    }
+30:
+31:    short Factor(USHORT n, USHORT *pSquared, USHORT *pCubed)
+32:    {
+33:    short Value = 0;
+34:       if (n > 20)
+35:          Value = 1;
+36:       else
+37:       {
+38:           *pSquared = n*n;
+39:           *pCubed = n*n*n;
+40:           Value = 0;
+41:       }
+42:       return Value;
+43: }
+Output: Enter a number (0-20): 3
+number: 3
+square: 9
+cubed: 27
+
+Anaylsis: On line 12, number, squared, and cubed are defined as USHORTs. number is assigned a value based on user input. This number and the addresses of squared and cubed are passed to the function Factor().
+Factor()examines the first parameter, which is passed by value. If it is greater than 20 (the maximum value this function can handle), it sets return Value to a simple error value. Note that the return value from Function() is reserved for either this error value or the value 0, indicating all went well, and note that the function returns this value on line 42.
+
+The actual values needed, the square and cube of number, are returned not by using the return mechanism, but rather by changing the pointers that were passed into the function.
+
+On lines 38 and 39, the pointers are assigned their return values. On line 40, return Value is assigned a success value. On line 41, return Value is returned.
+
+One improvement to this program might be to declare the following:
+
+enum ERROR_VALUE { SUCCESS, FAILURE};
+
+Then, rather than returning 0 or 1, the program could return SUCCESS or FAILURE.
+Returning Values by Reference
+
+Although Listing 9.8 works, it can be made easier to read and maintain by using references rather than pointers. Listing 9.9 shows the same program rewritten to use references and to incorporate the ERROR enumeration.
+
+Listing 9.9.Listing 9.8 rewritten using references.
+
+
+1:     //Listing 9.9
+2:      // Returning multiple values from a function
+3:      // using references
+4:
+5:      #include <iostream.h>
+6:
+7:      typedef unsigned short USHORT;
+8:      enum ERR_CODE { SUCCESS, ERROR };
+9:
+10:      ERR_CODE Factor(USHORT, USHORT&, USHORT&);
+11:
+12:      int main()
+13:      {
+14:           USHORT number, squared, cubed;
+15:           ERR_CODE result;
+16:
+17:           cout << "Enter a number (0 - 20): ";
+18:           cin >> number;
+19:
+20:           result = Factor(number, squared, cubed);
+21:
+22:           if (result == SUCCESS)
+23:           {
+24:                 cout << "number: " << number << "\n";
+25:                 cout << "square: " << squared << "\n";
+26:                 cout << "cubed: "  << cubed   << "\n";
+27:           }
+28:           else
+29:           cout << "Error encountered!!\n";
+30:     return 0;
+31:      }
+32:
+33:      ERR_CODE Factor(USHORT n, USHORT &rSquared, USHORT &rCubed)
+34:      {
+35:           if (n > 20)
+36:                return ERROR;   // simple error code
+37:           else
+38:           {
+39:                rSquared = n*n;
+40:                rCubed = n*n*n;
+41:                return SUCCESS;
+42:           }
+43: }
+
+Output: Enter a number (0 - 20): 3
+number: 3
+square: 9
+cubed: 27
+
+Anaylsis: Listing 9.9 is identical to 9.8, with two exceptions. The ERR_CODE enumeration makes the error reporting a bit more explicit on lines 36 and 41, as well as the error handling on line 22.
+
+The larger change, however, is that Factor() is now declared to take references to squared and cubed rather than to pointers. This makes the manipulation of these parameters far simpler and easier to understand.
+Passing by Reference for Efficiency
+
+Each time you pass an object into a function by value, a copy of the object is made. Each time you return an object from a function by value, another copy is made.
+
+In the "Extra Credit" section at the end of Day 5, you learned that these objects are copied onto the stack. Doing so takes time and memory. For small objects, such as the built-in integer values, this is a trivial cost.
+
+However, with larger, user-created objects, the cost is greater. The size of a user-created object on the stack is the sum of each of its member variables. These, in turn, can each be user-created objects, and passing such a massive structure by copying it onto the stack can be very expensive in performance and memory consumption.
+
+There is another cost as well. With the classes you create, each of these temporary copies is created when the compiler calls a special constructor: the copy constructor. Tomorrow you will learn how copy constructors work and how you can make your own, but for now it is enough to know that the copy constructor is called each time a temporary copy of the object is put on the stack.
+
+When the temporary object is destroyed, which happens when the function returns, the object's destructor is called. If an object is returned by the function by value, a copy of that object must be made and destroyed as well.
+
+With large objects, these constructor and destructor calls can be expensive in speed and use of memory. To illustrate this idea, Listing 9.9 creates a stripped-down user-created object: SimpleCat. A real object would be larger and more expensive, but this is sufficient to show how often the copy constructor and destructor are called.
+
+Listing 9.10 creates the SimpleCat object and then calls two functions. The first function receives the Cat by value and then returns it by value. The second one receives a pointer to the object, rather than the object itself, and returns a pointer to the object.
+
+Listing 9.10. Passing objects by reference.
+
+
+1:   //Listing 9.10
+2:   // Passing pointers to objects
+3:
+4:   #include <iostream.h>
+5:
+6:   class SimpleCat
+7:   {
+8:   public:
+9:           SimpleCat ();                    // constructor
+10:          SimpleCat(SimpleCat&);     // copy constructor
+11:          ~SimpleCat();                    // destructor
+12:   };
+13:
+14:   SimpleCat::SimpleCat()
+15:   {
+16:          cout << "Simple Cat Constructor...\n";
+17:   }
+18:
+19:   SimpleCat::SimpleCat(SimpleCat&)
+20:   {
+21:          cout << "Simple Cat Copy Constructor...\n";
+22:   }
+23:
+24:   SimpleCat::~SimpleCat()
+25:   {
+26:          cout << "Simple Cat Destructor...\n";
+27:   }
+28:
+29:   SimpleCat FunctionOne (SimpleCat theCat);
+30:   SimpleCat* FunctionTwo (SimpleCat *theCat);
+31:
+32:   int main()
+33:   {
+34:          cout << "Making a cat...\n";
+35:          SimpleCat Frisky;
+36:          cout << "Calling FunctionOne...\n";
+37:          FunctionOne(Frisky);
+38:          cout << "Calling FunctionTwo...\n";
+39:          FunctionTwo(&Frisky);
+40:     return 0;
+41:   }
+42:
+43:   // FunctionOne, passes by value
+44:   SimpleCat FunctionOne(SimpleCat theCat)
+45:   {
+46:                   cout << "Function One. Returning...\n";
+47:                   return theCat;
+48:   }
+49:
+50:   // functionTwo, passes by reference
+51:   SimpleCat* FunctionTwo (SimpleCat  *theCat)
+52:   {
+53:                   cout << "Function Two. Returning...\n";
+54:                   return theCat;
+55: }
+
+Output: 1:  Making a cat...
+2:  Simple Cat Constructor...
+3:  Calling FunctionOne...
+4:  Simple Cat Copy Constructor...
+5:  Function One. Returning...
+6:  Simple Cat Copy Constructor...
+7:  Simple Cat Destructor...
+8:  Simple Cat Destructor...
+9:  Calling FunctionTwo...
+10: Function Two. Returning...
+11: Simple Cat Destructor...
+
+    NOTE: Line numbers will not print. They were added to aid in the analysis. 
+
+Anaylsis: A very simplified SimpleCat class is declared on lines 6-12. The constructor, copy constructor, and destructor all print an informative message so that you can tell when they've been called.
+On line 34, main() prints out a message, and that is seen on output line 1. On line 35, a SimpleCat object is instantiated. This causes the constructor to be called, and the output from the constructor is seen on output line 2.
+
+On line 36, main() reports that it is calling FunctionOne, which creates output line 3. Because FunctionOne() is called passing the SimpleCat object by value, a copy of the SimpleCat object is made on the stack as an object local to the called function. This causes the copy constructor to be called, which creates output line 4.
+
+Program execution jumps to line 46 in the called function, which prints an informative message, output line 5. The function then returns, and returns the SimpleCat object by value. This creates yet another copy of the object, calling the copy constructor and producing line 6.
+
+The return value from FunctionOne() is not assigned to any object, and so the temporary created for the return is thrown away, calling the destructor, which produces output line 7. Since FunctionOne() has ended, its local copy goes out of scope and is destroyed, calling the destructor and producing line 8.
+
+Program execution returns to main(), and FunctionTwo() is called, but the parameter is passed by reference. No copy is produced, so there's no output. FunctionTwo() prints the message that appears as output line 10 and then returns the SimpleCat object, again by reference, and so again produces no calls to the constructor or destructor.
+
+Finally, the program ends and Frisky goes out of scope, causing one final call to the destructor and printing output line 11.
+
+The net effect of this is that the call to FunctionOne(), because it passed the cat by value, produced two calls to the copy constructor and two to the destructor, while the call to FunctionTwo() produced none.
+Passing a const Pointer
+
+Although passing a pointer to FunctionTwo() is more efficient, it is dangerous. FunctionTwo() is not allowed to change the SimpleCat object it is passed, yet it is given the address of the SimpleCat. This seriously exposes the object to change and defeats the protection offered in passing by value.
+
+Passing by value is like giving a museum a photograph of your masterpiece instead of the real thing. If vandals mark it up, there is no harm done to the original. Passing by reference is like sending your home address to the museum and inviting guests to come over and look at the real thing.
+
+The solution is to pass a const pointer to SimpleCat. Doing so prevents calling any non-const method on SimpleCat, and thus protects the object from change. Listing 9.11 demonstrates this idea.
+
+Listing 9.11. Passing const pointers.
+
+
+1:  //Listing 9.11
+2:       // Passing pointers to objects
+3:
+4:         #include <iostream.h>
+5:
+6:         class SimpleCat
+7:         {
+8:         public:
+9:                 SimpleCat();
+10:                 SimpleCat(SimpleCat&);
+11:                 ~SimpleCat();
+12:
+13:                 int GetAge() const { return itsAge; }
+14:                 void SetAge(int age) { itsAge = age; }
+15:
+16:         private:
+17:                 int itsAge;
+18:            };
+19:
+20:            SimpleCat::SimpleCat()
+21:            {
+22:                   cout << "Simple Cat Constructor...\n";
+23:                   itsAge = 1;
+24:            }
+25:
+26:            SimpleCat::SimpleCat(SimpleCat&)
+27:            {
+28:                   cout << "Simple Cat Copy Constructor...\n";
+29:            }
+30:
+31:            SimpleCat::~SimpleCat()
+32:            {
+33:                   cout << "Simple Cat Destructor...\n";
+34:            }
+35:
+36:const SimpleCat * const FunctionTwo (const SimpleCat * const theCat);
+37:
+38:            int main()
+39:            {
+40:                   cout << "Making a cat...\n";
+41:                   SimpleCat Frisky;
+42:                   cout << "Frisky is " ;
+43                    cout << Frisky.GetAge();
+44:                   cout << " years _old\n";
+45:                   int age = 5;
+46:                   Frisky.SetAge(age);
+47:                   cout << "Frisky is " ;
+48                    cout << Frisky.GetAge();
+49:                   cout << " years _old\n";
+50:                   cout << "Calling FunctionTwo...\n";
+51:                   FunctionTwo(&Frisky);
+52:                   cout << "Frisky is " ;
+53                    cout << Frisky.GetAge();
+54:                   cout << " years _old\n";
+55:     return 0;
+56:            }
+57:
+58:    // functionTwo, passes a const pointer
+59:    const SimpleCat * const FunctionTwo (const SimpleCat * const theCat)
+60:    {
+61:             cout << "Function Two. Returning...\n";
+62:             cout << "Frisky is now " << theCat->GetAge();
+63:             cout << " years old \n";
+64:             // theCat->SetAge(8);   const!
+65:             return theCat;
+66: }
+
+Output: Making a cat...
+Simple Cat constructor...
+Frisky is 1 years old
+Frisky is 5 years old
+Calling FunctionTwo...
+FunctionTwo. Returning...
+Frisky is now 5 years old
+Frisky is 5 years old
+Simple Cat Destructor...
+
+Anaylsis: SimpleCat has added two accessor functions, GetAge() on line 13, which is a const function, and SetAge() on line 14, which is not a const function. It has also added the member variable itsAge on line 17.
+The constructor, copy constructor, and destructor are still defined to print their messages. The copy constructor is never called, however, because the object is passed by reference and so no copies are made. On line 41, an object is created, and its default age is printed, starting on line 42.
+
+On line 46, itsAge is set using the accessor SetAge, and the result is printed on line 47. FunctionOne is not used in this program, but FunctionTwo() is called. FunctionTwo() has changed slightly; the parameter and return value are now declared, on line 36, to take a constant pointer to a constant object and to return a constant pointer to a constant object.
+
+Because the parameter and return value are still passed by reference, no copies are made and the copy constructor is not called. The pointer in FunctionTwo(), however, is now constant, and thus cannot call the non-const method, SetAge(). If the call to SetAge() on line 64 was not commented out, the program would not compile.
+
+Note that the object created in main() is not constant, and Frisky can call SetAge(). The address of this non-constant object is passed to FunctionTwo(), but because FunctionTwo()'s declaration declares the pointer to be a constant pointer, the object is treated as if it were constant!
+References as an Alternative
+
+Listing 9.11 solves the problem of making extra copies, and thus saves the calls to the copy constructor and destructor. It uses constant pointers to constant objects, and thereby solves the problem of the function changing the object. It is still somewhat cumbersome, however, because the objects passed to the function are pointers.
+
+Since you know the object will never be null, it would be easier to work with in the function if a reference were passed in, rather than a pointer. Listing 9.12 illustrates this.
+
+Listing 9.12. Passing references to objects.
+
+
+1: //Listing 9.12
+2: // Passing references to objects
+3:
+4:   #include <iostream.h>
+5:
+6:   class SimpleCat
+7:   {
+8:   public:
+9:           SimpleCat();
+10:           SimpleCat(SimpleCat&);
+11:           ~SimpleCat();
+12:
+13:           int GetAge() const { return itsAge; }
+14:           void SetAge(int age) { itsAge = age; }
+15:
+16:   private:
+17:           int itsAge;
+18:      };
+19:
+20:      SimpleCat::SimpleCat()
+21:      {
+22:             cout << "Simple Cat Constructor...\n";
+23:             itsAge = 1;
+24:      }
+25:
+26:      SimpleCat::SimpleCat(SimpleCat&)
+27:      {
+28:             cout << "Simple Cat Copy Constructor...\n";
+29:      }
+30:
+31:      SimpleCat::~SimpleCat()
+32:      {
+33:             cout << "Simple Cat Destructor...\n";
+34:      }
+35:
+36:      const     SimpleCat & FunctionTwo (const SimpleCat & theCat);
+37:
+38:      int main()
+39:      {
+40:             cout << "Making a cat...\n";
+41:             SimpleCat Frisky;
+42:             cout << "Frisky is " << Frisky.GetAge() << " years old\n";
+43:             int age = 5;
+44:             Frisky.SetAge(age);
+45:             cout << "Frisky is " << Frisky.GetAge() << " years old\n";
+46:             cout << "Calling FunctionTwo...\n";
+47:             FunctionTwo(Frisky);
+48:             cout << "Frisky is " << Frisky.GetAge() << " years old\n";
+49:     return 0;
+50:      }
+51:
+52:      // functionTwo, passes a ref to a const object
+53:      const SimpleCat & FunctionTwo (const SimpleCat & theCat)
+54:      {
+55:                      cout << "Function Two. Returning...\n";
+56:                      cout << "Frisky is now " << theCat.GetAge();
+57:                      cout << " years old \n";
+58:                      // theCat.SetAge(8);   const!
+59:                      return theCat;
+60: }
+
+Output: Making a cat...
+Simple Cat constructor...
+Frisky is 1 years old
+Frisky is 5 years old
+Calling FunctionTwo...
+FunctionTwo. Returning...
+Frisky is now 5 years old
+Frisky is 5 years old
+Simple Cat Destructor...
+
+Analysis: The output is identical to that produced by Listing 9.11. The only significant change is that FunctionTwo() now takes and returns a reference to a constant object. Once again, working with references is somewhat simpler than working with pointers, and the same savings and efficiency are achieved, as well as the safety provided by using const.
+const References
+
+C++ programmers do not usually differentiate between "constant reference to a SimpleCat object" and "reference to a constant SimpleCat object." References themselves can never be reassigned to refer to another object, and so are always constant. If the keyword const is applied to a reference, it is to make the object referred to constant.
+When to Use References and When to Use Pointers
+
+C++ programmers strongly prefer references to pointers. References are cleaner and easier to use, and they do a better job of hiding information, as we saw in the previous example.
+
+References cannot be reassigned, however. If you need to point first to one object and then another, you must use a pointer. References cannot be null, so if there is any chance that the object in question may be null, you must not use a reference. You must use a pointer.
+
+An example of the latter concern is the operator new. If new cannot allocate memory on the free store, it returns a null pointer. Since a reference can't be null, you must not initialize a reference to this memory until you've checked that it is not null. The following example shows how to handle this:
+
+int *pInt = new int;
+if (pInt != NULL)
+int &rInt = *pInt;
+
+In this example a pointer to int, pInt, is declared and initialized with the memory returned by the operator new. The address in pInt is tested, and if it is not null, pInt is dereferenced. The result of dereferencing an int variable is an int object, and rInt is initialized to refer to that object. Thus, rInt becomes an alias to the int returned by the operator new.
+
+    DO pass parameters by reference whenever possible. DO return by reference whenever possible. DON'T use pointers if references will work. DO use const to protect references and pointers whenever possible. DON'T return a reference to a local object. 
+
+Mixing References and Pointers
+
+It is perfectly legal to declare both pointers and references in the same function parameter list, along with objects passed by value. Here's an example:
+
+CAT * SomeFunction (Person &theOwner, House *theHouse, int age);
+
+This declaration says that SomeFunction takes three parameters. The first is a reference to a Person object, the second is a pointer to a house object, and the third is an integer. It returns a pointer to a CAT object.
+
+    NOTE: The question of where to put the reference (&) or indirection (*) operator when declaring these variables is a great controversy. You may legally write any of the following: 
+
+1:  CAT&  rFrisky;
+2:  CAT & rFrisky;
+3:  CAT  &rFrisky;
+
+White space is completely ignored, so anywhere you see a space here you may put as many spaces, tabs, and new lines as you like. Setting aside freedom of expression issues, which is best? Here are the arguments for all three: The argument for case 1 is that rFrisky is a variable whose name is rFrisky and whose type can be thought of as "reference to CAT object." Thus, this argument goes, the & should be with the type. The counterargument is that the type is CAT. The & is part of the "declarator," which includes the variable name and the ampersand. More important, having the & near the CAT can lead to the following bug:
+
+CAT&  rFrisky, rBoots;
+
+Casual examination of this line would lead you to think that both rFrisky and rBoots are references to CAT objects, but you'd be wrong. This really says that rFrisky is a reference to a CAT, and rBoots (despite its name) is not a reference but a plain old CAT variable. This should be rewritten as follows:
+
+CAT    &rFrisky, rBoots;
+
+The answer to this objection is that declarations of references and variables should never be combined like this. Here's the right answer:
+
+
+CAT& rFrisky;
+CAT  boots;
+
+Finally, many programmers opt out of the argument and go with the middle position, that of putting the & in the middle of the two, as illustrated in case 2. Of course, everything said so far about the reference operator (&) applies equally well to the indirection operator (*). The important thing is to recognize that reasonable people differ in their perceptions of the one true way. Choose a style that works for you, and be consistent within any one program; clarity is, and remains, the goal. This book will adopt two conventions when declaring references and pointers:
+
+    1. Put the ampersand and asterisk in the middle, with a space on either side.
+
+    2. Never declare references, pointers, and variables all on the same line. 
+
+Dont Return a Reference to an Object that Isnt in Scope!
+
+Once C++ programmers learn to pass by reference, they have a tendency to go hog-wild. It is possible, however, to overdo it. Remember that a reference is always an alias to some other object. If you pass a reference into or out of a function, be sure to ask yourself, "What is the object I'm aliasing, and will it still exist every time it's used?"
+
+Listing 9.13 illustrates the danger of returning a reference to an object that no longer exists.
+
+Listing 9.13. Returning a reference to a non-existent object.
+
+
+1:     // Listing 9.13
+2:      // Returning a reference to an object
+3:      // which no longer exists
+4:
+5:      #include <iostream.h>
+6:
+7:      class SimpleCat
+8:      {
+9:      public:
+10:            SimpleCat (int age, int weight);
+11:            ~SimpleCat() {}
+12:            int GetAge() { return itsAge; }
+13:            int GetWeight() { return itsWeight; }
+14:      private:
+15:           int itsAge;
+16:           int itsWeight;
+17:      };
+18:
+19:      SimpleCat::SimpleCat(int age, int weight):
+20:      itsAge(age), itsWeight(weight) {}
+21:
+22:      SimpleCat &TheFunction();
+23:
+24:      int main()
+25:      {
+26:           SimpleCat &rCat = TheFunction();
+27:           int age = rCat.GetAge();
+28:           cout << "rCat is " << age << " years old!\n";
+29:     return 0;
+30:      }
+31:
+32:      SimpleCat &TheFunction()
+33:      {
+34:           SimpleCat Frisky(5,9);
+35:           return Frisky;
+36: }
+Output: Compile error: Attempting to return a reference to a local object!
+
+    WARNING: This program won't compile on the Borland compiler. It will compile on Microsoft compilers; however, it should be noted that it is a bad coding practice. 
+
+Anaylsis: On lines 7-17, SimpleCat is declared. On line 26, a reference to a SimpleCat is initialized with the results of calling TheFunction(), which is declared on line 22 to return a reference to a SimpleCat.
+
+The body of TheFunction() declares a local object of type SimpleCat and initializes its age and weight. It then returns that local object by reference. Some compilers are smart enough to catch this error and won't let you run the program. Others will let you run the program, with unpredictable results.
+
+When TheFunction() returns, the local object, Frisky, will be destroyed (painlessly, I assure you). The reference returned by this function will be an alias to a non-existent object, and this is a bad thing.
+Returning a Reference to an Object on the Heap
+
+You might be tempted to solve the problem in Listing 9.13 by having TheFunction() create Frisky on the heap. That way, when you return from TheFunction(), Frisky will still exist.
+
+The problem with this approach is: What do you do with the memory allocated for Frisky when you are done with it? Listing 9.14 illustrates this problem.
+
+Listing 9.14. Memory leaks.
+
+
+1:     // Listing 9.14
+2:      // Resolving memory leaks
+3:      #include <iostream.h>
+4:
+5:      class SimpleCat
+6:      {
+7:      public:
+8:              SimpleCat (int age, int weight);
+9:             ~SimpleCat() {}
+10:            int GetAge() { return itsAge; }
+11:            int GetWeight() { return itsWeight; }
+12:
+13      private:
+14:           int itsAge;
+15:           int itsWeight;
+16:      };
+17:
+18:      SimpleCat::SimpleCat(int age, int weight):
+19:      itsAge(age), itsWeight(weight) {}
+20:
+21:      SimpleCat & TheFunction();
+22:
+23:      int main()
+24:      {
+25:           SimpleCat & rCat = TheFunction();
+26:           int age = rCat.GetAge();
+27:           cout << "rCat is " << age << " years old!\n";
+28:           cout << "&rCat: " << &rCat << endl;
+29:           // How do you get rid of that memory?
+30:           SimpleCat * pCat = &rCat;
+31:           delete pCat;
+32:           // Uh oh, rCat now refers to ??
+33:     return 0;
+34:      }
+35:
+36:      SimpleCat &TheFunction()
+37:      {
+38:           SimpleCat * pFrisky = new SimpleCat(5,9);
+39:           cout << "pFrisky: " << pFrisky << endl;
+40:           return *pFrisky;
+41: }
+
+Output: pFrisky:  0x2bf4
+rCat is 5 years old!
+&rCat: 0x2bf4
+
+    WARNING: This compiles, links, and appears to work. But it is a time bomb waiting to go off. 
+
+Anaylss: TheFunction() has been changed so that it no longer returns a reference to a local variable. Memory is allocated on the free store and assigned to a pointer on line 38. The address that pointer holds is printed, and then the pointer is dereferenced and the SimpleCat object is returned by reference.
+On line 25, the return of TheFunction() is assigned to a reference to SimpleCat, and that object is used to obtain the cat's age, which is printed on line 27.
+
+To prove that the reference declared in main() is referring to the object put on the free store in TheFunction(), the address of operator is applied to rCat. Sure enough, it displays the address of the object it refers to and this matches the address of the object on the free store.
+
+So far, so good. But how will that memory be freed? You can't call delete on the reference. One clever solution is to create another pointer and initialize it with the address obtained from rCat. This does delete the memory, and plugs the memory leak. One small problem, though: What is rCat referring to after line 31? As stated earlier, a reference must always alias an actual object; if it references a null object (as this does now), the program is invalid.
+
+    NOTE: It cannot be overemphasized that a program with a reference to a null object may compile, but it is invalid and its performance is unpredictable. 
+
+There are actually three solutions to this problem. The first is to declare a SimpleCat object on line 25, and to return that cat from TheFunction by value. The second is to go ahead and declare the SimpleCat on the free store in TheFunction(), but have TheFunction() return a pointer to that memory. Then the calling function can delete the pointer when it is done.
+The third workable solution, and the right one, is to declare the object in the calling function and then to pass it to TheFunction() by reference.
+Pointer, Pointer, Who Has the Pointer?
+
+When your program allocates memory on the free store, a pointer is returned. It is imperative that you keep a pointer to that memory, because once the pointer is lost, the memory cannot be deleted and becomes a memory leak.
+
+As you pass this block of memory between functions, someone will "own" the pointer. Typically the value in the block will be passed using references, and the function that created the memory is the one that deletes it. But this is a general rule, not an ironclad one.
+
+It is dangerous for one function to create memory and another to free it, however. Ambiguity about who owns the pointer can lead to one of two problems: forgetting to delete a pointer or deleting it twice. Either one can cause serious problems in your program. It is safer to build your functions so that they delete the memory they create.
+
+If you are writing a function that needs to create memory and then pass it back to the calling function, consider changing your interface. Have the calling function allocate the memory and then pass it into your function by reference. This moves all memory management out of your program and back to the function that is prepared to delete it.
+
+    DO pass parameters by value when you must. DO return by value when you must. DON'T pass by reference if the item referred to may go out of scope. DON'T use references to null objects. 
+
+Summary
+
+Today you learned what references are and how they compare to pointers. You saw that references must be initialized to refer to an existing object, and cannot be reassigned to refer to anything else. Any action taken on a reference is in fact taken on the reference's target object. Proof of this is that taking the address of a reference returns the address of the target.
+
+You saw that passing objects by reference can be more efficient than passing by value. Passing by reference also allows the called function to change the value in the arguments back in the calling function.
+
+You saw that arguments to functions and values returned from functions can be passed by reference, and that this can be implemented with pointers or with references.
+
+You saw how to use const pointers and const references to safely pass values between functions while achieving the efficiency of passing by reference.
+Q&A
+
+    Q. Why have references if pointers can do everything references can?
+
+    A. References are easier to use and understand. The indirection is hidden, and there is no need to repeatedly dereference the variable.
+
+    Q. Why have pointers if references are easier?
+
+    A. References cannot be null, and they cannot be reassigned. Pointers offer greater flexibility, but are slightly more difficult to use.
+
+    Q. Why would you ever return by value from a function?
+
+    A. If the object being returned is local, you must return by value or you will be returning a reference to a non-existent object.
+
+    Q. Given the danger in returning by reference, why not always return by value?
+
+    A. There is far greater efficiency in returning by reference. Memory is saved and the program runs faster. 
+
+Workshop
+
+The Workshop contains quiz questions to help solidify your understanding of the material covered and exercises to provide you with experience in using what you've learned. Try to answer the quiz and exercise questions before checking the answers in Appendix D, and make sure you understand the answers before going to the next chapter.
+Quiz
+
+    1. What is the difference between a reference and a pointer?
+
+    2. When must you use a pointer rather than a reference?
+
+    3. What does new return if there is insufficient memory to make your new object?
+
+    4. What is a constant reference?
+
+    5. What is the difference between passing by reference and passing a reference? 
+
+Exercises
+
+    1. Write a program that declares an int, a reference to an int, and a pointer to an int. Use the pointer and the reference to manipulate the value in the int.
+
+    2. Write a program that declares a constant pointer to a constant integer. Initialize the pointer to an integer variable, varOne. Assign 6 to varOne. Use the pointer to assign 7 to varOne. Create a second integer variable, varTwo. Reassign the pointer to varTwo.
+
+    3. Compile the program in Exercise 2. What produces errors? What produces warnings?
+
+    4. Write a program that produces a stray pointer.
+
+    5. Fix the program from Exercise 4.
+
+    6. Write a program that produces a memory leak.
+
+    7. Fix the program from Exercise 6.
+
+    8. BUG BUSTERS: What is wrong with this program? 
+
+1:     #include <iostream.h>
+2:
+3:     class CAT
+4:     {
+5:        public:
+6:           CAT(int age) { itsAge = age; }
+7:           ~CAT(){}
+8:           int GetAge() const { return itsAge;}
+9:        private:
+10:          int itsAge;
+11:    };
+12:
+13:    CAT & MakeCat(int age);
+14:    int main()
+15:    {
+16:       int age = 7;
+17:       CAT Boots = MakeCat(age);
+18:       cout << "Boots is " << Boots.GetAge() << " years old\n";
+19:    }
+20:
+21:    CAT & MakeCat(int age)
+22:    {
+23:       CAT * pCat = new CAT(age);
+24:       return *pCat;
+25:    }
+
+    9. Fix the program from Exercise 8.
+
+
